@@ -6,6 +6,7 @@ import 'package:cw_trainer/cw.dart';
 import 'package:cw_trainer/wav.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -33,7 +34,8 @@ void main() async {
 
 class AudioPlayerHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
-  String _s = "SOS ";
+  FlutterTts _tts = FlutterTts();
+  String _s = "";
   MorseGenerator _generator = MorseGenerator.fromEwpm(12, 12, sampleRate, 500);
 
   AudioPlayerHandler() {
@@ -53,6 +55,11 @@ class AudioPlayerHandler extends BaseAudioHandler {
     switch (name) {
       case 'setString':
         _s = extras!['s'];
+        List<int> frames;
+        frames = _generator.stringToPcm(_s);
+
+        // Load the player.
+        _player.setAudioSource(WavSource(frames));
         break;
       case 'configureMorse':
         _generator = MorseGenerator.fromEwpm(
@@ -64,11 +71,6 @@ class AudioPlayerHandler extends BaseAudioHandler {
 
   @override
   Future<void> play() {
-    List<int> frames;
-    frames = _generator.stringToPcm(_s);
-
-    // Load the player.
-    _player.setAudioSource(WavSource(frames));
     print('AudioPlayerHandler play');
     return _player.play();
   }
@@ -85,8 +87,16 @@ class AudioPlayerHandler extends BaseAudioHandler {
     return _player.stop();
   }
 
-  void _justAudioCompleted() {
+  void _justAudioCompleted() async {
     print('just_audio completed');
+    var voice = await _tts.getDefaultVoice;
+    var engine = await _tts.getDefaultEngine;
+    print('tts $voice $engine');
+    await _tts.awaitSpeakCompletion(true);
+    _tts.setVolume(1.0);
+    _tts.setPitch(1.0);
+    _tts.setSpeechRate(1.0);
+    await _tts.speak(_s);
   }
 
   /// Transform a just_audio event into an audio_service state.
