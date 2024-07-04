@@ -8,6 +8,7 @@ environment:
 
 dependencies:
   audio_service: ^0.18.13
+  audio_session: ^0.1.19
   characters: ^1.3.0
   flutter:
     sdk: flutter

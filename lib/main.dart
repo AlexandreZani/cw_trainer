@@ -1,7 +1,9 @@
+import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:cw_trainer/cw.dart';
 import 'package:cw_trainer/wav.dart';
 import 'package:just_audio/just_audio.dart';
@@ -14,15 +16,30 @@ import 'dart:io';
 late AudioHandler _audioHandler;
 
 extension CwTrainerAudioHandler on AudioHandler {
-  Future<void> playString(String s) async {
-    await _audioHandler.customAction('setString', {'s': s});
-    await _audioHandler.play();
+  Future<void> setMorseParameters(int wpm, int ewpm, int frequency) async {
+    await _audioHandler.customAction('setMorseParameters', {
+      'wpm': wpm,
+      'ewpm': ewpm,
+      'frequency': frequency,
+    });
+  }
+
+  Future<void> appendAudioItems(List<AudioItem> items) async {
+    _audioHandler.customAction('appendAudioItems', {'items': items});
+  }
+
+  Future<void> appendAudioItem(AudioItem item) async {
+    _audioHandler.appendAudioItems([item]);
+  }
+
+  Future<void> clearAudioItems() async {
+    _audioHandler.customAction('clearAudioItems');
   }
 }
 
 void main() async {
   _audioHandler = await AudioService.init(
-    builder: () => AudioPlayerHandler(),
+    builder: () => MorseAudioHandler(),
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'io.zfc.cw_trainer',
       androidNotificationChannelName: 'Audio playback',
@@ -32,71 +49,149 @@ void main() async {
   runApp(const MyApp());
 }
 
-class AudioPlayerHandler extends BaseAudioHandler {
-  final _player = AudioPlayer();
-  FlutterTts _tts = FlutterTts();
-  String _s = "";
-  MorseGenerator _generator = MorseGenerator.fromEwpm(12, 12, sampleRate, 500);
+enum AudioItemType {
+  morse,
+  text,
+}
 
-  AudioPlayerHandler() {
+class AudioItem {
+  final String value;
+  final AudioItemType type;
+
+  AudioItem(this.value, this.type);
+}
+
+class MorseAudioHandler extends BaseAudioHandler {
+  final _player = AudioPlayer();
+  final FlutterTts _flutterTts = FlutterTts();
+
+  int _wpm = 12;
+  int _ewpm = 12;
+  int _frequency = 500;
+
+  final Queue<AudioItem> _queue = Queue<AudioItem>();
+  AudioItem? _current;
+
+  MorseAudioHandler() {
     // So that our clients (the Flutter UI and the system notification) know
     // what state to display, here we set up our audio handler to broadcast all
     // playback state changes as they happen via playbackState...
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
     _player.playbackEventStream.listen((PlaybackEvent event) {
       if (event.processingState == ProcessingState.completed) {
-        _justAudioCompleted();
+        _completed();
       }
     });
+    _flutterTts.setCompletionHandler(_completed);
   }
 
   @override
-  Future<dynamic> customAction(String name, [Map<String, dynamic>? extras]) {
+  Future<dynamic> customAction(String name,
+      [Map<String, dynamic>? extras]) async {
     switch (name) {
-      case 'setString':
-        _s = extras!['s'];
-        List<int> frames;
-        frames = _generator.stringToPcm(_s);
+      case 'appendAudioItems':
+        _queue.addAll(extras!['items']);
+        return null;
 
-        // Load the player.
-        _player.setAudioSource(WavSource(frames));
-        break;
-      case 'configureMorse':
-        _generator = MorseGenerator.fromEwpm(
-            extras!['wpm'], extras['ewpm'], sampleRate, extras['frequency']);
-        break;
+      case 'clearAudioItems':
+        _queue.clear();
+        return null;
+
+      case 'setMorseParameters':
+        _setMorseParameters(
+            extras!['wpm'], extras['ewpm'], extras['frequency']);
+        return null;
     }
     return super.customAction(name, extras);
   }
 
+  void _setMorseParameters(int wpm, int ewpm, int frequency) {
+    _wpm = wpm;
+    _ewpm = ewpm;
+    _frequency = frequency;
+  }
+
+  MorseGenerator _getMorseGenerator() {
+    return MorseGenerator.fromEwpm(_wpm, _ewpm, sampleRate, _frequency);
+  }
+
+  Future<void> _completed() async {
+    print('AudioPlayerHandler completed');
+    _current = null;
+    if (_queue.isNotEmpty) {
+      play();
+    }
+  }
+
   @override
-  Future<void> play() {
+  Future<void> play() async {
     print('AudioPlayerHandler play');
-    return _player.play();
+    if (_current == null) {
+      _readyNext();
+    }
+
+    switch (_current!.type) {
+      case AudioItemType.morse:
+        return _player.play();
+
+      case AudioItemType.text:
+        print('playing tts');
+        _flutterTts.setVolume(1.0);
+        // final session = await AudioSession.instance;
+        // await session.setActive(true);
+        _flutterTts.speak(_current!.value);
+        return;
+    }
   }
 
   @override
-  Future<void> pause() {
+  Future<void> pause() async {
     print('AudioPlayerHandler pause');
-    return _player.pause();
+    switch (_current!.type) {
+      case AudioItemType.morse:
+        return _player.pause();
+
+      case AudioItemType.text:
+        print('pausing tts');
+        return;
+    }
   }
 
   @override
-  Future<void> stop() {
+  Future<void> stop() async {
     print('AudioPlayerHandler stop');
-    return _player.stop();
+    var type = _current!.type;
+    _current = null;
+    _queue.clear();
+    switch (type) {
+      case AudioItemType.morse:
+        return _player.stop();
+
+      case AudioItemType.text:
+        print('stopping tts');
+        _flutterTts.stop();
+        return;
+    }
   }
 
-  void _justAudioCompleted() async {
-    print('just_audio completed');
-    var voice = await _tts.getDefaultVoice;
-    var engine = await _tts.getDefaultEngine;
-    print('tts $voice $engine');
-    await _tts.awaitSpeakCompletion(true);
-    _tts.setVolume(1.0);
-    _tts.setPitch(1.0);
-    _tts.setSpeechRate(1.0);
-    await _tts.speak(_s);
+  void _readyNext() {
+    _current = _queue.removeFirst();
+
+    switch (_current!.type) {
+      case AudioItemType.morse:
+        _readyMorse(_current!.value);
+        return;
+
+      case AudioItemType.text:
+        print('tts beep boop readying: ${_current!.value}');
+        return;
+    }
+  }
+
+  void _readyMorse(String s) {
+    var generator = _getMorseGenerator();
+    var frames = generator.stringToPcm(s);
+    _player.setAudioSource(WavSource(frames));
   }
 
   /// Transform a just_audio event into an audio_service state.
@@ -208,7 +303,9 @@ class PlaybackPage extends StatelessWidget {
             IconButton(
               onPressed: () {
                 print('play');
-                _audioHandler.playString("MY STRING ");
+                _audioHandler.appendAudioItem(AudioItem("SOS", AudioItemType.morse));
+                _audioHandler.appendAudioItem(AudioItem("SOS", AudioItemType.text));
+                _audioHandler.play();
               },
               icon: const Icon(Icons.play_arrow),
             ),
@@ -247,7 +344,7 @@ void writeToFile(List<int> frames) async {
 class WavSource extends StreamAudioSource {
   // Assumes pcm was sampled at 44.1kHz in 16 bits.
   final Uint8List _wav;
-  WavSource(List<int> frames) : _wav = pcmToWav(frames, sampleRate) {}
+  WavSource(List<int> frames) : _wav = pcmToWav(frames, sampleRate);
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
