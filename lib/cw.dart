@@ -81,7 +81,7 @@ class MorseGenerator {
   }
 
   List<int> stringToPcm(String s) {
-    List<int> pcm = List.filled(stringNumFrames(s), 0);
+    List<int> pcm = List.filled(stringNumFrames(s), 128);
     int curFrame = 0;
 
     for (int i = 0; i < s.length; i++) {
@@ -119,13 +119,22 @@ class MorseGenerator {
   }
 
   int addSineWave(List<int> pcm, int startFrame, int numFrames) {
-    const volume = 127;
+    const max_value = 127;
 
     final numFramesPerCycles = sampleRate / frequency;
     final step = math.pi * 2 / numFramesPerCycles;
+    print('has ramp');
 
     for (int i = 0; i < numFrames; i++) {
-      pcm[i + startFrame] = (math.sin(step * (i % numFramesPerCycles)) * volume).toInt() + 128;
+      double ramp = 1.0;
+      if (i < numFrames * 0.1) {
+        ramp = i / (numFrames * 0.1);
+      }
+
+      if (i > numFrames * 0.9) {
+        ramp = 1.0 - ((i - (numFrames * 0.9)) / (numFrames * 0.1));
+      }
+      pcm[i + startFrame] = (math.sin(step * (i % numFramesPerCycles)) * ramp * max_value).toInt() + 128;
     }
 
     return numFrames + startFrame;

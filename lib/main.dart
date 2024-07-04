@@ -35,6 +35,11 @@ extension CwTrainerAudioHandler on AudioHandler {
   Future<void> clearAudioItems() async {
     _audioHandler.customAction('clearAudioItems');
   }
+
+  Future<void> setOnQueueCompleted(Function onQueueCompleted) async {
+    _audioHandler.customAction(
+        'setOnQueueCompleted', {'onQueueCompleted': onQueueCompleted});
+  }
 }
 
 void main() async {
@@ -64,6 +69,7 @@ class AudioItem {
 class MorseAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
   final FlutterTts _flutterTts = FlutterTts();
+  Function _onQueueCompleted = () {};
 
   int _wpm = 12;
   int _ewpm = 12;
@@ -79,10 +85,10 @@ class MorseAudioHandler extends BaseAudioHandler {
     _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
     _player.playbackEventStream.listen((PlaybackEvent event) {
       if (event.processingState == ProcessingState.completed) {
-        _completed();
+        _onCompleted();
       }
     });
-    _flutterTts.setCompletionHandler(_completed);
+    _flutterTts.setCompletionHandler(_onCompleted);
   }
 
   @override
@@ -101,6 +107,9 @@ class MorseAudioHandler extends BaseAudioHandler {
         _setMorseParameters(
             extras!['wpm'], extras['ewpm'], extras['frequency']);
         return null;
+
+      case 'setOnQueueCompleted':
+        _onQueueCompleted = extras!['onQueueCompleted'];
     }
     return super.customAction(name, extras);
   }
@@ -115,11 +124,13 @@ class MorseAudioHandler extends BaseAudioHandler {
     return MorseGenerator.fromEwpm(_wpm, _ewpm, sampleRate, _frequency);
   }
 
-  Future<void> _completed() async {
+  Future<void> _onCompleted() async {
     print('AudioPlayerHandler completed');
     _current = null;
     if (_queue.isNotEmpty) {
       play();
+    } else {
+      _onQueueCompleted();
     }
   }
 
@@ -160,6 +171,9 @@ class MorseAudioHandler extends BaseAudioHandler {
   @override
   Future<void> stop() async {
     print('AudioPlayerHandler stop');
+    if (_current == null) {
+      return;
+    }
     var type = _current!.type;
     _current = null;
     _queue.clear();
@@ -175,11 +189,13 @@ class MorseAudioHandler extends BaseAudioHandler {
   }
 
   void _readyNext() {
+    print('_readyNext');
     _current = _queue.removeFirst();
 
     switch (_current!.type) {
       case AudioItemType.morse:
         _readyMorse(_current!.value);
+        print('_readyNext morse done');
         return;
 
       case AudioItemType.text:
@@ -269,6 +285,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   var selectedIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -285,7 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class PlaybackPage extends StatelessWidget {
-  const PlaybackPage({
+  PlaybackPage({
     super.key,
     required this.appState,
   });
@@ -301,11 +318,13 @@ class PlaybackPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
-              onPressed: () {
+              onPressed: () async {
                 print('play');
-                _audioHandler.appendAudioItem(AudioItem("SOS", AudioItemType.morse));
-                _audioHandler.appendAudioItem(AudioItem("SOS", AudioItemType.text));
-                _audioHandler.play();
+                await _audioHandler
+                    .appendAudioItem(AudioItem("SOS", AudioItemType.morse));
+                await _audioHandler
+                    .appendAudioItem(AudioItem("SOS", AudioItemType.text));
+                await _audioHandler.play();
               },
               icon: const Icon(Icons.play_arrow),
             ),
@@ -325,7 +344,8 @@ class PlaybackPage extends StatelessWidget {
 
 void writeToFile(List<int> frames) async {
   final Directory directory = await getApplicationCacheDirectory();
-  String filepath = '${directory.path}/my_file.csv';
+  // final Directory directory = (await getDownloadsDirectory())!;
+  String filepath = '/storage/emulated/0/Download/cw.wav';// '${directory.path}/my_file.wav';
   print(filepath);
   final File file = File(filepath);
   var sink = file.openWrite();
