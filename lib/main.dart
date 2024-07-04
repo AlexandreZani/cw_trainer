@@ -77,6 +77,7 @@ class MorseAudioHandler extends BaseAudioHandler {
 
   final Queue<AudioItem> _queue = Queue<AudioItem>();
   AudioItem? _current;
+  bool _playing = false;
 
   MorseAudioHandler() {
     // So that our clients (the Flutter UI and the system notification) know
@@ -126,6 +127,7 @@ class MorseAudioHandler extends BaseAudioHandler {
 
   Future<void> _onCompleted() async {
     print('AudioPlayerHandler completed');
+    _playing = false;
     _current = null;
     if (_queue.isNotEmpty) {
       play();
@@ -137,9 +139,17 @@ class MorseAudioHandler extends BaseAudioHandler {
   @override
   Future<void> play() async {
     print('AudioPlayerHandler play');
+    if (_playing) {
+      return;
+    }
+
+    _playing = true;
     if (_current == null) {
       _readyNext();
     }
+
+    final session = await AudioSession.instance;
+    await session.setActive(true);
 
     switch (_current!.type) {
       case AudioItemType.morse:
@@ -148,8 +158,7 @@ class MorseAudioHandler extends BaseAudioHandler {
       case AudioItemType.text:
         print('playing tts');
         _flutterTts.setVolume(1.0);
-        // final session = await AudioSession.instance;
-        // await session.setActive(true);
+        
         _flutterTts.speak(_current!.value);
         return;
     }
@@ -204,7 +213,7 @@ class MorseAudioHandler extends BaseAudioHandler {
     }
   }
 
-  void _readyMorse(String s) {
+  void _readyMorse(String s) async {
     var generator = _getMorseGenerator();
     var frames = generator.stringToPcm(s);
     _player.setAudioSource(WavSource(frames));

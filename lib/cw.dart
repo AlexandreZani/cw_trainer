@@ -10,6 +10,7 @@ class MorseGenerator {
   final int interCharacterNumFrames;
   final int interGroupNumFrames;
   final int frequency;
+  final double rampFraction; // Fraction of a unit spent ramping up and down
 
   MorseGenerator(
       this.sampleRate,
@@ -18,7 +19,8 @@ class MorseGenerator {
       this.interElementNumFrames,
       this.interCharacterNumFrames,
       this.interGroupNumFrames,
-      this.frequency);
+      this.frequency,
+      this.rampFraction);
 
   static MorseGenerator fromEwpm(
       int wpm, int ewpm, int sampleRate, int frequency) {
@@ -40,6 +42,7 @@ class MorseGenerator {
       unitFNumFrames * 3,
       unitFNumFrames * 7,
       frequency,
+      0.1,
     );
   }
 
@@ -118,21 +121,22 @@ class MorseGenerator {
     return curFrame;
   }
 
+  int get rampNumFrames => (dotNumFrames * rampFraction).toInt();
+
   int addSineWave(List<int> pcm, int startFrame, int numFrames) {
     const max_value = 127;
 
     final numFramesPerCycles = sampleRate / frequency;
     final step = math.pi * 2 / numFramesPerCycles;
-    print('has ramp');
 
     for (int i = 0; i < numFrames; i++) {
       double ramp = 1.0;
-      if (i < numFrames * 0.1) {
-        ramp = i / (numFrames * 0.1);
+      if (i < rampNumFrames) {
+        ramp = i / rampNumFrames;
       }
 
-      if (i > numFrames * 0.9) {
-        ramp = 1.0 - ((i - (numFrames * 0.9)) / (numFrames * 0.1));
+      if (i > (numFrames - rampNumFrames)) {
+        ramp = (numFrames - i) / rampNumFrames;
       }
       pcm[i + startFrame] = (math.sin(step * (i % numFramesPerCycles)) * ramp * max_value).toInt() + 128;
     }
