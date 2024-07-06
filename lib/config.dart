@@ -1,86 +1,98 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CwConfig {
-  int wpm;
-  int ewpm;
-  int frequency;
+class SharedState extends ChangeNotifier {
+  final SharedPreferences _prefs;
+  SharedState(this._prefs) : super();
 
-  CwConfig(this.wpm, this.ewpm, this.frequency);
-
-  static CwConfig getDefaultConfig() {
-    return CwConfig(20, 12, 500);
+  int? getInt(String k) {
+    return _prefs.getInt(k);
   }
 
-  static CwConfig readFromShared(SharedPreferences prefs) {
-    CwConfig d = CwConfig.getDefaultConfig();
-
-    return CwConfig(
-      prefs.getInt('cw_wpm') ?? d.wpm,
-      prefs.getInt('cw_ewpm') ?? d.ewpm,
-      prefs.getInt('cw_frequency') ?? d.frequency,
-    );
+  double? getDouble(String k) {
+    return _prefs.getDouble(k);
   }
 
-  Future<void> writeToShared(SharedPreferences prefs) async {
-    prefs.setInt('cw_wpm', wpm);
-    prefs.setInt('cw_ewpm', ewpm);
-    prefs.setInt('frequency', frequency);
-  }
-}
-
-class TtsConfig {
-  String language;
-  double rate;
-  double pitch;
-  double volume;
-
-  TtsConfig(this.language, this.rate, this.pitch, this.volume);
-
-  static TtsConfig getDefaultConfig() {
-    return TtsConfig('en-US', 1.0, 1.0, 1.0);
+  String? getString(String k) {
+    return _prefs.getString(k);
   }
 
-  static TtsConfig readFromShared(SharedPreferences prefs) {
-    TtsConfig d = TtsConfig.getDefaultConfig();
-
-    return TtsConfig(
-      prefs.getString('tts_language') ?? d.language,
-      prefs.getDouble('tts_rate') ?? d.rate,
-      prefs.getDouble('tts_pitch') ?? d.pitch,
-      prefs.getDouble('tts_volume') ?? d.volume,
-    );
+  void setInt(String k, int v) {
+    _prefs.setInt(k, v);
+    notifyListeners();
   }
 
-  Future<void> writeToShared(SharedPreferences prefs) async {
-    prefs.setString('tts_language', language);
-    prefs.setDouble('tts_rate', rate);
-    prefs.setDouble('tts_pitch', pitch);
-    prefs.setDouble('tts_volume', volume);
+  void setDouble(String k, double v) {
+    _prefs.setDouble(k, v);
+    notifyListeners();
+  }
+
+  void setString(String k, String v) {
+    _prefs.setString(k, v);
+    notifyListeners();
   }
 }
 
-class AppConfig {
+class CwConfig extends SharedState {
+  CwConfig(super._prefs);
+
+  int get wpm => getInt('cw_wpm') ?? 20;
+  int get ewpm => getInt('cw_ewpm') ?? 12;
+  int get frequency => getInt('cw_frequency') ?? 500;
+
+  set wpm(int wpm) {
+    setInt('cw_wpm', wpm);
+  }
+
+  set ewpm(int ewpm) {
+    setInt('cw_ewpm', ewpm);
+  }
+
+  set frequency(int frequency) {
+    setInt('cw_frequency', frequency);
+  }
+}
+
+class TtsConfig extends SharedState {
+  TtsConfig(super._prefs);
+
+  String get language => getString('tts_language') ?? 'en-US';
+  double get rate => getDouble('tts_rate') ?? 1.0;
+  double get pitch => getDouble('tts_pitch') ?? 1.0;
+  double get volume => getDouble('tts_volume') ?? 1.0;
+
+  set language(String language) {
+    _prefs.setString('tts_language', language);
+  }
+
+  set rate(double rate) {
+    setDouble('tts_rate', rate);
+  }
+
+  set pitch(double pitch) {
+    setDouble('tts_pitch', pitch);
+  }
+
+  set volume(double volume) {
+    setDouble('tts_volume', volume);
+  }
+}
+
+class AppConfig extends ChangeNotifier {
   CwConfig cwConfig;
   TtsConfig ttsConfig;
 
-  AppConfig(this.cwConfig, this.ttsConfig);
-
-  static AppConfig getDefaultConfig() {
-    return AppConfig(CwConfig.getDefaultConfig(), TtsConfig.getDefaultConfig());
+  AppConfig(this.cwConfig, this.ttsConfig) {
+    cwConfig.addListener(notifyListeners);
+    ttsConfig.addListener(notifyListeners);
   }
 
-  static AppConfig readFromShared(SharedPreferences prefs) {
-    return AppConfig(
-        CwConfig.readFromShared(prefs), TtsConfig.readFromShared(prefs));
-  }
-
-  Future<void> writeToShared(SharedPreferences prefs) async {
-    cwConfig.writeToShared(prefs);
-    ttsConfig.writeToShared(prefs);
+  static AppConfig buildFromShared(SharedPreferences prefs) {
+    return AppConfig(CwConfig(prefs), TtsConfig(prefs));
   }
 }
 
 Future<AppConfig> readAppConfigFromShared() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  return AppConfig.readFromShared(prefs);
+  return AppConfig.buildFromShared(prefs);
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cw_trainer/config.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 late AudioHandler _audioHandler;
 
@@ -31,6 +32,7 @@ extension CwTrainerAudioHandler on AudioHandler {
 }
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   _audioHandler = await AudioService.init(
     builder: () => CwAudioHandler(),
     config: const AudioServiceConfig(
@@ -62,7 +64,15 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
+  late AppConfig appConfig;
+
   MyAppState() : super() {
+    SharedPreferences.getInstance().then(
+      (prefs) {
+        appConfig = AppConfig.buildFromShared(prefs);
+        appConfig.addListener(notifyListeners);
+      },
+    );
     print('MyAppState constructed');
   }
 }
@@ -108,9 +118,9 @@ class _MyHomePageState extends State<MyHomePage> {
               title: const Text('Settings'),
               onTap: () {
                 setState(() {
-                currentPage = Pages.settings;  
+                  currentPage = Pages.settings;
                 });
-                
+
                 Navigator.pop(context);
               },
             ),
@@ -120,9 +130,9 @@ class _MyHomePageState extends State<MyHomePage> {
               title: const Text('Practice'),
               onTap: () {
                 setState(() {
-                currentPage = Pages.practice;  
+                  currentPage = Pages.practice;
                 });
-                
+
                 Navigator.pop(context);
               },
             )
@@ -138,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class SettingsPage extends StatelessWidget {
-  SettingsPage({
+  const SettingsPage({
     super.key,
     required this.appState,
   });
@@ -148,12 +158,98 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('building settings page');
-    return const Text("Settings Page");
+    return ListView(
+      children: [
+        const ListTile(title: Text('CW Settings')),
+        const Divider(),
+        ListTile(
+          title: IntSetting(
+            label: "WPM",
+            initialValue: appState.appConfig.cwConfig.wpm,
+            min: 5,
+            max: 40,
+            step: 1,
+            onSelected: (int i) {
+              appState.appConfig.cwConfig.wpm = i;
+            },
+          ),
+        ),
+        IntSetting(
+          label: "EWPM",
+          initialValue: appState.appConfig.cwConfig.ewpm,
+          min: 5,
+          max: 40,
+          step: 1,
+          onSelected: (int i) {
+            appState.appConfig.cwConfig.ewpm = i;
+          },
+        ),
+
+        IntSetting(
+          label: "Frequency",
+          initialValue: appState.appConfig.cwConfig.frequency,
+          min: 400,
+          max: 1000,
+          step: 50,
+          onSelected: (int i) {
+            appState.appConfig.cwConfig.frequency = i;
+          },
+        )
+      ],
+    );
+  }
+}
+
+class IntSetting extends StatelessWidget {
+  const IntSetting({
+    super.key,
+    required this.initialValue,
+    required this.label,
+    required this.min,
+    required this.max,
+    required this.step,
+    required this.onSelected,
+  });
+
+  final int initialValue;
+  final int min;
+  final int max;
+  final int step;
+  final String label;
+  final Function onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    int numEntries = 1 + (max - min) ~/ step;
+    return ListTile(
+      title: Row(children: [
+        Text(label, textAlign: TextAlign.left),
+        const Spacer(),
+        DropdownMenu(
+          onSelected: (int? i) {
+            if (i != null) {
+              onSelected(i);
+            }
+          },
+          initialSelection: initialValue,
+          dropdownMenuEntries: List.generate(
+            numEntries,
+            (int i) {
+              int value = i * step + min;
+              return DropdownMenuEntry(
+                label: (value).toString(),
+                value: value,
+              );
+            },
+          ).toList(),
+        ),
+      ]),
+    );
   }
 }
 
 class PracticePage extends StatelessWidget {
-  PracticePage({
+  const PracticePage({
     super.key,
     required this.appState,
   });

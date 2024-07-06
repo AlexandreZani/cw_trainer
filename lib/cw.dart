@@ -124,7 +124,7 @@ class MorseGenerator {
   int get rampNumFrames => (dotNumFrames * rampFraction).toInt();
 
   int addSineWave(List<int> pcm, int startFrame, int numFrames) {
-    const max_value = 127;
+    const maxValue = 127;
 
     final numFramesPerCycles = sampleRate / frequency;
     final step = math.pi * 2 / numFramesPerCycles;
@@ -138,7 +138,10 @@ class MorseGenerator {
       if (i > (numFrames - rampNumFrames)) {
         ramp = (numFrames - i) / rampNumFrames;
       }
-      pcm[i + startFrame] = (math.sin(step * (i % numFramesPerCycles)) * ramp * max_value).toInt() + 128;
+      pcm[i + startFrame] =
+          (math.sin(step * (i % numFramesPerCycles)) * ramp * maxValue)
+                  .toInt() +
+              128;
     }
 
     return numFrames + startFrame;

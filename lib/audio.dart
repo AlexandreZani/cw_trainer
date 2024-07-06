@@ -17,7 +17,7 @@ class CwAudioHandler extends BaseAudioHandler {
   final FlutterTts _flutterTts = FlutterTts();
   Function _onQueueCompleted = () {};
 
-  CwConfig _cwConfig = CwConfig.getDefaultConfig();
+  late CwConfig _cwConfig;
 
   final Queue<AudioItem> _queue = Queue<AudioItem>();
   AudioItem? _current;
@@ -212,7 +212,7 @@ class WavSource extends StreamAudioSource {
       contentType: 'audio/wav',
       rangeRequestsSupported: false,
     );
-    writeToFile(_wav);
+    // writeToFile(_wav);
     print('Made response ${_wav.length}');
     return r;
   }
