@@ -65,10 +65,11 @@ class MyAppState extends ChangeNotifier {
   MyAppState() : super() {
     print('MyAppState constructed');
   }
+}
 
-  int wpm = 20;
-  int ewpm = 20;
-  int frequency = 500;
+enum Pages {
+  practice,
+  settings,
 }
 
 class MyHomePage extends StatefulWidget {
@@ -79,7 +80,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var selectedIndex = 0;
+  Pages currentPage = Pages.practice;
 
   @override
   void initState() {
@@ -91,13 +92,53 @@ class _MyHomePageState extends State<MyHomePage> {
     var appState = context.watch<MyAppState>();
 
     return Scaffold(
-      body: PlaybackPage(appState: appState),
+      appBar: AppBar(title: const Text('CW Trainer')),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text('Drawer Header'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                setState(() {
+                currentPage = Pages.settings;  
+                });
+                
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Visibility(
+                  visible: false, child: Icon(Icons.chevron_right)),
+              title: const Text('Practice'),
+              onTap: () {
+                setState(() {
+                currentPage = Pages.practice;  
+                });
+                
+                Navigator.pop(context);
+              },
+            )
+          ],
+        ),
+      ),
+      body: switch (currentPage) {
+        Pages.practice => PracticePage(appState: appState),
+        Pages.settings => SettingsPage(appState: appState),
+      },
     );
   }
 }
 
-class PlaybackPage extends StatelessWidget {
-  PlaybackPage({
+class SettingsPage extends StatelessWidget {
+  SettingsPage({
     super.key,
     required this.appState,
   });
@@ -106,6 +147,22 @@ class PlaybackPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('building settings page');
+    return const Text("Settings Page");
+  }
+}
+
+class PracticePage extends StatelessWidget {
+  PracticePage({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    print('building playback page');
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
