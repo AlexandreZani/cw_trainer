@@ -1,5 +1,6 @@
 import 'package:cw_trainer/audio.dart';
-import 'package:cw_trainer/audio_item_type.dart';
+import 'package:cw_trainer/exercises.dart';
+import 'package:cw_trainer/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cw_trainer/config.dart';
@@ -9,25 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 late AudioHandler _audioHandler;
 
 extension CwTrainerAudioHandler on AudioHandler {
-  Future<void> setAppConfig(AppConfig appConfig) async {
-    _audioHandler.customAction('setAppConfig', {'appConfig': appConfig});
-  }
-
-  Future<void> appendAudioItems(List<AudioItem> items) async {
-    _audioHandler.customAction('appendAudioItems', {'items': items});
-  }
-
-  Future<void> appendAudioItem(AudioItem item) async {
-    _audioHandler.appendAudioItems([item]);
-  }
-
-  Future<void> clearAudioItems() async {
-    _audioHandler.customAction('clearAudioItems');
-  }
-
-  Future<void> setOnQueueCompleted(Function onQueueCompleted) async {
-    _audioHandler.customAction(
-        'setOnQueueCompleted', {'onQueueCompleted': onQueueCompleted});
+  Future<void> startExercise(Exercise exercise) async {
+    _audioHandler.customAction('startExercise', {'exercise': exercise});
   }
 }
 
@@ -147,107 +131,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class SettingsPage extends StatelessWidget {
-  const SettingsPage({
-    super.key,
-    required this.appState,
-  });
-
-  final MyAppState appState;
-
-  @override
-  Widget build(BuildContext context) {
-    print('building settings page');
-    return ListView(
-      children: [
-        const ListTile(title: Text('CW Settings')),
-        const Divider(),
-        ListTile(
-          title: IntSetting(
-            label: "WPM",
-            initialValue: appState.appConfig.cwConfig.wpm,
-            min: 5,
-            max: 40,
-            step: 1,
-            onSelected: (int i) {
-              appState.appConfig.cwConfig.wpm = i;
-            },
-          ),
-        ),
-        IntSetting(
-          label: "EWPM",
-          initialValue: appState.appConfig.cwConfig.ewpm,
-          min: 5,
-          max: 40,
-          step: 1,
-          onSelected: (int i) {
-            appState.appConfig.cwConfig.ewpm = i;
-          },
-        ),
-
-        IntSetting(
-          label: "Frequency",
-          initialValue: appState.appConfig.cwConfig.frequency,
-          min: 400,
-          max: 1000,
-          step: 50,
-          onSelected: (int i) {
-            appState.appConfig.cwConfig.frequency = i;
-          },
-        )
-      ],
-    );
-  }
-}
-
-class IntSetting extends StatelessWidget {
-  const IntSetting({
-    super.key,
-    required this.initialValue,
-    required this.label,
-    required this.min,
-    required this.max,
-    required this.step,
-    required this.onSelected,
-  });
-
-  final int initialValue;
-  final int min;
-  final int max;
-  final int step;
-  final String label;
-  final Function onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    int numEntries = 1 + (max - min) ~/ step;
-    return ListTile(
-      title: Row(children: [
-        Text(label, textAlign: TextAlign.left),
-        const Spacer(),
-        DropdownMenu(
-          onSelected: (int? i) {
-            if (i != null) {
-              onSelected(i);
-            }
-          },
-          initialSelection: initialValue,
-          dropdownMenuEntries: List.generate(
-            numEntries,
-            (int i) {
-              int value = i * step + min;
-              return DropdownMenuEntry(
-                label: (value).toString(),
-                value: value,
-              );
-            },
-          ).toList(),
-        ),
-      ]),
-    );
-  }
-}
-
 class PracticePage extends StatelessWidget {
   const PracticePage({
     super.key,
@@ -269,12 +152,8 @@ class PracticePage extends StatelessWidget {
               onPressed: () async {
                 print('play');
                 var appConfig = await readAppConfigFromShared();
-                await _audioHandler.setAppConfig(appConfig);
-                await _audioHandler
-                    .appendAudioItem(AudioItem("SOS", AudioItemType.morse));
-                await _audioHandler
-                    .appendAudioItem(AudioItem("SOS", AudioItemType.text));
-                await _audioHandler.play();
+                var exercise = FarnsworthExercise(appConfig);
+                await _audioHandler.startExercise(exercise);
               },
               icon: const Icon(Icons.play_arrow),
             ),

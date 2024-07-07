@@ -1,11 +1,10 @@
-import 'dart:collection';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:cw_trainer/audio_item_type.dart';
-import 'package:cw_trainer/config.dart';
 import 'package:cw_trainer/cw.dart';
+import 'package:cw_trainer/exercises.dart';
 import 'package:cw_trainer/wav.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
@@ -15,12 +14,10 @@ const sampleRate = 44100;
 class CwAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
   final FlutterTts _flutterTts = FlutterTts();
-  Function _onQueueCompleted = () {};
 
-  late CwConfig _cwConfig;
-
-  final Queue<AudioItem> _queue = Queue<AudioItem>();
-  AudioItem? _current;
+  Exercise? _currentExercise;
+  // final Queue<AudioItem> _queue = Queue<AudioItem>();
+  AudioItem? _currentAudioItem;
   bool _playing = false;
 
   CwAudioHandler() {
@@ -40,41 +37,29 @@ class CwAudioHandler extends BaseAudioHandler {
   Future<dynamic> customAction(String name,
       [Map<String, dynamic>? extras]) async {
     switch (name) {
-      case 'appendAudioItems':
-        _queue.addAll(extras!['items']);
-        return null;
-
-      case 'clearAudioItems':
-        _queue.clear();
-        return null;
-
-      case 'setOnQueueCompleted':
-        _onQueueCompleted = extras!['onQueueCompleted'];
-
-      case 'setAppConfig':
-        AppConfig appConfig = extras!['appConfig'];
-        _cwConfig = appConfig.cwConfig;
+      case 'startExercise':
+        _currentExercise = extras!['exercise'];
+        play();
     }
     return super.customAction(name, extras);
   }
 
   MorseGenerator _getMorseGenerator() {
     return MorseGenerator.fromEwpm(
-      _cwConfig.wpm,
-      _cwConfig.ewpm,
+      _currentExercise!.appConfig.cwConfig.wpm,
+      _currentExercise!.appConfig.cwConfig.ewpm,
       sampleRate,
-      _cwConfig.frequency,
+      _currentExercise!.appConfig.cwConfig.frequency,
     );
   }
 
   Future<void> _onCompleted() async {
     print('AudioPlayerHandler completed');
     _playing = false;
-    _current = null;
-    if (_queue.isNotEmpty) {
+    _currentAudioItem = null;
+
+    if (!_currentExercise!.complete) {
       play();
-    } else {
-      _onQueueCompleted();
     }
   }
 
@@ -86,14 +71,14 @@ class CwAudioHandler extends BaseAudioHandler {
     }
 
     _playing = true;
-    if (_current == null) {
+    if (_currentAudioItem == null) {
       _readyNext();
     }
 
     final session = await AudioSession.instance;
     await session.setActive(true);
 
-    switch (_current!.type) {
+    switch (_currentAudioItem!.type) {
       case AudioItemType.morse:
         return _player.play();
 
@@ -101,7 +86,7 @@ class CwAudioHandler extends BaseAudioHandler {
         print('playing tts');
         _flutterTts.setVolume(1.0);
 
-        _flutterTts.speak(_current!.value);
+        _flutterTts.speak(_currentAudioItem!.value);
         return;
     }
   }
@@ -109,7 +94,7 @@ class CwAudioHandler extends BaseAudioHandler {
   @override
   Future<void> pause() async {
     print('AudioPlayerHandler pause');
-    switch (_current!.type) {
+    switch (_currentAudioItem!.type) {
       case AudioItemType.morse:
         return _player.pause();
 
@@ -122,12 +107,12 @@ class CwAudioHandler extends BaseAudioHandler {
   @override
   Future<void> stop() async {
     print('AudioPlayerHandler stop');
-    if (_current == null) {
+    if (_currentAudioItem == null) {
       return;
     }
-    var type = _current!.type;
-    _current = null;
-    _queue.clear();
+    var type = _currentAudioItem!.type;
+    _currentAudioItem = null;
+    _currentExercise = null;
     switch (type) {
       case AudioItemType.morse:
         return _player.stop();
@@ -141,16 +126,20 @@ class CwAudioHandler extends BaseAudioHandler {
 
   void _readyNext() {
     print('_readyNext');
-    _current = _queue.removeFirst();
+    _currentAudioItem = _currentExercise?.getNextAudioItem();
+    if (_currentAudioItem == null) {
+      stop();
+      return;
+    }
 
-    switch (_current!.type) {
+    switch (_currentAudioItem!.type) {
       case AudioItemType.morse:
-        _readyMorse(_current!.value);
+        _readyMorse(_currentAudioItem!.value);
         print('_readyNext morse done');
         return;
 
       case AudioItemType.text:
-        print('tts beep boop readying: ${_current!.value}');
+        print('tts beep boop readying: ${_currentAudioItem!.value}');
         return;
     }
   }

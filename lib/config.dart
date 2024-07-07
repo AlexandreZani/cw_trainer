@@ -3,92 +3,119 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedState extends ChangeNotifier {
   final SharedPreferences _prefs;
-  SharedState(this._prefs) : super();
+  final String _prefix;
+  SharedState(this._prefs, this._prefix) : super();
+
+  String key(String k) {
+    return '${_prefix}_$k';
+  }
 
   int? getInt(String k) {
-    return _prefs.getInt(k);
+    return _prefs.getInt(key(k));
   }
 
   double? getDouble(String k) {
-    return _prefs.getDouble(k);
+    return _prefs.getDouble(key(k));
   }
 
   String? getString(String k) {
-    return _prefs.getString(k);
+    return _prefs.getString(key(k));
   }
 
   void setInt(String k, int v) {
-    _prefs.setInt(k, v);
+    _prefs.setInt(key(k), v);
     notifyListeners();
   }
 
   void setDouble(String k, double v) {
-    _prefs.setDouble(k, v);
+    _prefs.setDouble(key(k), v);
     notifyListeners();
   }
 
   void setString(String k, String v) {
-    _prefs.setString(k, v);
+    _prefs.setString(key(k), v);
     notifyListeners();
   }
 }
 
 class CwConfig extends SharedState {
-  CwConfig(super._prefs);
+  CwConfig(SharedPreferences prefs) : super(prefs, 'cw');
 
-  int get wpm => getInt('cw_wpm') ?? 20;
-  int get ewpm => getInt('cw_ewpm') ?? 12;
-  int get frequency => getInt('cw_frequency') ?? 500;
+  int get wpm => getInt('wpm') ?? 20;
+  int get ewpm => getInt('ewpm') ?? 12;
+  int get frequency => getInt('frequency') ?? 500;
 
   set wpm(int wpm) {
-    setInt('cw_wpm', wpm);
+    setInt('wpm', wpm);
   }
 
   set ewpm(int ewpm) {
-    setInt('cw_ewpm', ewpm);
+    setInt('ewpm', ewpm);
   }
 
   set frequency(int frequency) {
-    setInt('cw_frequency', frequency);
+    setInt('frequency', frequency);
   }
 }
 
 class TtsConfig extends SharedState {
-  TtsConfig(super._prefs);
+  TtsConfig(SharedPreferences prefs) : super(prefs, 'tts');
 
-  String get language => getString('tts_language') ?? 'en-US';
-  double get rate => getDouble('tts_rate') ?? 1.0;
-  double get pitch => getDouble('tts_pitch') ?? 1.0;
-  double get volume => getDouble('tts_volume') ?? 1.0;
+  String get language => getString('language') ?? 'en-US';
+  double get rate => getDouble('rate') ?? 1.0;
+  double get pitch => getDouble('pitch') ?? 1.0;
+  double get volume => getDouble('volume') ?? 1.0;
 
   set language(String language) {
-    _prefs.setString('tts_language', language);
+    _prefs.setString('language', language);
   }
 
   set rate(double rate) {
-    setDouble('tts_rate', rate);
+    setDouble('rate', rate);
   }
 
   set pitch(double pitch) {
-    setDouble('tts_pitch', pitch);
+    setDouble('pitch', pitch);
   }
 
   set volume(double volume) {
-    setDouble('tts_volume', volume);
+    setDouble('volume', volume);
   }
+}
+
+class FarnsworthConfig extends SharedState {
+  FarnsworthConfig(SharedPreferences prefs) : super(prefs, 'farnsworth');
+
+  String get letters => getString('letters') ?? 'KMURESNAPTLWI.JZ=FOY,VG5/Q92H38B?47C1D60X';
+
+  set letters(String letters) {
+    setString('letters', letters);
+  }
+
+  String get level => getString('level') ?? 'M';
+
+  set level(String l) {
+    setString('level', l);
+  }
+
+  int get groupSize => getInt('group_size') ?? 4;
+
+  int get groupNum => getInt('group_num') ?? 5;
 }
 
 class AppConfig extends ChangeNotifier {
   CwConfig cwConfig;
   TtsConfig ttsConfig;
+  FarnsworthConfig farnsworthConfig;
 
-  AppConfig(this.cwConfig, this.ttsConfig) {
+  AppConfig(this.cwConfig, this.ttsConfig, this.farnsworthConfig) {
     cwConfig.addListener(notifyListeners);
     ttsConfig.addListener(notifyListeners);
+    farnsworthConfig.addListener(notifyListeners);
   }
 
   static AppConfig buildFromShared(SharedPreferences prefs) {
-    return AppConfig(CwConfig(prefs), TtsConfig(prefs));
+    return AppConfig(CwConfig(prefs), TtsConfig(prefs), FarnsworthConfig(prefs));
   }
 }
 
