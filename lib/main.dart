@@ -10,15 +10,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 late AudioHandler _audioHandler;
 
 extension CwTrainerAudioHandler on AudioHandler {
-  Future<void> startExercise(Exercise exercise) async {
-    _audioHandler.customAction('startExercise', {'exercise': exercise});
+  Future<void> setExerciseType(ExerciseType exerciseType) async {
+    _audioHandler.customAction('setExerciseType', {'exerciseType': exerciseType});
   }
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  var prefs = await SharedPreferences.getInstance();
+  AppConfig config = AppConfig.buildFromShared(prefs);
+
   _audioHandler = await AudioService.init(
-    builder: () => CwAudioHandler(),
+    builder: () => CwAudioHandler(config),
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'io.zfc.cw_trainer',
       androidNotificationChannelName: 'Audio playback',
@@ -151,9 +154,7 @@ class PracticePage extends StatelessWidget {
             IconButton(
               onPressed: () async {
                 print('play');
-                var appConfig = await readAppConfigFromShared();
-                var exercise = FarnsworthExercise(appConfig);
-                await _audioHandler.startExercise(exercise);
+                await _audioHandler.play();
               },
               icon: const Icon(Icons.play_arrow),
             ),

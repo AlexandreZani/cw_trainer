@@ -11,7 +11,7 @@ enum ExerciseType {
 
 abstract class Exercise {
   final AppConfig _appConfig;
-  final Queue<AudioItem> _queue = Queue.from([AudioItem.Silence(1000)]);
+  final Queue<AudioItem> _queue = Queue.from([AudioItem.silence(300)]);
 
   Exercise(this._appConfig);
 
@@ -72,8 +72,8 @@ class FarnsworthExercise extends Exercise {
     }
 
     _queue.addAll([
-      AudioItem.Morse(group),
-      AudioItem.Text(mapToItu(group)),
+      AudioItem.morse(group),
+      AudioItem.text(mapToItu(group)),
     ]);
   }
 }

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:cw_trainer/audio_item_type.dart';
+import 'package:cw_trainer/config.dart';
 import 'package:cw_trainer/cw.dart';
 import 'package:cw_trainer/exercises.dart';
 import 'package:cw_trainer/wav.dart';
@@ -12,11 +13,14 @@ import 'package:just_audio/just_audio.dart';
 class CwAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
   final FlutterTts _flutterTts = FlutterTts();
+  bool _paused = false;
 
-  Exercise? _currentExercise;
+  ExerciseType _exerciseType = ExerciseType.farnsworth;
+  AppConfig _appConfig;
+  Exercise _currentExercise;
   AudioItem? _currentAudioItem;
 
-  CwAudioHandler() {
+  CwAudioHandler(this._appConfig) : _currentExercise = Exercise.getByType(_appConfig, ExerciseType.farnsworth) {
     // So that our clients (the Flutter UI and the system notification) know
     // what state to display, here we set up our audio handler to broadcast all
     // playback state changes as they happen via playbackState...
@@ -39,17 +43,21 @@ class CwAudioHandler extends BaseAudioHandler {
     switch (name) {
       case 'startExercise':
         _currentExercise = extras!['exercise'];
-        play();
+        return play();
+
+      case 'setExerciseType':
+        _exerciseType = extras!['exerciseType'];
+        return;
     }
     return super.customAction(name, extras);
   }
 
   MorseGenerator _getMorseGenerator() {
     return MorseGenerator.fromEwpm(
-      _currentExercise!.appConfig.cw.wpm,
-      _currentExercise!.appConfig.cw.ewpm,
-      _currentExercise!.appConfig.cw.sampleRate,
-      _currentExercise!.appConfig.cw.frequency,
+      _currentExercise.appConfig.cw.wpm,
+      _currentExercise.appConfig.cw.ewpm,
+      _currentExercise.appConfig.cw.sampleRate,
+      _currentExercise.appConfig.cw.frequency,
     );
   }
 
@@ -58,8 +66,16 @@ class CwAudioHandler extends BaseAudioHandler {
 
     _currentAudioItem = null;
 
-    if (playbackState.isPaused) {
+    if (_paused) {
       print('isPaused');
+      playbackState.add(PlaybackState(
+        controls: [
+          MediaControl.play,
+          MediaControl.stop,
+        ],
+        androidCompactActionIndices: [0, 1],
+        playing: false,
+      ));
       return;
     }
 
@@ -73,6 +89,9 @@ class CwAudioHandler extends BaseAudioHandler {
 
   Future<void> _onPlaying() async {
     print('_onPlaying');
+    if (_paused) {
+      return;
+    }
     playbackState.add(PlaybackState(
       controls: [
         MediaControl.pause,
@@ -83,19 +102,23 @@ class CwAudioHandler extends BaseAudioHandler {
     ));
   }
 
+  void _resetExercise() {
+    _currentExercise = Exercise.getByType(_appConfig, _exerciseType);
+  }
+
   Future<void> _onExerciseFinished() async {
     print('_onExercisedFinished');
     playbackState.add(PlaybackState(
       playing: false,
     ));
+    _resetExercise();
+    print('_onExercisedFinished finished');
   }
 
   @override
   Future<void> play() async {
     print('AudioPlayerHandler play');
-    if (_currentExercise == null) {
-      return;
-    }
+    _paused = false;
 
     if (_currentAudioItem == null && !_readyNext()) {
       return;
@@ -121,7 +144,7 @@ class CwAudioHandler extends BaseAudioHandler {
 
       case AudioItemType.text:
         print('playing tts');
-        _flutterTts.speak(_currentAudioItem!.text);
+        _flutterTts.speak(_currentAudioItem!.textString);
         return;
     }
   }
@@ -129,42 +152,31 @@ class CwAudioHandler extends BaseAudioHandler {
   @override
   Future<void> pause() async {
     print('AudioPlayerHandler pause');
-
-    playbackState.add(PlaybackState(
-      controls: [
-        MediaControl.play,
-        MediaControl.stop,
-      ],
-      androidCompactActionIndices: [0, 1],
-      playing: false,
-    ));
+    _paused = true;
   }
 
   @override
   Future<void> stop() async {
     print('AudioPlayerHandler stop');
-    if (_currentExercise == null) {
-      return;
-    }
     if (!playbackState.value.playing) {
       return;
     }
 
-    var type = _currentAudioItem!.type;
-    _currentAudioItem = null;
-    _currentExercise = null;
+    if (_currentAudioItem != null) {
+      var type = _currentAudioItem!.type;
+      _currentAudioItem = null;
+      switch (type) {
+        case AudioItemType.morse:
+          await _player.stop();
+          break;
 
-    switch (type) {
-      case AudioItemType.morse:
-        await _player.stop();
-        break;
+        case AudioItemType.silence:
+          break;
 
-      case AudioItemType.silence:
-        break;
-
-      case AudioItemType.text:
-        await _flutterTts.stop();
-        break;
+        case AudioItemType.text:
+          await _flutterTts.stop();
+          break;
+      }
     }
 
     _onExerciseFinished();
@@ -172,15 +184,14 @@ class CwAudioHandler extends BaseAudioHandler {
 
   bool _readyNext() {
     print('_readyNext');
-    _currentAudioItem = _currentExercise?.getNextAudioItem();
+    _currentAudioItem = _currentExercise.getNextAudioItem();
     if (_currentAudioItem == null) {
-      stop();
       return false;
     }
 
     switch (_currentAudioItem!.type) {
       case AudioItemType.morse:
-        _readyMorse(_currentAudioItem!.text);
+        _readyMorse(_currentAudioItem!.textString);
         print('_readyNext morse done');
         return true;
 
@@ -190,16 +201,16 @@ class CwAudioHandler extends BaseAudioHandler {
         return true;
 
       case AudioItemType.text:
-        print('tts beep boop readying: ${_currentAudioItem!.text}');
+        print('tts beep boop readying: ${_currentAudioItem!.textString}');
         _readyTts();
         return true;
     }
   }
 
   void _readyTts() async {
-    _flutterTts.setVolume(_currentExercise!.appConfig.tts.volume);
-    _flutterTts.setPitch(_currentExercise!.appConfig.tts.pitch);
-    _flutterTts.setSpeechRate(_currentExercise!.appConfig.tts.rate);
+    _flutterTts.setVolume(_currentExercise.appConfig.tts.volume);
+    _flutterTts.setPitch(_currentExercise.appConfig.tts.pitch);
+    _flutterTts.setSpeechRate(_currentExercise.appConfig.tts.rate);
   }
 
   void _readyMorse(String s) async {
@@ -207,15 +218,15 @@ class CwAudioHandler extends BaseAudioHandler {
     var frames = generator.stringToPcm(s);
     await _player.stop();
     await _player.setAudioSource(
-        WavSource(frames, _currentExercise!.appConfig.cw.sampleRate));
+        WavSource(frames, _currentExercise.appConfig.cw.sampleRate));
   }
 
   void _readySilence(int ms) async {
-    int numFrames = (_currentExercise!.appConfig.cw.sampleRate * ms) ~/ 1000;
+    int numFrames = (_currentExercise.appConfig.cw.sampleRate * ms) ~/ 1000;
     var frames = List.filled(numFrames, 128);
     await _player.stop();
     await _player.setAudioSource(WavSource(
-        Uint8List.fromList(frames), _currentExercise!.appConfig.cw.sampleRate));
+        Uint8List.fromList(frames), _currentExercise.appConfig.cw.sampleRate));
   }
 }
 

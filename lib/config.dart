@@ -110,7 +110,7 @@ class FarnsworthConfig extends SharedState {
     setInt('group_size', s);
   }
 
-  int get groupNum => getInt('group_num') ?? 5;
+  int get groupNum => getInt('group_num') ?? 2;
 
   set groupNum(int n) {
     setInt('group_num', n);

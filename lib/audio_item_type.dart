@@ -5,19 +5,19 @@ enum AudioItemType {
 }
 
 class AudioItem {
-  final String text;
+  final String textString;
   final int milliseconds;
   final AudioItemType type;
 
-  AudioItem.Text(this.text)
-      : type = AudioItemType.text,
-        milliseconds = 0;
+  AudioItem.text(this.textString) :
+    type = AudioItemType.text,
+    milliseconds = 0;
 
-  AudioItem.Morse(this.text)
-      : type = AudioItemType.morse,
-        milliseconds = 0;
+  AudioItem.morse(this.textString) :
+    type = AudioItemType.morse,
+    milliseconds = 0;
 
-  AudioItem.Silence(this.milliseconds)
-      : type = AudioItemType.silence,
-        text = '';
+  AudioItem.silence(this.milliseconds) :
+    type = AudioItemType.silence,
+    textString = '';
 }
