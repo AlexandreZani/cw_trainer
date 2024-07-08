@@ -91,7 +91,8 @@ class TtsConfig extends SharedState {
 class FarnsworthConfig extends SharedState {
   FarnsworthConfig(SharedPreferences prefs) : super(prefs, 'farnsworth');
 
-  String get letters => getString('letters') ?? 'KMURESNAPTLWI.JZ=FOY,VG5/Q92H38B?47C1D60X';
+  String get letters =>
+      getString('letters') ?? 'KMURESNAPTLWI.JZ=FOY,VG5/Q92H38B?47C1D60X';
 
   set letters(String letters) {
     setString('letters', letters);
@@ -128,7 +129,8 @@ class AppConfig extends ChangeNotifier {
   }
 
   static AppConfig buildFromShared(SharedPreferences prefs) {
-    return AppConfig(CwConfig(prefs), TtsConfig(prefs), FarnsworthConfig(prefs));
+    return AppConfig(
+        CwConfig(prefs), TtsConfig(prefs), FarnsworthConfig(prefs));
   }
 }
 

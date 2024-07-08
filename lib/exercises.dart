@@ -3,16 +3,19 @@ import 'dart:math';
 
 import 'package:cw_trainer/audio_item_type.dart';
 import 'package:cw_trainer/config.dart';
+import 'package:cw_trainer/itu_phonetic_alphabet.dart';
+
+enum ExerciseType {
+  farnsworth,
+}
 
 abstract class Exercise {
   final AppConfig _appConfig;
-  final Queue<AudioItem> _queue = Queue.from([AudioItem.Pause(1000)]);
-  bool _exhausted = false;
+  final Queue<AudioItem> _queue = Queue.from([AudioItem.Silence(1000)]);
 
   Exercise(this._appConfig);
 
   get appConfig => _appConfig;
-  get complete => _exhausted && _queue.isEmpty;
 
   AudioItem? getNextAudioItem() {
     if (_queue.isEmpty) {
@@ -27,6 +30,12 @@ abstract class Exercise {
   }
 
   void _replenishQueue();
+
+  static Exercise getByType(AppConfig config, ExerciseType type) {
+    return switch (type) {
+      ExerciseType.farnsworth => FarnsworthExercise(config),
+    };
+  }
 }
 
 class FarnsworthExercise extends Exercise {
@@ -34,13 +43,12 @@ class FarnsworthExercise extends Exercise {
   final FarnsworthConfig _config;
   int _remainingGroups;
   final int _maxIndex;
-  
 
   FarnsworthExercise(super._appConfig)
       : _config = _appConfig.farnsworth,
         _remainingGroups = _appConfig.farnsworth.groupNum,
-        _maxIndex = _appConfig.farnsworth.letters
-            .indexOf(_appConfig.farnsworth.level);
+        _maxIndex =
+            _appConfig.farnsworth.letters.indexOf(_appConfig.farnsworth.level);
 
   String _randomGroup() {
     String group = '';
@@ -58,14 +66,9 @@ class FarnsworthExercise extends Exercise {
       return;
     }
 
-
     String group = _randomGroup();
     if (_remainingGroups > 0) {
       _remainingGroups -= 1;
-    }
-
-    if (_remainingGroups == 0) {
-      _exhausted = true;
     }
 
     _queue.addAll([
@@ -73,59 +76,4 @@ class FarnsworthExercise extends Exercise {
       AudioItem.Text(mapToItu(group)),
     ]);
   }
-
-}
-
-Map<String, String> ituPhoneticAlphabet = {
-  'A': 'Alpha',
-  'B': 'Bravo',
-  'C': 'Charlie',
-  'D': 'Delta',
-  'E': 'Echo',
-  'F': 'Foxtrot',
-  'G': 'Golf',
-  'H': 'Hotel',
-  'I': 'India',
-  'J': 'Juliett',
-  'K': 'Kilo',
-  'L': 'Lima',
-  'M': 'Mike',
-  'N': 'November',
-  'O': 'Oscar',
-  'P': 'Papa',
-  'Q': 'Quebec',
-  'R': 'Romeo',
-  'S': 'Sierra',
-  'T': 'Tango',
-  'U': 'Uniform',
-  'V': 'Victor',
-  'W': 'Whiskey',
-  'X': 'X-ray',
-  'Y': 'Yankee',
-  'Z': 'Zulu',
-  '0': 'Zero',
-  '1': 'One',
-  '2': 'Two',
-  '3': 'Three',
-  '4': 'Four',
-  '5': 'Five',
-  '6': 'Six',
-  '7': 'Seven',
-  '8': 'Eight',
-  '9': 'Nine',
-  '.': 'Full Stop',
-  '=': 'Equal',
-  ',': 'Comma',
-  '/': 'Slash',
-  '?': 'Question Mark',
-};
-
-String mapToItu(String input) {
-  return input.toUpperCase().split('').map((char) {
-    if (ituPhoneticAlphabet.containsKey(char)) {
-      return ituPhoneticAlphabet[char];
-    } else {
-      return char;
-    }
-  }).join(' ');
 }

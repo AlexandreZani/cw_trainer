@@ -14,21 +14,23 @@ class CwAudioHandler extends BaseAudioHandler {
   final FlutterTts _flutterTts = FlutterTts();
 
   Exercise? _currentExercise;
-  // final Queue<AudioItem> _queue = Queue<AudioItem>();
   AudioItem? _currentAudioItem;
-  bool _playing = false;
 
   CwAudioHandler() {
     // So that our clients (the Flutter UI and the system notification) know
     // what state to display, here we set up our audio handler to broadcast all
     // playback state changes as they happen via playbackState...
-    _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
+    // _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
     _player.playbackEventStream.listen((PlaybackEvent event) {
+      if (_player.playing) {
+        _onPlaying();
+      }
       if (event.processingState == ProcessingState.completed) {
         _onCompleted();
       }
     });
     _flutterTts.setCompletionHandler(_onCompleted);
+    _flutterTts.setStartHandler(_onPlaying);
   }
 
   @override
@@ -53,52 +55,72 @@ class CwAudioHandler extends BaseAudioHandler {
 
   Future<void> _onCompleted() async {
     print('AudioPlayerHandler completed');
-    _playing = false;
+
     _currentAudioItem = null;
 
     if (playbackState.isPaused) {
+      print('isPaused');
       return;
     }
 
-    if (_currentExercise!.complete) {
-      stop();
+    if (!_readyNext()) {
+      print('exercised is complete');
+      _onExerciseFinished();
+      return;
     }
-    play();
+    _beginPlayback();
+  }
+
+  Future<void> _onPlaying() async {
+    print('_onPlaying');
+    playbackState.add(PlaybackState(
+      controls: [
+        MediaControl.pause,
+        MediaControl.stop,
+      ],
+      androidCompactActionIndices: [0, 1],
+      playing: true,
+    ));
+  }
+
+  Future<void> _onExerciseFinished() async {
+    print('_onExercisedFinished');
+    playbackState.add(PlaybackState(
+      playing: false,
+    ));
   }
 
   @override
   Future<void> play() async {
     print('AudioPlayerHandler play');
-    if (_playing) {
+    if (_currentExercise == null) {
       return;
     }
 
-    _playing = true;
-    if (_currentAudioItem == null) {
-      _readyNext();
+    if (_currentAudioItem == null && !_readyNext()) {
+      return;
     }
 
+    return _beginPlayback();
+  }
+
+  Future<void> _beginPlayback() async {
+    if (_currentAudioItem == null) {
+      return;
+    }
     final session = await AudioSession.instance;
     await session.setActive(true);
 
+    _onPlaying();
     switch (_currentAudioItem!.type) {
       case AudioItemType.morse:
         return _player.play();
 
       case AudioItemType.silence:
-        return Future.delayed(
-          Duration(milliseconds: _currentAudioItem!.milliseconds),
-          () {
-            _onCompleted();
-          },
-        );
+        return _player.play();
 
       case AudioItemType.text:
         print('playing tts');
-        _flutterTts.setVolume(_currentExercise!.appConfig.tts.volume);
-        _flutterTts.setPitch(_currentExercise!.appConfig.tts.pitch);
-        _flutterTts.setSpeechRate(_currentExercise!.appConfig.tts.rate);
-
         _flutterTts.speak(_currentAudioItem!.text);
         return;
     }
@@ -106,66 +128,78 @@ class CwAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> pause() async {
-    _playing = false;
     print('AudioPlayerHandler pause');
-    switch (_currentAudioItem!.type) {
-      case AudioItemType.morse:
-        return _player.pause();
 
-      case AudioItemType.silence:
-        return;
-
-      case AudioItemType.text:
-        print('pausing tts');
-        return;
-    }
+    playbackState.add(PlaybackState(
+      controls: [
+        MediaControl.play,
+        MediaControl.stop,
+      ],
+      androidCompactActionIndices: [0, 1],
+      playing: false,
+    ));
   }
 
   @override
   Future<void> stop() async {
     print('AudioPlayerHandler stop');
-    _playing = false;
-    if (_currentAudioItem == null) {
+    if (_currentExercise == null) {
       return;
     }
+    if (!playbackState.value.playing) {
+      return;
+    }
+
     var type = _currentAudioItem!.type;
     _currentAudioItem = null;
     _currentExercise = null;
+
     switch (type) {
       case AudioItemType.morse:
+        await _player.stop();
+        break;
+
       case AudioItemType.silence:
-        return _player.stop();
+        break;
 
       case AudioItemType.text:
-        print('stopping tts');
-        _flutterTts.stop();
-        return;
+        await _flutterTts.stop();
+        break;
     }
+
+    _onExerciseFinished();
   }
 
-  void _readyNext() {
+  bool _readyNext() {
     print('_readyNext');
     _currentAudioItem = _currentExercise?.getNextAudioItem();
     if (_currentAudioItem == null) {
       stop();
-      return;
+      return false;
     }
 
     switch (_currentAudioItem!.type) {
       case AudioItemType.morse:
         _readyMorse(_currentAudioItem!.text);
         print('_readyNext morse done');
-        return;
+        return true;
 
       case AudioItemType.silence:
         _readySilence(_currentAudioItem!.milliseconds);
         print('_readyNext silence done');
-        return;
+        return true;
 
       case AudioItemType.text:
         print('tts beep boop readying: ${_currentAudioItem!.text}');
-        return;
+        _readyTts();
+        return true;
     }
+  }
+
+  void _readyTts() async {
+    _flutterTts.setVolume(_currentExercise!.appConfig.tts.volume);
+    _flutterTts.setPitch(_currentExercise!.appConfig.tts.pitch);
+    _flutterTts.setSpeechRate(_currentExercise!.appConfig.tts.rate);
   }
 
   void _readyMorse(String s) async {
@@ -182,40 +216,6 @@ class CwAudioHandler extends BaseAudioHandler {
     await _player.stop();
     await _player.setAudioSource(WavSource(
         Uint8List.fromList(frames), _currentExercise!.appConfig.cw.sampleRate));
-  }
-
-  /// Transform a just_audio event into an audio_service state.
-  ///
-  /// This method is used from the constructor. Every event received from the
-  /// just_audio player will be transformed into an audio_service state so that
-  /// it can be broadcast to audio_service clients.
-  PlaybackState _transformEvent(PlaybackEvent event) {
-    return PlaybackState(
-      controls: [
-        MediaControl.rewind,
-        if (_player.playing) MediaControl.pause else MediaControl.play,
-        MediaControl.stop,
-        MediaControl.fastForward,
-      ],
-      systemActions: const {
-        MediaAction.seek,
-        MediaAction.seekForward,
-        MediaAction.seekBackward,
-      },
-      androidCompactActionIndices: const [0, 1, 3],
-      processingState: const {
-        ProcessingState.idle: AudioProcessingState.idle,
-        ProcessingState.loading: AudioProcessingState.loading,
-        ProcessingState.buffering: AudioProcessingState.buffering,
-        ProcessingState.ready: AudioProcessingState.ready,
-        ProcessingState.completed: AudioProcessingState.completed,
-      }[_player.processingState]!,
-      playing: _player.playing,
-      updatePosition: _player.position,
-      bufferedPosition: _player.bufferedPosition,
-      speed: _player.speed,
-      queueIndex: event.currentIndex,
-    );
   }
 }
 
