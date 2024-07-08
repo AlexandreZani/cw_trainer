@@ -9,8 +9,6 @@ import 'package:cw_trainer/wav.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
 
-const sampleRate = 44100;
-
 class CwAudioHandler extends BaseAudioHandler {
   final _player = AudioPlayer();
   final FlutterTts _flutterTts = FlutterTts();
@@ -46,10 +44,10 @@ class CwAudioHandler extends BaseAudioHandler {
 
   MorseGenerator _getMorseGenerator() {
     return MorseGenerator.fromEwpm(
-      _currentExercise!.appConfig.cwConfig.wpm,
-      _currentExercise!.appConfig.cwConfig.ewpm,
-      sampleRate,
-      _currentExercise!.appConfig.cwConfig.frequency,
+      _currentExercise!.appConfig.cw.wpm,
+      _currentExercise!.appConfig.cw.ewpm,
+      _currentExercise!.appConfig.cw.sampleRate,
+      _currentExercise!.appConfig.cw.frequency,
     );
   }
 
@@ -58,9 +56,14 @@ class CwAudioHandler extends BaseAudioHandler {
     _playing = false;
     _currentAudioItem = null;
 
-    if (!_currentExercise!.complete) {
-      play();
+    if (playbackState.isPaused) {
+      return;
     }
+
+    if (_currentExercise!.complete) {
+      stop();
+    }
+    play();
   }
 
   @override
@@ -82,21 +85,35 @@ class CwAudioHandler extends BaseAudioHandler {
       case AudioItemType.morse:
         return _player.play();
 
+      case AudioItemType.silence:
+        return Future.delayed(
+          Duration(milliseconds: _currentAudioItem!.milliseconds),
+          () {
+            _onCompleted();
+          },
+        );
+
       case AudioItemType.text:
         print('playing tts');
-        _flutterTts.setVolume(1.0);
+        _flutterTts.setVolume(_currentExercise!.appConfig.tts.volume);
+        _flutterTts.setPitch(_currentExercise!.appConfig.tts.pitch);
+        _flutterTts.setSpeechRate(_currentExercise!.appConfig.tts.rate);
 
-        _flutterTts.speak(_currentAudioItem!.value);
+        _flutterTts.speak(_currentAudioItem!.text);
         return;
     }
   }
 
   @override
   Future<void> pause() async {
+    _playing = false;
     print('AudioPlayerHandler pause');
     switch (_currentAudioItem!.type) {
       case AudioItemType.morse:
         return _player.pause();
+
+      case AudioItemType.silence:
+        return;
 
       case AudioItemType.text:
         print('pausing tts');
@@ -107,6 +124,7 @@ class CwAudioHandler extends BaseAudioHandler {
   @override
   Future<void> stop() async {
     print('AudioPlayerHandler stop');
+    _playing = false;
     if (_currentAudioItem == null) {
       return;
     }
@@ -115,6 +133,7 @@ class CwAudioHandler extends BaseAudioHandler {
     _currentExercise = null;
     switch (type) {
       case AudioItemType.morse:
+      case AudioItemType.silence:
         return _player.stop();
 
       case AudioItemType.text:
@@ -134,12 +153,17 @@ class CwAudioHandler extends BaseAudioHandler {
 
     switch (_currentAudioItem!.type) {
       case AudioItemType.morse:
-        _readyMorse(_currentAudioItem!.value);
+        _readyMorse(_currentAudioItem!.text);
         print('_readyNext morse done');
         return;
 
+      case AudioItemType.silence:
+        _readySilence(_currentAudioItem!.milliseconds);
+        print('_readyNext silence done');
+        return;
+
       case AudioItemType.text:
-        print('tts beep boop readying: ${_currentAudioItem!.value}');
+        print('tts beep boop readying: ${_currentAudioItem!.text}');
         return;
     }
   }
@@ -147,7 +171,17 @@ class CwAudioHandler extends BaseAudioHandler {
   void _readyMorse(String s) async {
     var generator = _getMorseGenerator();
     var frames = generator.stringToPcm(s);
-    _player.setAudioSource(WavSource(frames));
+    await _player.stop();
+    await _player.setAudioSource(
+        WavSource(frames, _currentExercise!.appConfig.cw.sampleRate));
+  }
+
+  void _readySilence(int ms) async {
+    int numFrames = (_currentExercise!.appConfig.cw.sampleRate * ms) ~/ 1000;
+    var frames = List.filled(numFrames, 128);
+    await _player.stop();
+    await _player.setAudioSource(WavSource(
+        Uint8List.fromList(frames), _currentExercise!.appConfig.cw.sampleRate));
   }
 
   /// Transform a just_audio event into an audio_service state.
@@ -186,9 +220,10 @@ class CwAudioHandler extends BaseAudioHandler {
 }
 
 class WavSource extends StreamAudioSource {
-  // Assumes pcm was sampled at 44.1kHz in 16 bits.
+  // Assumes pcm was sampled at 44.1kHz in 8 bits.
   final Uint8List _wav;
-  WavSource(List<int> frames) : _wav = pcmToWav(frames, sampleRate);
+  WavSource(List<int> frames, int sampleRate)
+      : _wav = pcmToWav(frames, sampleRate);
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {

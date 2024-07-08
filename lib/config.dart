@@ -44,6 +44,7 @@ class CwConfig extends SharedState {
   int get wpm => getInt('wpm') ?? 20;
   int get ewpm => getInt('ewpm') ?? 12;
   int get frequency => getInt('frequency') ?? 500;
+  int get sampleRate => getInt('sample_rate') ?? 44100;
 
   set wpm(int wpm) {
     setInt('wpm', wpm);
@@ -55,6 +56,10 @@ class CwConfig extends SharedState {
 
   set frequency(int frequency) {
     setInt('frequency', frequency);
+  }
+
+  set sampleRate(int frequency) {
+    setInt('sample_rate', frequency);
   }
 }
 
@@ -100,18 +105,26 @@ class FarnsworthConfig extends SharedState {
 
   int get groupSize => getInt('group_size') ?? 4;
 
+  set groupSize(int s) {
+    setInt('group_size', s);
+  }
+
   int get groupNum => getInt('group_num') ?? 5;
+
+  set groupNum(int n) {
+    setInt('group_num', n);
+  }
 }
 
 class AppConfig extends ChangeNotifier {
-  CwConfig cwConfig;
-  TtsConfig ttsConfig;
-  FarnsworthConfig farnsworthConfig;
+  CwConfig cw;
+  TtsConfig tts;
+  FarnsworthConfig farnsworth;
 
-  AppConfig(this.cwConfig, this.ttsConfig, this.farnsworthConfig) {
-    cwConfig.addListener(notifyListeners);
-    ttsConfig.addListener(notifyListeners);
-    farnsworthConfig.addListener(notifyListeners);
+  AppConfig(this.cw, this.tts, this.farnsworth) {
+    cw.addListener(notifyListeners);
+    tts.addListener(notifyListeners);
+    farnsworth.addListener(notifyListeners);
   }
 
   static AppConfig buildFromShared(SharedPreferences prefs) {

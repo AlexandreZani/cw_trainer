@@ -6,7 +6,7 @@ import 'package:cw_trainer/config.dart';
 
 abstract class Exercise {
   final AppConfig _appConfig;
-  final Queue<AudioItem> _queue = Queue();
+  final Queue<AudioItem> _queue = Queue.from([AudioItem.Pause(1000)]);
   bool _exhausted = false;
 
   Exercise(this._appConfig);
@@ -37,10 +37,10 @@ class FarnsworthExercise extends Exercise {
   
 
   FarnsworthExercise(super._appConfig)
-      : _config = _appConfig.farnsworthConfig,
-        _remainingGroups = _appConfig.farnsworthConfig.groupNum,
-        _maxIndex = _appConfig.farnsworthConfig.letters
-            .indexOf(_appConfig.farnsworthConfig.level);
+      : _config = _appConfig.farnsworth,
+        _remainingGroups = _appConfig.farnsworth.groupNum,
+        _maxIndex = _appConfig.farnsworth.letters
+            .indexOf(_appConfig.farnsworth.level);
 
   String _randomGroup() {
     String group = '';
@@ -53,6 +53,7 @@ class FarnsworthExercise extends Exercise {
 
   @override
   void _replenishQueue() {
+    print('_replenishQueue $_remainingGroups');
     if (_remainingGroups == 0) {
       return;
     }
@@ -68,8 +69,8 @@ class FarnsworthExercise extends Exercise {
     }
 
     _queue.addAll([
-      (AudioItem(group, AudioItemType.morse)),
-      (AudioItem(mapToItu(group), AudioItemType.text)),
+      AudioItem.Morse(group),
+      AudioItem.Text(mapToItu(group)),
     ]);
   }
 
