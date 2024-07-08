@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cw_trainer/audio_item_type.dart';
 import 'package:cw_trainer/config.dart';
 import 'package:cw_trainer/itu_phonetic_alphabet.dart';
+import 'package:logging/logging.dart';
 
 enum ExerciseType {
   farnsworth,
@@ -39,6 +40,7 @@ abstract class Exercise {
 }
 
 class FarnsworthExercise extends Exercise {
+  final log = Logger('FarnsworthExercise');
   final Random _random = Random();
   final FarnsworthConfig _config;
   int _remainingGroups;
@@ -61,7 +63,7 @@ class FarnsworthExercise extends Exercise {
 
   @override
   void _replenishQueue() {
-    print('_replenishQueue $_remainingGroups');
+    log.finest('_replenishQueue $_remainingGroups');
     if (_remainingGroups == 0) {
       return;
     }

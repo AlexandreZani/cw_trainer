@@ -6,17 +6,24 @@ import 'package:provider/provider.dart';
 import 'package:cw_trainer/config.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:logging/logging.dart';
 
 late AudioHandler _audioHandler;
 
 extension CwTrainerAudioHandler on AudioHandler {
   Future<void> setExerciseType(ExerciseType exerciseType) async {
-    _audioHandler.customAction('setExerciseType', {'exerciseType': exerciseType});
+    _audioHandler
+        .customAction('setExerciseType', {'exerciseType': exerciseType});
   }
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
+
   var prefs = await SharedPreferences.getInstance();
   AppConfig config = AppConfig.buildFromShared(prefs);
 
@@ -52,6 +59,7 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   late AppConfig appConfig;
+  final log = Logger('MyAppState');
 
   MyAppState() : super() {
     SharedPreferences.getInstance().then(
@@ -60,7 +68,7 @@ class MyAppState extends ChangeNotifier {
         appConfig.addListener(notifyListeners);
       },
     );
-    print('MyAppState constructed');
+    log.finest('MyAppState constructed');
   }
 }
 
@@ -135,7 +143,9 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class PracticePage extends StatelessWidget {
-  const PracticePage({
+  final log = Logger('PracticePage');
+
+  PracticePage({
     super.key,
     required this.appState,
   });
@@ -144,7 +154,7 @@ class PracticePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('building playback page');
+    log.finest('building playback page');
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -153,14 +163,14 @@ class PracticePage extends StatelessWidget {
           children: [
             IconButton(
               onPressed: () async {
-                print('play');
+                log.finest('play');
                 await _audioHandler.play();
               },
               icon: const Icon(Icons.play_arrow),
             ),
             IconButton(
               onPressed: () {
-                print('stop');
+                log.finest('stop');
                 _audioHandler.stop();
               },
               icon: const Icon(Icons.stop),

@@ -9,18 +9,22 @@ import 'package:cw_trainer/exercises.dart';
 import 'package:cw_trainer/wav.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:logging/logging.dart';
 
 class CwAudioHandler extends BaseAudioHandler {
+  final log = Logger('CwAudioHandler');
   final _player = AudioPlayer();
   final FlutterTts _flutterTts = FlutterTts();
   bool _paused = false;
 
   ExerciseType _exerciseType = ExerciseType.farnsworth;
-  AppConfig _appConfig;
+  final AppConfig _appConfig;
   Exercise _currentExercise;
   AudioItem? _currentAudioItem;
 
-  CwAudioHandler(this._appConfig) : _currentExercise = Exercise.getByType(_appConfig, ExerciseType.farnsworth) {
+  CwAudioHandler(this._appConfig)
+      : _currentExercise =
+            Exercise.getByType(_appConfig, ExerciseType.farnsworth) {
     // So that our clients (the Flutter UI and the system notification) know
     // what state to display, here we set up our audio handler to broadcast all
     // playback state changes as they happen via playbackState...
@@ -62,12 +66,12 @@ class CwAudioHandler extends BaseAudioHandler {
   }
 
   Future<void> _onCompleted() async {
-    print('AudioPlayerHandler completed');
+    log.finest('AudioPlayerHandler completed');
 
     _currentAudioItem = null;
 
     if (_paused) {
-      print('isPaused');
+      log.finest('isPaused');
       playbackState.add(PlaybackState(
         controls: [
           MediaControl.play,
@@ -80,7 +84,7 @@ class CwAudioHandler extends BaseAudioHandler {
     }
 
     if (!_readyNext()) {
-      print('exercised is complete');
+      log.finest('exercised is complete');
       _onExerciseFinished();
       return;
     }
@@ -88,7 +92,7 @@ class CwAudioHandler extends BaseAudioHandler {
   }
 
   Future<void> _onPlaying() async {
-    print('_onPlaying');
+    log.finest('_onPlaying');
     if (_paused) {
       return;
     }
@@ -107,17 +111,17 @@ class CwAudioHandler extends BaseAudioHandler {
   }
 
   Future<void> _onExerciseFinished() async {
-    print('_onExercisedFinished');
+    log.finest('_onExercisedFinished');
     playbackState.add(PlaybackState(
       playing: false,
     ));
     _resetExercise();
-    print('_onExercisedFinished finished');
+    log.finest('_onExercisedFinished finished');
   }
 
   @override
   Future<void> play() async {
-    print('AudioPlayerHandler play');
+    log.finest('AudioPlayerHandler play');
     _paused = false;
 
     if (_currentAudioItem == null && !_readyNext()) {
@@ -143,7 +147,7 @@ class CwAudioHandler extends BaseAudioHandler {
         return _player.play();
 
       case AudioItemType.text:
-        print('playing tts');
+        log.finest('playing tts');
         _flutterTts.speak(_currentAudioItem!.textString);
         return;
     }
@@ -151,13 +155,13 @@ class CwAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> pause() async {
-    print('AudioPlayerHandler pause');
+    log.finest('AudioPlayerHandler pause');
     _paused = true;
   }
 
   @override
   Future<void> stop() async {
-    print('AudioPlayerHandler stop');
+    log.finest('AudioPlayerHandler stop');
     if (!playbackState.value.playing) {
       return;
     }
@@ -183,7 +187,7 @@ class CwAudioHandler extends BaseAudioHandler {
   }
 
   bool _readyNext() {
-    print('_readyNext');
+    log.finest('_readyNext');
     _currentAudioItem = _currentExercise.getNextAudioItem();
     if (_currentAudioItem == null) {
       return false;
@@ -192,16 +196,16 @@ class CwAudioHandler extends BaseAudioHandler {
     switch (_currentAudioItem!.type) {
       case AudioItemType.morse:
         _readyMorse(_currentAudioItem!.textString);
-        print('_readyNext morse done');
+        log.finest('_readyNext morse done');
         return true;
 
       case AudioItemType.silence:
         _readySilence(_currentAudioItem!.milliseconds);
-        print('_readyNext silence done');
+        log.finest('_readyNext silence done');
         return true;
 
       case AudioItemType.text:
-        print('tts beep boop readying: ${_currentAudioItem!.textString}');
+        log.finest('tts beep boop readying: ${_currentAudioItem!.textString}');
         _readyTts();
         return true;
     }
@@ -231,6 +235,7 @@ class CwAudioHandler extends BaseAudioHandler {
 }
 
 class WavSource extends StreamAudioSource {
+  final log = Logger('WavSource');
   // Assumes pcm was sampled at 44.1kHz in 8 bits.
   final Uint8List _wav;
   WavSource(List<int> frames, int sampleRate)
@@ -238,7 +243,7 @@ class WavSource extends StreamAudioSource {
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
-    print('AudioStream requested');
+    log.finest('AudioStream requested');
     var r = StreamAudioResponse(
       sourceLength: _wav.length,
       contentLength: _wav.length,
@@ -248,16 +253,17 @@ class WavSource extends StreamAudioSource {
       rangeRequestsSupported: false,
     );
     // writeToFile(_wav);
-    print('Made response ${_wav.length}');
+    log.finest('Made response ${_wav.length}');
     return r;
   }
 }
 
 void writeToFile(List<int> frames) async {
+  final log = Logger('writeToFile');
   // final Directory directory = await getApplicationCacheDirectory();
   String filepath =
       '/storage/emulated/0/Download/cw.wav'; // '${directory.path}/my_file.wav';
-  print(filepath);
+  log.finest(filepath);
   final File file = File(filepath);
   var sink = file.openWrite();
   file.writeAsBytes(frames);
