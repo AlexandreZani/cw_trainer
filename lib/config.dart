@@ -67,7 +67,7 @@ class TtsConfig extends SharedState {
   TtsConfig(SharedPreferences prefs) : super(prefs, 'tts');
 
   String get language => getString('language') ?? 'en-US';
-  double get rate => getDouble('rate') ?? 1.0;
+  double get rate => getDouble('rate') ?? 0.7;
   double get pitch => getDouble('pitch') ?? 1.0;
   double get volume => getDouble('volume') ?? 1.0;
 
