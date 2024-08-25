@@ -25,10 +25,6 @@ class CwAudioHandler extends BaseAudioHandler {
   CwAudioHandler(this._appConfig)
       : _currentExercise =
             Exercise.getByType(_appConfig, ExerciseType.farnsworth) {
-    // So that our clients (the Flutter UI and the system notification) know
-    // what state to display, here we set up our audio handler to broadcast all
-    // playback state changes as they happen via playbackState...
-    // _player.playbackEventStream.map(_transformEvent).pipe(playbackState);
     _player.playbackEventStream.listen((PlaybackEvent event) {
       if (_player.playing) {
         _onPlaying();

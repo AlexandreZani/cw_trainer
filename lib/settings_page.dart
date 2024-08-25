@@ -110,6 +110,16 @@ class SettingsPage extends StatelessWidget {
             appState.appConfig.farnsworth.groupSize = i;
           },
         ),
+        NumSetting(
+          label: "Number of Groups",
+          initialValue: appState.appConfig.farnsworth.groupNum,
+          min: -1,
+          max: 15,
+          step: 1,
+          onSelected: (int i) {
+            appState.appConfig.farnsworth.groupNum = i;
+          },
+        ),
       ],
     );
   }
