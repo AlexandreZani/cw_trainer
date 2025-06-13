@@ -166,6 +166,7 @@ class PracticePage extends StatelessWidget {
                 log.finest('play');
                 await _audioHandler.play();
               },
+              iconSize: 48,
               icon: const Icon(Icons.play_arrow),
             ),
             IconButton(
@@ -173,6 +174,7 @@ class PracticePage extends StatelessWidget {
                 log.finest('stop');
                 _audioHandler.stop();
               },
+              iconSize: 48,
               icon: const Icon(Icons.stop),
             ),
           ],

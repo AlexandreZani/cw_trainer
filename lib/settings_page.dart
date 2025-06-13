@@ -16,17 +16,15 @@ class SettingsPage extends StatelessWidget {
       children: [
         const ListTile(title: Text('CW')),
         const Divider(),
-        ListTile(
-          title: NumSetting(
-            label: "WPM",
-            initialValue: appState.appConfig.cw.wpm,
-            min: 5,
-            max: 40,
-            step: 1,
-            onSelected: (int i) {
-              appState.appConfig.cw.wpm = i;
-            },
-          ),
+        NumSetting(
+          label: "WPM",
+          initialValue: appState.appConfig.cw.wpm,
+          min: 5,
+          max: 40,
+          step: 1,
+          onSelected: (int i) {
+            appState.appConfig.cw.wpm = i;
+          },
         ),
         NumSetting(
           label: "EWPM",
@@ -113,7 +111,7 @@ class SettingsPage extends StatelessWidget {
         NumSetting(
           label: "Number of Groups",
           initialValue: appState.appConfig.farnsworth.groupNum,
-          min: -1,
+          min: 1,
           max: 15,
           step: 1,
           onSelected: (int i) {
