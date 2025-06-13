@@ -170,6 +170,14 @@ class PracticePage extends StatelessWidget {
               icon: const Icon(Icons.play_arrow),
             ),
             IconButton(
+              onPressed: () async {
+                log.finest('pause with impl');
+                await _audioHandler.pause();
+              },
+              iconSize: 48,
+              icon: const Icon(Icons.pause),
+            ),
+            IconButton(
               onPressed: () {
                 log.finest('stop');
                 _audioHandler.stop();
