@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -113,7 +115,15 @@ class FarnsworthConfig extends SharedState {
   int get groupNum => getInt('group_num') ?? 2;
 
   set groupNum(int n) {
-    setInt('group_num', n);
+    setInt('group_num', max(n, 1));
+  }
+
+  bool get repeat {
+    return (getInt('repeat') ?? 0) == 1;
+  }
+
+  set repeat(bool v) {
+    setInt('repeat', v ? 1 : 0);
   }
 }
 

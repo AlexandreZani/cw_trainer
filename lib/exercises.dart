@@ -45,10 +45,12 @@ class FarnsworthExercise extends Exercise {
   final FarnsworthConfig _config;
   int _remainingGroups;
   final int _maxIndex;
+  final bool _repeat;
 
   FarnsworthExercise(super._appConfig)
       : _config = _appConfig.farnsworth,
         _remainingGroups = _appConfig.farnsworth.groupNum,
+        _repeat = _appConfig.farnsworth.repeat,
         _maxIndex =
             _appConfig.farnsworth.letters.indexOf(_appConfig.farnsworth.level);
 
@@ -63,15 +65,15 @@ class FarnsworthExercise extends Exercise {
 
   @override
   void _replenishQueue() {
-    log.finest('_replenishQueue $_remainingGroups');
-    if (_remainingGroups == 0) {
-      return;
+    log.finest('_replenishQueue $_remainingGroups _repeat $_repeat');
+    if (!_repeat) {
+      if (_remainingGroups <= 0) {
+        return;
+      }
+      _remainingGroups -= 1;
     }
 
     String group = _randomGroup();
-    if (_remainingGroups > 0) {
-      _remainingGroups -= 1;
-    }
 
     _queue.addAll([
       AudioItem.morse(group),
