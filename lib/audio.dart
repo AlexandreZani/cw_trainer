@@ -35,6 +35,11 @@ class CwAudioHandler extends BaseAudioHandler {
     });
     _flutterTts.setCompletionHandler(_onCompleted);
     _flutterTts.setStartHandler(_onPlaying);
+    playbackState.add(playbackState.value.copyWith(
+      controls: [MediaControl.play],
+      playing: false,
+      androidCompactActionIndices: [0],
+    ));
   }
 
   @override
@@ -68,7 +73,7 @@ class CwAudioHandler extends BaseAudioHandler {
 
     if (_paused) {
       log.finest('isPaused');
-      playbackState.add(PlaybackState(
+      playbackState.add(playbackState.value.copyWith(
         controls: [
           MediaControl.play,
           MediaControl.stop,
@@ -92,7 +97,7 @@ class CwAudioHandler extends BaseAudioHandler {
     if (_paused) {
       return;
     }
-    playbackState.add(PlaybackState(
+    playbackState.add(playbackState.value.copyWith(
       controls: [
         MediaControl.pause,
         MediaControl.stop,
@@ -108,8 +113,10 @@ class CwAudioHandler extends BaseAudioHandler {
 
   Future<void> _onExerciseFinished() async {
     log.finest('_onExercisedFinished');
-    playbackState.add(PlaybackState(
+    playbackState.add(playbackState.value.copyWith(
+      controls: [MediaControl.play],
       playing: false,
+      androidCompactActionIndices: [0],
     ));
     _resetExercise();
     log.finest('_onExercisedFinished finished');
@@ -158,10 +165,6 @@ class CwAudioHandler extends BaseAudioHandler {
   @override
   Future<void> stop() async {
     log.finest('AudioPlayerHandler stop');
-    if (!playbackState.value.playing) {
-      return;
-    }
-
     if (_currentAudioItem != null) {
       var type = _currentAudioItem!.type;
       _currentAudioItem = null;

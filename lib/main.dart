@@ -1,5 +1,6 @@
 import 'package:cw_trainer/audio.dart';
 import 'package:cw_trainer/exercises.dart';
+import 'package:cw_trainer/practice_page.dart';
 import 'package:cw_trainer/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -135,59 +136,10 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: switch (currentPage) {
-        Pages.practice => PracticePage(appState: appState),
+        Pages.practice =>
+          PracticePage(appState: appState, audioHandler: _audioHandler),
         Pages.settings => SettingsPage(appState: appState),
       },
-    );
-  }
-}
-
-class PracticePage extends StatelessWidget {
-  final log = Logger('PracticePage');
-
-  PracticePage({
-    super.key,
-    required this.appState,
-  });
-
-  final MyAppState appState;
-
-  @override
-  Widget build(BuildContext context) {
-    log.finest('building playback page');
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              onPressed: () async {
-                log.finest('play');
-                await _audioHandler.play();
-              },
-              iconSize: 48,
-              icon: const Icon(Icons.play_arrow),
-            ),
-            IconButton(
-              onPressed: () async {
-                log.finest('pause with impl');
-                await _audioHandler.pause();
-              },
-              iconSize: 48,
-              icon: const Icon(Icons.pause),
-            ),
-            IconButton(
-              onPressed: () {
-                log.finest('stop');
-                _audioHandler.stop();
-              },
-              iconSize: 48,
-              icon: const Icon(Icons.stop),
-            ),
-          ],
-        )
-      ],
     );
   }
 }
