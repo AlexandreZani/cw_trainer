@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
               decoration: BoxDecoration(
                 color: Colors.blue,
               ),
-              child: Text('Drawer Header'),
+              child: Text(''),
             ),
             ListTile(
               leading: const Icon(Icons.settings),
