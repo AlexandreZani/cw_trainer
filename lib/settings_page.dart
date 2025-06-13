@@ -125,6 +125,13 @@ class SettingsPage extends StatelessWidget {
             appState.appConfig.farnsworth.repeat = v;
           },
         ),
+        BoolSetting(
+          label: "Force Latest Letter",
+          initialValue: appState.appConfig.farnsworth.forceLatest,
+          onChanged: (bool v) {
+            appState.appConfig.farnsworth.forceLatest = v;
+          },
+        ),
       ],
     );
   }

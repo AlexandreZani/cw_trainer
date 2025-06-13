@@ -44,29 +44,33 @@ class FarnsworthExercise extends Exercise {
   final Random _random = Random();
   final FarnsworthConfig _config;
   int _remainingGroups;
-  final int _maxIndex;
-  final bool _repeat;
 
   FarnsworthExercise(super._appConfig)
       : _config = _appConfig.farnsworth,
-        _remainingGroups = _appConfig.farnsworth.groupNum,
-        _repeat = _appConfig.farnsworth.repeat,
-        _maxIndex =
-            _appConfig.farnsworth.letters.indexOf(_appConfig.farnsworth.level);
+        _remainingGroups = _appConfig.farnsworth.groupNum;
 
   String _randomGroup() {
     String group = '';
+    int maxIndex =
+        _appConfig.farnsworth.letters.indexOf(_appConfig.farnsworth.level);
     while (group.length < _config.groupSize) {
-      int i = _random.nextInt(_maxIndex + 1);
+      int i = _random.nextInt(maxIndex + 1);
       group += _config.letters[i];
     }
+
+    String latest = _config.letters[maxIndex];
+    if (_config.forceLatest && !group.contains(latest)) {
+      int i = _random.nextInt(group.length);
+      group = group.replaceRange(i, i + 1, latest);
+    }
+
     return group;
   }
 
   @override
   void _replenishQueue() {
-    log.finest('_replenishQueue $_remainingGroups _repeat $_repeat');
-    if (!_repeat) {
+    log.finest('_replenishQueue $_remainingGroups');
+    if (!_config.repeat) {
       if (_remainingGroups <= 0) {
         return;
       }

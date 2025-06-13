@@ -24,6 +24,10 @@ class SharedState extends ChangeNotifier {
     return _prefs.getString(key(k));
   }
 
+  bool? getBool(String k) {
+    return _prefs.getBool(k);
+  }
+
   void setInt(String k, int v) {
     _prefs.setInt(key(k), v);
     notifyListeners();
@@ -36,6 +40,11 @@ class SharedState extends ChangeNotifier {
 
   void setString(String k, String v) {
     _prefs.setString(key(k), v);
+    notifyListeners();
+  }
+
+  void setBool(String k, bool v) {
+    _prefs.setBool(k, v);
     notifyListeners();
   }
 }
@@ -118,12 +127,16 @@ class FarnsworthConfig extends SharedState {
     setInt('group_num', max(n, 1));
   }
 
-  bool get repeat {
-    return (getInt('repeat') ?? 0) == 1;
-  }
+  bool get repeat => getBool('repeat') ?? false;
 
   set repeat(bool v) {
-    setInt('repeat', v ? 1 : 0);
+    setBool('repeat', v);
+  }
+
+  bool get forceLatest => getBool('force_latest') ?? true;
+
+  set forceLatest(bool v) {
+    setBool('force_latest', v);
   }
 }
 
