@@ -19,6 +19,25 @@ class PracticePage extends StatelessWidget {
   Widget build(BuildContext context) {
     log.finest('building playback page');
 
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [PlayControls(audioHandler: audioHandler, log: log)],
+    );
+  }
+}
+
+class PlayControls extends StatelessWidget {
+  const PlayControls({
+    super.key,
+    required this.audioHandler,
+    required this.log,
+  });
+
+  final AudioHandler audioHandler;
+  final Logger log;
+
+  @override
+  Widget build(BuildContext context) {
     return StreamBuilder<PlaybackState>(
         stream: audioHandler.playbackState,
         builder: (context, snapshot) {
@@ -58,14 +77,9 @@ class PracticePage extends StatelessWidget {
             ));
           }
 
-          return Column(
+          return Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: children,
-              )
-            ],
+            children: children,
           );
         });
   }

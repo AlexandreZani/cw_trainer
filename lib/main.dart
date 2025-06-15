@@ -97,44 +97,31 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
 
+    var navBarIndex = switch (currentPage) {
+      Pages.practice => 0,
+      Pages.settings => 1,
+    };
+
     return Scaffold(
       appBar: AppBar(title: const Text('CW Trainer')),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(''),
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
-              onTap: () {
-                setState(() {
-                  currentPage = Pages.settings;
-                });
-
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Visibility(
-                  visible: false, child: Icon(Icons.chevron_right)),
-              title: const Text('Practice'),
-              onTap: () {
-                setState(() {
-                  currentPage = Pages.practice;
-                });
-
-                Navigator.pop(context);
-              },
-            )
+      bottomNavigationBar: NavigationBar(
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          selectedIndex: navBarIndex,
+          destinations: const <Widget>[
+            NavigationDestination(icon: Icon(Icons.school), label: "Practice"),
+            NavigationDestination(
+                icon: Icon(Icons.settings), label: "Settings"),
           ],
-        ),
-      ),
+          onDestinationSelected: (int selectedIndex) {
+            setState(() {
+              switch (selectedIndex) {
+                case 0:
+                  currentPage = Pages.practice;
+                case 1:
+                  currentPage = Pages.settings;
+              }
+            });
+          }),
       body: switch (currentPage) {
         Pages.practice =>
           PracticePage(appState: appState, audioHandler: _audioHandler),
