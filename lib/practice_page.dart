@@ -21,8 +21,60 @@ class PracticePage extends StatelessWidget {
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [PlayControls(audioHandler: audioHandler, log: log)],
+      children: [
+        Spacer(),
+        Spacer(),
+        Spacer(),
+        PlayControls(audioHandler: audioHandler, log: log),
+        Spacer(),
+        PracticeSettings(appState: appState),
+        Spacer(),
+      ],
     );
+  }
+}
+
+class PracticeSettings extends StatelessWidget {
+  const PracticeSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    var letters = appState.appConfig.farnsworth.letters;
+    var curChar = appState.appConfig.farnsworth.level;
+    var i = letters.indexOf(curChar);
+
+    return Column(children: [
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        IconButton(
+            iconSize: 48,
+            icon: const Icon(Icons.chevron_left),
+            onPressed: () {
+              if (i <= 0) {
+                return;
+              }
+
+              var nc = appState.appConfig.farnsworth.letters[i - 1];
+              appState.appConfig.farnsworth.level = nc;
+            }),
+        Text(curChar),
+        IconButton(
+            iconSize: 48,
+            icon: const Icon(Icons.chevron_right),
+            onPressed: () {
+              if (i >= letters.length - 1) {
+                return;
+              }
+
+              var nc = appState.appConfig.farnsworth.letters[i + 1];
+              appState.appConfig.farnsworth.level = nc;
+            })
+      ])
+    ]);
   }
 }
 

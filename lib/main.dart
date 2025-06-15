@@ -36,16 +36,20 @@ void main() async {
       androidNotificationOngoing: true,
     ),
   );
-  runApp(const MyApp());
+  runApp(MyApp(
+    appConfig: config,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.appConfig});
+
+  final AppConfig appConfig;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
+      create: (context) => MyAppState(appConfig),
       child: MaterialApp(
         title: 'CW Trainer',
         theme: ThemeData(
@@ -59,16 +63,11 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  late AppConfig appConfig;
+  final AppConfig appConfig;
   final log = Logger('MyAppState');
 
-  MyAppState() : super() {
-    SharedPreferences.getInstance().then(
-      (prefs) {
-        appConfig = AppConfig.buildFromShared(prefs);
-        appConfig.addListener(notifyListeners);
-      },
-    );
+  MyAppState(this.appConfig) : super() {
+    appConfig.addListener(notifyListeners);
     log.finest('MyAppState constructed');
   }
 }
