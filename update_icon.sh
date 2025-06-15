@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 python3 assets/icon.py
-magick -background none assets/cw_icon.svg assets/cw_icon.png
-cp assets/cw_icon.png android/app/src/main/res/drawable/
+magick assets/background_icon.svg android/app/src/main/res/drawable/background_icon.png
+magick -background none assets/foreground_icon.svg android/app/src/main/res/drawable/foreground_icon.png

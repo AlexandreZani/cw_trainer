@@ -1,10 +1,10 @@
 from math import sin, cos, tan, sqrt, radians
 from xml.dom import getDOMImplementation
-import argparse
 
 SIZE = 512
 OFFSET = SIZE/2
-DIT = (SIZE/2)/18
+# For whatever reason, this is the right ratio to make things work
+DIT = (SIZE/2)/25
 
 def makeElement(doc, tag, **attrs):
   el = doc.createElement(tag)
@@ -79,14 +79,7 @@ def letters(doc, parent, ls):
 #svg.appendChild(pulse(doc, 0, 100, 40, 30, fill='#34deeb'))
 #svg.appendChild(radial(doc, 20, stroke='orange'))
 
-def main():
-  parser = argparse.ArgumentParser(
-    prog = 'icon.py',
-    description = 'Creates svg icon'
-  )
-  parser.add_argument('-background', action='store_true')
-  args = parser.parse_args()
-
+def new_doc():
   impl = getDOMImplementation()
   doc = impl.createDocument(None, None, None)
 
@@ -97,16 +90,30 @@ def main():
   svg.setAttribute('height', str(SIZE))
   svg.setAttribute('viewBox', '{:f} {:f} {:f} {:f}'.format(0, 0, SIZE, SIZE))
   doc.appendChild(svg)
+  return doc, svg
+
+def foreground():
+  doc, svg = new_doc()
   svg.appendChild(makeElement(doc, 'circle', cx=OFFSET, cy=OFFSET, r = OFFSET, fill='white'))
 
   ls = ['--..', '..-.', '-.-.']
   ls2 = ['-.-', '--...'] + ls
-  if args.background:
-    svg.appendChild(makeElement(doc, 'rect', x=0, y=0, width=SIZE, height=SIZE, fill='white'))
   letters(doc, svg, ls2)
+  return doc
 
-  with open('assets/cw_icon.svg', 'w') as fp:
-    fp.write(doc.toprettyxml())
+def background():
+  doc, svg = new_doc()
+  svg.appendChild(makeElement(doc, 'rect', x=0, y=0, width=SIZE, height=SIZE, fill='white'))
+  return doc
+
+def main():
+  foreground_doc = foreground()
+  with open('assets/foreground_icon.svg', 'w') as fp:
+    fp.write(foreground_doc.toprettyxml())
+
+  background_doc = background()
+  with open('assets/background_icon.svg', 'w') as fp:
+    fp.write(background_doc.toprettyxml())
 
 if __name__ == '__main__':
   main()
