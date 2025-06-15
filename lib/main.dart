@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
         ),
-        home: const MyHomePage(),
+        home: const MyHomePage(currentPage: Pages.practice),
       ),
     );
   }
@@ -78,20 +78,9 @@ enum Pages {
   settings,
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  Pages currentPage = Pages.practice;
-
-  @override
-  void initState() {
-    super.initState();
-  }
+class MyHomePage extends StatelessWidget {
+  final Pages currentPage;
+  const MyHomePage({super.key, required this.currentPage});
 
   @override
   Widget build(BuildContext context) {
@@ -113,14 +102,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 icon: Icon(Icons.settings), label: "Settings"),
           ],
           onDestinationSelected: (int selectedIndex) {
-            setState(() {
-              switch (selectedIndex) {
-                case 0:
-                  currentPage = Pages.practice;
-                case 1:
-                  currentPage = Pages.settings;
-              }
-            });
+            switch (selectedIndex) {
+              case 0:
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const MyHomePage(currentPage: Pages.practice)));
+              case 1:
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const MyHomePage(currentPage: Pages.settings)));
+            }
           }),
       body: switch (currentPage) {
         Pages.practice =>
