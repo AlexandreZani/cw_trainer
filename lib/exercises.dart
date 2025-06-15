@@ -78,9 +78,11 @@ class FarnsworthExercise extends Exercise {
     }
 
     String group = _randomGroup();
+    int delayMs = (_config.delay * 1000).round();
 
     _queue.addAll([
       AudioItem.morse(group),
+      AudioItem.silence(delayMs),
       AudioItem.text(mapToItu(group)),
     ]);
   }

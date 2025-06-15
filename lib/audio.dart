@@ -166,20 +166,8 @@ class CwAudioHandler extends BaseAudioHandler {
   Future<void> stop() async {
     log.finest('AudioPlayerHandler stop');
     if (_currentAudioItem != null) {
-      var type = _currentAudioItem!.type;
       _currentAudioItem = null;
-      switch (type) {
-        case AudioItemType.morse:
-          await _player.stop();
-          break;
-
-        case AudioItemType.silence:
-          break;
-
-        case AudioItemType.text:
-          await _flutterTts.stop();
-          break;
-      }
+      await _player.stop();
     }
 
     _onExerciseFinished();

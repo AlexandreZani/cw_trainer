@@ -87,6 +87,16 @@ class SettingsPage extends StatelessWidget {
             appState.appConfig.tts.volume = i;
           },
         ),
+        NumSetting(
+          label: "Delay Before Speaking",
+          initialValue: appState.appConfig.farnsworth.delay,
+          min: 0.0,
+          max: 3.0,
+          step: 0.5,
+          onSelected: (double i) {
+            appState.appConfig.farnsworth.delay = i;
+          },
+        ),
         const Divider(),
         const ListTile(title: Text('Farnsworth')),
         const Divider(),

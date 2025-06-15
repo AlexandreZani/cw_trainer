@@ -138,6 +138,12 @@ class FarnsworthConfig extends SharedState {
   set forceLatest(bool v) {
     setBool('force_latest', v);
   }
+
+  double get delay => getDouble('delay') ?? 1.0;
+
+  set delay(double delay) {
+    setDouble('delay', delay);
+  }
 }
 
 class AppConfig extends ChangeNotifier {
