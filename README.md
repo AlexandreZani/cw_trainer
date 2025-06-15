@@ -3,5 +3,5 @@
 ## To update launcher icon
 
 ```
-flutter pub run flutter_launcher_icons
+./update_icon.sh
 ```
