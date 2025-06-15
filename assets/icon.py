@@ -4,7 +4,7 @@ import argparse
 
 SIZE = 512
 OFFSET = SIZE/2
-DIT = (SIZE/2)/16.2
+DIT = (SIZE/2)/18
 
 def makeElement(doc, tag, **attrs):
   el = doc.createElement(tag)
@@ -72,8 +72,8 @@ def letters(doc, parent, ls):
 
   c = makeElement(doc, 'circle', cx=OFFSET, cy=OFFSET, r = DIT*2, stroke='black', stroke_width=5, fill='none')
   #parent.appendChild(c)
-  for i in range(5):
-    c = makeElement(doc, 'circle', cx=OFFSET, cy=OFFSET, r = DIT*3*(i+1), stroke='black', stroke_width=5, fill='none')
+  for i in range(4):
+    c = makeElement(doc, 'circle', cx=OFFSET, cy=OFFSET, r = DIT*(4*(i) + 3), stroke='black', stroke_width=5, fill='none')
     parent.appendChild(c)
 
 #svg.appendChild(pulse(doc, 0, 100, 40, 30, fill='#34deeb'))
@@ -97,6 +97,7 @@ def main():
   svg.setAttribute('height', str(SIZE))
   svg.setAttribute('viewBox', '{:f} {:f} {:f} {:f}'.format(0, 0, SIZE, SIZE))
   doc.appendChild(svg)
+  svg.appendChild(makeElement(doc, 'circle', cx=OFFSET, cy=OFFSET, r = OFFSET, fill='white'))
 
   ls = ['--..', '..-.', '-.-.']
   ls2 = ['-.-', '--...'] + ls
