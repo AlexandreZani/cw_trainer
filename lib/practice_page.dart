@@ -23,13 +23,13 @@ class PracticePage extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Spacer(),
-        Spacer(),
-        Spacer(),
+        const Spacer(),
+        const Spacer(),
+        const Spacer(),
         PlayControls(audioHandler: audioHandler, log: log),
-        Spacer(),
+        const Spacer(),
         PracticeSettings(appState: appState),
-        Spacer(),
+        const Spacer(),
       ],
     );
   }

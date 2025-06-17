@@ -1,17 +1,20 @@
 import 'package:cw_trainer/main.dart';
 import 'package:cw_trainer/settings_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 class SettingsPage extends StatelessWidget {
+  final log = Logger('SettingsPage');
   final MyAppState appState;
-  const SettingsPage({
+
+  SettingsPage({
     super.key,
     required this.appState,
   });
 
   @override
   Widget build(BuildContext context) {
-    print('building settings page');
+    log.finest('building settings page');
     return ListView(
       children: [
         CWSettings(appState: appState),
