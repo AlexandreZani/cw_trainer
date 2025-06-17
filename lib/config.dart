@@ -109,10 +109,10 @@ class FarnsworthConfig extends SharedState {
     setString('letters', letters);
   }
 
-  String get level => getString('level') ?? 'M';
+  int get levelI => getInt('level_i') ?? 1;
 
-  set level(String l) {
-    setString('level', l);
+  set levelI(int i) {
+    setInt('level_i', i);
   }
 
   int get groupSize => getInt('group_size') ?? 4;

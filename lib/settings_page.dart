@@ -45,14 +45,7 @@ class FarnsworthSettings extends StatelessWidget {
       children: [
         const ListTile(title: Text('Farnsworth')),
         const Divider(),
-        ListSetting(
-          label: "Level",
-          initialValue: appState.appConfig.farnsworth.level,
-          values: appState.appConfig.farnsworth.letters.split(''),
-          onSelected: (String i) {
-            appState.appConfig.farnsworth.level = i;
-          },
-        ),
+        LevelSetting(appState: appState),
         NumSettingChevron(
           label: "Letters Per Group",
           initialValue: appState.appConfig.farnsworth.groupSize,

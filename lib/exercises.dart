@@ -51,8 +51,7 @@ class FarnsworthExercise extends Exercise {
 
   String _randomGroup() {
     String group = '';
-    int maxIndex =
-        _appConfig.farnsworth.letters.indexOf(_appConfig.farnsworth.level);
+    int maxIndex = _appConfig.farnsworth.levelI;
     while (group.length < _config.groupSize) {
       int i = _random.nextInt(maxIndex + 1);
       group += _config.letters[i];

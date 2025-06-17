@@ -1,3 +1,5 @@
+import 'package:cw_trainer/main.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;
@@ -276,5 +278,77 @@ class NumSettingList<T extends num> extends StatelessWidget {
         ),
       ]),
     );
+  }
+}
+
+class PracticeSettings extends StatelessWidget {
+  const PracticeSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [LevelSelector(appState: appState)]);
+  }
+}
+
+class LevelSetting extends StatelessWidget {
+  const LevelSetting({
+    super.key,
+    required this.appState,
+  });
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Row(children: [
+        const Text("Level", textAlign: TextAlign.left),
+        const Spacer(),
+        LevelSelector(appState: appState)
+      ]),
+    );
+  }
+}
+
+class LevelSelector extends StatelessWidget {
+  const LevelSelector({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    var letters = appState.appConfig.farnsworth.letters;
+    var levelI = appState.appConfig.farnsworth.levelI;
+    var curChar = letters[levelI];
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      IconButton(
+          iconSize: 48,
+          icon: const Icon(Icons.chevron_left),
+          onPressed: () {
+            if (levelI <= 0) {
+              return;
+            }
+
+            appState.appConfig.farnsworth.levelI -= 1;
+          }),
+      Text(curChar),
+      IconButton(
+          iconSize: 48,
+          icon: const Icon(Icons.chevron_right),
+          onPressed: () {
+            if (levelI >= letters.length - 1) {
+              return;
+            }
+
+            appState.appConfig.farnsworth.levelI += 1;
+          })
+    ]);
   }
 }
