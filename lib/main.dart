@@ -54,7 +54,8 @@ class MyApp extends StatelessWidget {
         title: 'CW Trainer',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromRGBO(0x34, 0xde, 0xeb, 1.0)),
         ),
         home: const MyHomePage(currentPage: Pages.practice),
       ),
@@ -91,7 +92,10 @@ class MyHomePage extends StatelessWidget {
     };
 
     return Scaffold(
-      appBar: AppBar(title: const Text('CW Trainer')),
+      appBar: AppBar(
+        title: const Text('CW Trainer'),
+        backgroundColor: const Color.fromRGBO(0x34, 0xde, 0xeb, 0.2),
+      ),
       bottomNavigationBar: NavigationBar(
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           selectedIndex: navBarIndex,
