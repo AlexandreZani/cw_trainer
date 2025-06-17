@@ -90,6 +90,11 @@ class NumSettingChevron<T extends num> extends StatelessWidget {
   final String label;
   final Function onSelected;
 
+  void onSelectedInner(num v) {
+    var value = math.max(min, math.min(v, max));
+    onSelected(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     var f = NumberFormat("######.##", "en_US");
@@ -101,18 +106,126 @@ class NumSettingChevron<T extends num> extends StatelessWidget {
             iconSize: 48,
             icon: const Icon(Icons.chevron_left),
             onPressed: () {
-              var newValue = math.max(min, initialValue - step);
-              onSelected(newValue);
+              onSelectedInner(initialValue - step);
             }),
-        Text(f.format(initialValue)),
+        TextButton(
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return NumDialog(
+                      label: label,
+                      f: f,
+                      initialValue: initialValue,
+                      onSelected: onSelectedInner,
+                    );
+                  });
+            },
+            style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+            child: Text(f.format(initialValue))),
         IconButton(
             iconSize: 48,
             icon: const Icon(Icons.chevron_right),
             onPressed: () {
-              var newValue = math.min(max, initialValue + step);
-              onSelected(newValue);
+              onSelectedInner(initialValue + step);
             }),
       ]),
+    );
+  }
+}
+
+class NumDialog<T extends num> extends StatefulWidget {
+  const NumDialog({
+    super.key,
+    required this.label,
+    required this.f,
+    required this.initialValue,
+    required this.onSelected,
+  });
+
+  final String label;
+  final NumberFormat f;
+  final T initialValue;
+  final Function onSelected;
+
+  @override
+  State<NumDialog<T>> createState() => _NumDialogState<T>();
+}
+
+class _NumDialogState<T extends num> extends State<NumDialog<T>> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  num? tryParse(v) {
+    if (T == int) {
+      return int.tryParse(v);
+    }
+    if (T == double) {
+      return double.tryParse(v);
+    }
+
+    return null;
+  }
+
+  void onSubmitted() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(title: Text(widget.label)),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                    labelText: widget.f.format(widget.initialValue)),
+                onSaved: (value) {
+                  widget.onSelected(tryParse(value!));
+                },
+                onFieldSubmitted: (value) {
+                  onSubmitted();
+                },
+                validator: (String? value) {
+                  if (value == null) {
+                    return "No value was entered.";
+                  }
+                  if (tryParse(value) == null) {
+                    return "Not a valid number!";
+                  }
+
+                  return null;
+                },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                      onPressed: onSubmitted, child: const Text("Accept")),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Cancel")),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
