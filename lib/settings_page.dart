@@ -16,7 +16,7 @@ class SettingsPage extends StatelessWidget {
       children: [
         const ListTile(title: Text('CW')),
         const Divider(),
-        NumSetting(
+        NumSettingChevron(
           label: "WPM",
           initialValue: appState.appConfig.cw.wpm,
           min: 5,
@@ -26,7 +26,7 @@ class SettingsPage extends StatelessWidget {
             appState.appConfig.cw.wpm = i;
           },
         ),
-        NumSetting(
+        NumSettingChevron(
           label: "EWPM",
           initialValue: appState.appConfig.cw.ewpm,
           min: 5,
@@ -36,7 +36,7 @@ class SettingsPage extends StatelessWidget {
             appState.appConfig.cw.ewpm = i;
           },
         ),
-        NumSetting(
+        NumSettingChevron(
           label: "Frequency",
           initialValue: appState.appConfig.cw.frequency,
           min: 400,
@@ -57,7 +57,7 @@ class SettingsPage extends StatelessWidget {
         const Divider(),
         const ListTile(title: Text('Text-to-Speech')),
         const Divider(),
-        NumSetting(
+        NumSettingChevron(
           label: "Speech Rate",
           initialValue: appState.appConfig.tts.rate,
           min: 0.1,
@@ -67,7 +67,7 @@ class SettingsPage extends StatelessWidget {
             appState.appConfig.tts.rate = i;
           },
         ),
-        NumSetting(
+        NumSettingChevron(
           label: "Pitch",
           initialValue: appState.appConfig.tts.pitch,
           min: 0.1,
@@ -77,7 +77,7 @@ class SettingsPage extends StatelessWidget {
             appState.appConfig.tts.pitch = i;
           },
         ),
-        NumSetting(
+        NumSettingChevron(
           label: "Volume",
           initialValue: appState.appConfig.tts.volume,
           min: 0.1,
@@ -87,7 +87,7 @@ class SettingsPage extends StatelessWidget {
             appState.appConfig.tts.volume = i;
           },
         ),
-        NumSetting(
+        NumSettingChevron(
           label: "Delay Before Speaking",
           initialValue: appState.appConfig.farnsworth.delay,
           min: 0.0,
@@ -108,7 +108,7 @@ class SettingsPage extends StatelessWidget {
             appState.appConfig.farnsworth.level = i;
           },
         ),
-        NumSetting(
+        NumSettingChevron(
           label: "Letters Per Group",
           initialValue: appState.appConfig.farnsworth.groupSize,
           min: 1,
@@ -118,7 +118,7 @@ class SettingsPage extends StatelessWidget {
             appState.appConfig.farnsworth.groupSize = i;
           },
         ),
-        NumSetting(
+        NumSettingChevron(
           label: "Number of Groups",
           initialValue: appState.appConfig.farnsworth.groupNum,
           min: 1,

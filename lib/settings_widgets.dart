@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:math' as math;
 
 class BoolSetting extends StatelessWidget {
   const BoolSetting({
@@ -71,8 +72,53 @@ class ListSetting<T extends dynamic> extends StatelessWidget {
   }
 }
 
-class NumSetting<T extends num> extends StatelessWidget {
-  const NumSetting({
+class NumSettingChevron<T extends num> extends StatelessWidget {
+  const NumSettingChevron({
+    super.key,
+    required this.initialValue,
+    required this.label,
+    required this.min,
+    required this.max,
+    required this.step,
+    required this.onSelected,
+  });
+
+  final T initialValue;
+  final T min;
+  final T max;
+  final T step;
+  final String label;
+  final Function onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    var f = NumberFormat("######.##", "en_US");
+    return ListTile(
+      title: Row(children: [
+        Text(label, textAlign: TextAlign.left),
+        const Spacer(),
+        IconButton(
+            iconSize: 48,
+            icon: const Icon(Icons.chevron_left),
+            onPressed: () {
+              var newValue = math.max(min, initialValue - step);
+              onSelected(newValue);
+            }),
+        Text(f.format(initialValue)),
+        IconButton(
+            iconSize: 48,
+            icon: const Icon(Icons.chevron_right),
+            onPressed: () {
+              var newValue = math.min(max, initialValue + step);
+              onSelected(newValue);
+            }),
+      ]),
+    );
+  }
+}
+
+class NumSettingList<T extends num> extends StatelessWidget {
+  const NumSettingList({
     super.key,
     required this.initialValue,
     required this.label,
