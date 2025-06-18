@@ -323,8 +323,8 @@ class LevelSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var letters = appState.appConfig.farnsworth.letters;
-    var levelI = appState.appConfig.farnsworth.levelI;
+    var letters = appState.appConfig.randomGroups.letters;
+    var levelI = appState.appConfig.randomGroups.levelI;
     var curChar = letters[levelI];
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       IconButton(
@@ -335,7 +335,7 @@ class LevelSelector extends StatelessWidget {
               return;
             }
 
-            appState.appConfig.farnsworth.levelI -= 1;
+            appState.appConfig.randomGroups.levelI -= 1;
           }),
       Text(curChar),
       IconButton(
@@ -346,7 +346,7 @@ class LevelSelector extends StatelessWidget {
               return;
             }
 
-            appState.appConfig.farnsworth.levelI += 1;
+            appState.appConfig.randomGroups.levelI += 1;
           })
     ]);
   }

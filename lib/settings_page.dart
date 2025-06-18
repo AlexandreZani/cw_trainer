@@ -21,12 +21,12 @@ class SettingsPage extends StatelessWidget {
         const Divider(),
         TTSSettings(appState: appState),
         const Divider(),
-        FarnsworthSettings(appState: appState),
+        RandomGroupsSettings(appState: appState),
         BoolSetting(
           label: "Force Latest Letter",
-          initialValue: appState.appConfig.farnsworth.forceLatest,
+          initialValue: appState.appConfig.randomGroups.forceLatest,
           onChanged: (bool v) {
-            appState.appConfig.farnsworth.forceLatest = v;
+            appState.appConfig.randomGroups.forceLatest = v;
           },
         ),
       ],
@@ -34,8 +34,8 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-class FarnsworthSettings extends StatelessWidget {
-  const FarnsworthSettings({
+class RandomGroupsSettings extends StatelessWidget {
+  const RandomGroupsSettings({
     super.key,
     required this.appState,
   });
@@ -46,34 +46,34 @@ class FarnsworthSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const ListTile(title: Text('Farnsworth')),
+        const ListTile(title: Text('Random Groups')),
         const Divider(),
         LevelSetting(appState: appState),
         NumSettingChevron(
           label: "Letters Per Group",
-          initialValue: appState.appConfig.farnsworth.groupSize,
+          initialValue: appState.appConfig.randomGroups.groupSize,
           min: 1,
           max: 10,
           step: 1,
           onSelected: (int i) {
-            appState.appConfig.farnsworth.groupSize = i;
+            appState.appConfig.randomGroups.groupSize = i;
           },
         ),
         NumSettingChevron(
           label: "Number of Groups",
-          initialValue: appState.appConfig.farnsworth.groupNum,
+          initialValue: appState.appConfig.randomGroups.groupNum,
           min: 1,
           max: 15,
           step: 1,
           onSelected: (int i) {
-            appState.appConfig.farnsworth.groupNum = i;
+            appState.appConfig.randomGroups.groupNum = i;
           },
         ),
         BoolSetting(
           label: "Repeat",
-          initialValue: appState.appConfig.farnsworth.repeat,
+          initialValue: appState.appConfig.randomGroups.repeat,
           onChanged: (bool v) {
-            appState.appConfig.farnsworth.repeat = v;
+            appState.appConfig.randomGroups.repeat = v;
           },
         ),
       ],
@@ -127,12 +127,19 @@ class TTSSettings extends StatelessWidget {
         ),
         NumSettingChevron(
           label: "Delay Before Speaking",
-          initialValue: appState.appConfig.farnsworth.delay,
+          initialValue: appState.appConfig.tts.delay,
           min: 0.0,
           max: 3.0,
           step: 0.5,
           onSelected: (double i) {
-            appState.appConfig.farnsworth.delay = i;
+            appState.appConfig.tts.delay = i;
+          },
+        ),
+        BoolSetting(
+          label: "Spell with ITU",
+          initialValue: appState.appConfig.tts.spellWithItu,
+          onChanged: (bool v) {
+            appState.appConfig.tts.spellWithItu = v;
           },
         ),
       ],

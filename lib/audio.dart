@@ -6,6 +6,7 @@ import 'package:cw_trainer/audio_item_type.dart';
 import 'package:cw_trainer/config.dart';
 import 'package:cw_trainer/cw.dart';
 import 'package:cw_trainer/exercises.dart';
+import 'package:cw_trainer/spelling.dart';
 import 'package:cw_trainer/wav.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
@@ -17,14 +18,14 @@ class CwAudioHandler extends BaseAudioHandler {
   final FlutterTts _flutterTts = FlutterTts();
   bool _paused = false;
 
-  ExerciseType _exerciseType = ExerciseType.farnsworth;
+  ExerciseType _exerciseType = ExerciseType.randomGroups;
   final AppConfig _appConfig;
   Exercise _currentExercise;
   AudioItem? _currentAudioItem;
 
   CwAudioHandler(this._appConfig)
       : _currentExercise =
-            Exercise.getByType(_appConfig, ExerciseType.farnsworth) {
+            Exercise.getByType(_appConfig, ExerciseType.randomGroups) {
     _player.playbackEventStream.listen((PlaybackEvent event) {
       if (_player.playing) {
         _onPlaying();
@@ -153,6 +154,17 @@ class CwAudioHandler extends BaseAudioHandler {
         log.finest('playing tts');
         _flutterTts.speak(_currentAudioItem!.textString);
         return;
+
+      case AudioItemType.spell:
+        String spoken;
+        log.finest('spelling');
+        if (_currentExercise.appConfig.tts.spellWithItu) {
+          spoken = spellWithItu(_currentAudioItem!.textString);
+        } else {
+          spoken = spellWithoutItu(_currentAudioItem!.textString);
+        }
+        log.finest("spoken: $spoken");
+        _flutterTts.speak(spoken);
     }
   }
 
@@ -193,6 +205,12 @@ class CwAudioHandler extends BaseAudioHandler {
 
       case AudioItemType.text:
         log.finest('tts beep boop readying: ${_currentAudioItem!.textString}');
+        _readyTts();
+        return true;
+
+      case AudioItemType.spell:
+        log.finest(
+            'tts beep boop readying to spell: ${_currentAudioItem!.textString}');
         _readyTts();
         return true;
     }

@@ -77,13 +77,20 @@ class CwConfig extends SharedState {
 class TtsConfig extends SharedState {
   TtsConfig(SharedPreferences prefs) : super(prefs, 'tts');
 
+  bool get enable => getBool('enable') ?? true;
   String get language => getString('language') ?? 'en-US';
   double get rate => getDouble('rate') ?? 0.7;
   double get pitch => getDouble('pitch') ?? 1.0;
   double get volume => getDouble('volume') ?? 1.0;
+  double get delay => getDouble('delay') ?? 1.0;
+  bool get spellWithItu => getBool('spell_with_itu') ?? true;
+
+  set enable(bool enable) {
+    setBool('enable', enable);
+  }
 
   set language(String language) {
-    _prefs.setString('language', language);
+    setString('language', language);
   }
 
   set rate(double rate) {
@@ -97,10 +104,18 @@ class TtsConfig extends SharedState {
   set volume(double volume) {
     setDouble('volume', volume);
   }
+
+  set delay(double delay) {
+    setDouble('delay', delay);
+  }
+
+  set spellWithItu(bool spellWithItu) {
+    setBool('spell_with_itu', spellWithItu);
+  }
 }
 
-class FarnsworthConfig extends SharedState {
-  FarnsworthConfig(SharedPreferences prefs) : super(prefs, 'farnsworth');
+class RandomGroupsConfig extends SharedState {
+  RandomGroupsConfig(SharedPreferences prefs) : super(prefs, 'random_groups');
 
   String get letters =>
       getString('letters') ?? 'KMURESNAPTLWI.JZ=FOY,VG5/Q92H38B?47C1D60X';
@@ -138,28 +153,22 @@ class FarnsworthConfig extends SharedState {
   set forceLatest(bool v) {
     setBool('force_latest', v);
   }
-
-  double get delay => getDouble('delay') ?? 1.0;
-
-  set delay(double delay) {
-    setDouble('delay', delay);
-  }
 }
 
 class AppConfig extends ChangeNotifier {
   CwConfig cw;
   TtsConfig tts;
-  FarnsworthConfig farnsworth;
+  RandomGroupsConfig randomGroups;
 
-  AppConfig(this.cw, this.tts, this.farnsworth) {
+  AppConfig(this.cw, this.tts, this.randomGroups) {
     cw.addListener(notifyListeners);
     tts.addListener(notifyListeners);
-    farnsworth.addListener(notifyListeners);
+    randomGroups.addListener(notifyListeners);
   }
 
   static AppConfig buildFromShared(SharedPreferences prefs) {
     return AppConfig(
-        CwConfig(prefs), TtsConfig(prefs), FarnsworthConfig(prefs));
+        CwConfig(prefs), TtsConfig(prefs), RandomGroupsConfig(prefs));
   }
 }
 

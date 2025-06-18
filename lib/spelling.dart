@@ -42,7 +42,36 @@ Map<String, String> ituPhoneticAlphabet = {
   '?': 'Question Mark',
 };
 
-String mapToItu(String input) {
+extension StringX on String {
+  bool isBetween(String min, String max) {
+    final a = min.codeUnitAt(0);
+    final z = max.codeUnitAt(0);
+    final i = codeUnitAt(0);
+    return i >= a && i <= z;
+  }
+
+  bool isLowerAlpha() => isBetween('a', 'z');
+
+  bool isUpperAlpha() => isBetween('A', 'Z');
+
+  bool isAlpha() => isLowerAlpha() || isUpperAlpha();
+
+  bool isNum() => isBetween('0', '9');
+
+  bool isAlphaNum() => isAlpha() || isNum();
+}
+
+String spellWithoutItu(String input) {
+  return input.toUpperCase().split('').map((char) {
+    if (char.isAlphaNum() || !ituPhoneticAlphabet.containsKey(char)) {
+      return char;
+    } else {
+      return ituPhoneticAlphabet[char];
+    }
+  }).join('. ');
+}
+
+String spellWithItu(String input) {
   return input.toUpperCase().split('').map((char) {
     if (ituPhoneticAlphabet.containsKey(char)) {
       return ituPhoneticAlphabet[char];

@@ -2,6 +2,7 @@ enum AudioItemType {
   morse,
   text,
   silence,
+  spell,
 }
 
 class AudioItem {
@@ -15,6 +16,10 @@ class AudioItem {
 
   AudioItem.morse(this.textString)
       : type = AudioItemType.morse,
+        milliseconds = 0;
+
+  AudioItem.spell(this.textString)
+      : type = AudioItemType.spell,
         milliseconds = 0;
 
   AudioItem.silence(this.milliseconds)

@@ -3,11 +3,10 @@ import 'dart:math';
 
 import 'package:cw_trainer/audio_item_type.dart';
 import 'package:cw_trainer/config.dart';
-import 'package:cw_trainer/itu_phonetic_alphabet.dart';
 import 'package:logging/logging.dart';
 
 enum ExerciseType {
-  farnsworth,
+  randomGroups,
 }
 
 abstract class Exercise {
@@ -34,24 +33,26 @@ abstract class Exercise {
 
   static Exercise getByType(AppConfig config, ExerciseType type) {
     return switch (type) {
-      ExerciseType.farnsworth => FarnsworthExercise(config),
+      ExerciseType.randomGroups => RandomGroupsExercise(config),
     };
   }
 }
 
-class FarnsworthExercise extends Exercise {
-  final log = Logger('FarnsworthExercise');
+class RandomGroupsExercise extends Exercise {
+  final log = Logger('RandomGroupsExercise');
   final Random _random = Random();
-  final FarnsworthConfig _config;
+  final RandomGroupsConfig _config;
+  final TtsConfig _ttsConfig;
   int _remainingGroups;
 
-  FarnsworthExercise(super._appConfig)
-      : _config = _appConfig.farnsworth,
-        _remainingGroups = _appConfig.farnsworth.groupNum;
+  RandomGroupsExercise(super._appConfig)
+      : _config = _appConfig.randomGroups,
+        _ttsConfig = _appConfig.tts,
+        _remainingGroups = _appConfig.randomGroups.groupNum;
 
   String _randomGroup() {
     String group = '';
-    int maxIndex = _appConfig.farnsworth.levelI;
+    int maxIndex = _appConfig.randomGroups.levelI;
     while (group.length < _config.groupSize) {
       int i = _random.nextInt(maxIndex + 1);
       group += _config.letters[i];
@@ -77,12 +78,12 @@ class FarnsworthExercise extends Exercise {
     }
 
     String group = _randomGroup();
-    int delayMs = (_config.delay * 1000).round();
+    int delayMs = (_ttsConfig.delay * 1000).round();
 
     _queue.addAll([
       AudioItem.morse(group),
       AudioItem.silence(delayMs),
-      AudioItem.text(mapToItu(group)),
+      AudioItem.spell(group),
     ]);
   }
 }
