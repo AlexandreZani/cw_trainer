@@ -3,10 +3,12 @@ import 'dart:math';
 
 import 'package:cw_trainer/audio_item_type.dart';
 import 'package:cw_trainer/config.dart';
+import 'package:cw_trainer/words.dart';
 import 'package:logging/logging.dart';
 
 enum ExerciseType {
   randomGroups,
+  words,
 }
 
 abstract class Exercise {
@@ -34,6 +36,7 @@ abstract class Exercise {
   static Exercise getByType(AppConfig config, ExerciseType type) {
     return switch (type) {
       ExerciseType.randomGroups => RandomGroupsExercise(config),
+      ExerciseType.words => WordsExercise(config),
     };
   }
 }
@@ -86,6 +89,55 @@ class RandomGroupsExercise extends Exercise {
       AudioItem.morse(group),
       AudioItem.silence(delayMs),
       AudioItem.spell(group),
+    ]);
+  }
+}
+
+class WordsExercise extends Exercise {
+  final log = Logger('WordsExercise');
+  final Random _random = Random();
+  final WordsExerciseConfig _config;
+  final TtsConfig _ttsConfig;
+  final SharedExerciseConfig _sharedExercise;
+  int _remainingWords;
+
+  WordsExercise(super._appConfig)
+      : _config = _appConfig.wordsExercise,
+        _ttsConfig = _appConfig.tts,
+        _remainingWords = _appConfig.sharedExercise.exerciseNum,
+        _sharedExercise = _appConfig.sharedExercise;
+
+  String _pickLetter() {
+    int levelI = _config.levelI;
+    if (levelI == 1 || _random.nextDouble() > 0.5) {
+      return order[levelI];
+    }
+
+    int i = _random.nextInt(levelI);
+    return order[i];
+  }
+
+  @override
+  void _replenishQueue() {
+    log.finest('_replenishQueue $_remainingWords');
+    if (!_sharedExercise.repeat) {
+      if (_remainingWords <= 0) {
+        return;
+      }
+      _remainingWords -= 1;
+    }
+
+    var c = _pickLetter();
+    var words = wordsForExercise[c]!;
+
+    int i = _random.nextInt(words.length);
+    String word = words[i];
+    int delayMs = (_ttsConfig.delay * 1000).round();
+
+    _queue.addAll([
+      AudioItem.morse(word),
+      AudioItem.silence(delayMs),
+      AudioItem.text(word),
     ]);
   }
 }

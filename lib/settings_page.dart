@@ -1,3 +1,4 @@
+import 'package:cw_trainer/exercises.dart';
 import 'package:cw_trainer/main.dart';
 import 'package:cw_trainer/settings_widgets.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +21,12 @@ class SettingsPage extends StatelessWidget {
         CWSettings(appState: appState),
         const Divider(),
         TTSSettings(appState: appState),
+        const Divider(),
         SharedExerciseSettings(appState: appState),
         const Divider(),
         RandomGroupsSettings(appState: appState),
+        const Divider(),
+        WordsExerciseSettings(appState: appState),
       ],
     );
   }
@@ -40,7 +44,6 @@ class SharedExerciseSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Divider(),
         const ListTile(title: Text('Exercises')),
         const Divider(),
         BoolSetting(
@@ -79,7 +82,10 @@ class RandomGroupsSettings extends StatelessWidget {
       children: [
         const ListTile(title: Text('Random Groups')),
         const Divider(),
-        LevelSetting(appState: appState),
+        LevelSetting(
+          appState: appState,
+          exerciseType: ExerciseType.randomGroups,
+        ),
         NumSettingChevron(
           label: "Letters Per Group",
           initialValue: appState.appConfig.randomGroups.groupSize,
@@ -96,6 +102,29 @@ class RandomGroupsSettings extends StatelessWidget {
           onChanged: (bool v) {
             appState.appConfig.randomGroups.forceLatest = v;
           },
+        ),
+      ],
+    );
+  }
+}
+
+class WordsExerciseSettings extends StatelessWidget {
+  const WordsExerciseSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const ListTile(title: Text('Words Exercise')),
+        const Divider(),
+        LevelSetting(
+          appState: appState,
+          exerciseType: ExerciseType.words,
         ),
       ],
     );

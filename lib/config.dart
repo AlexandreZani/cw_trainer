@@ -160,22 +160,39 @@ class RandomGroupsConfig extends SharedState {
   }
 }
 
+class WordsExerciseConfig extends SharedState {
+  WordsExerciseConfig(SharedPreferences prefs) : super(prefs, 'words_exercise');
+
+  int get levelI => getInt('level_i') ?? 2;
+
+  set levelI(int i) {
+    setInt('level_i', i);
+  }
+}
+
 class AppConfig extends ChangeNotifier {
   CwConfig cw;
   TtsConfig tts;
   SharedExerciseConfig sharedExercise;
   RandomGroupsConfig randomGroups;
+  WordsExerciseConfig wordsExercise;
 
-  AppConfig(this.cw, this.tts, this.sharedExercise, this.randomGroups) {
+  AppConfig(this.cw, this.tts, this.sharedExercise, this.randomGroups,
+      this.wordsExercise) {
     cw.addListener(notifyListeners);
     tts.addListener(notifyListeners);
     randomGroups.addListener(notifyListeners);
     sharedExercise.addListener(notifyListeners);
+    wordsExercise.addListener(notifyListeners);
   }
 
   static AppConfig buildFromShared(SharedPreferences prefs) {
-    return AppConfig(CwConfig(prefs), TtsConfig(prefs),
-        SharedExerciseConfig(prefs), RandomGroupsConfig(prefs));
+    return AppConfig(
+        CwConfig(prefs),
+        TtsConfig(prefs),
+        SharedExerciseConfig(prefs),
+        RandomGroupsConfig(prefs),
+        WordsExerciseConfig(prefs));
   }
 }
 

@@ -18,14 +18,13 @@ class CwAudioHandler extends BaseAudioHandler {
   final FlutterTts _flutterTts = FlutterTts();
   bool _paused = false;
 
-  ExerciseType _exerciseType = ExerciseType.randomGroups;
+  ExerciseType _exerciseType = ExerciseType.words;
   final AppConfig _appConfig;
   Exercise _currentExercise;
   AudioItem? _currentAudioItem;
 
   CwAudioHandler(this._appConfig)
-      : _currentExercise =
-            Exercise.getByType(_appConfig, ExerciseType.randomGroups) {
+      : _currentExercise = Exercise.getByType(_appConfig, ExerciseType.words) {
     _player.playbackEventStream.listen((PlaybackEvent event) {
       if (_player.playing) {
         _onPlaying();

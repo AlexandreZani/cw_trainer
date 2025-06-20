@@ -209,5 +209,5 @@ String cwChar(String c) {
     throw UnsupportedError('Unsupported character $c');
   }
 
-  return codes[c]!;
+  return codes[c.toUpperCase()]!;
 }

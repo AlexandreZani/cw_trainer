@@ -1,4 +1,6 @@
+import 'package:cw_trainer/exercises.dart';
 import 'package:cw_trainer/main.dart';
+import 'package:cw_trainer/words.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;
@@ -290,7 +292,7 @@ class PracticeSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [LevelSelector(appState: appState)]);
+    return Column(children: [WordsLevelSelector(appState: appState)]);
   }
 }
 
@@ -298,23 +300,50 @@ class LevelSetting extends StatelessWidget {
   const LevelSetting({
     super.key,
     required this.appState,
+    required this.exerciseType,
   });
   final MyAppState appState;
+  final ExerciseType exerciseType;
 
   @override
   Widget build(BuildContext context) {
+    var selector = switch (exerciseType) {
+      ExerciseType.words => WordsLevelSelector(appState: appState),
+      ExerciseType.randomGroups => RandomGroupLevelSelector(appState: appState),
+    };
     return ListTile(
       title: Row(children: [
         const Text("Level", textAlign: TextAlign.left),
         const Spacer(),
-        LevelSelector(appState: appState)
+        selector,
       ]),
     );
   }
 }
 
-class LevelSelector extends StatelessWidget {
-  const LevelSelector({
+class LevelSelectorForExercise extends StatelessWidget {
+  const LevelSelectorForExercise({
+    super.key,
+    required this.appState,
+    required this.exerciseType,
+  });
+
+  final MyAppState appState;
+  final ExerciseType exerciseType;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (exerciseType) {
+      case ExerciseType.randomGroups:
+        return RandomGroupLevelSelector(appState: appState);
+      case ExerciseType.words:
+        throw UnimplementedError();
+    }
+  }
+}
+
+class RandomGroupLevelSelector extends StatelessWidget {
+  const RandomGroupLevelSelector({
     super.key,
     required this.appState,
   });
@@ -323,8 +352,49 @@ class LevelSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var letters = appState.appConfig.randomGroups.letters;
-    var levelI = appState.appConfig.randomGroups.levelI;
+    return LevelSelector(
+      letters: appState.appConfig.randomGroups.letters,
+      levelI: appState.appConfig.randomGroups.levelI,
+      onChanged: (int i) {
+        appState.appConfig.randomGroups.levelI = i;
+      },
+    );
+  }
+}
+
+class WordsLevelSelector extends StatelessWidget {
+  const WordsLevelSelector({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return LevelSelector(
+      letters: order,
+      levelI: appState.appConfig.wordsExercise.levelI,
+      onChanged: (int i) {
+        appState.appConfig.wordsExercise.levelI = i;
+      },
+    );
+  }
+}
+
+class LevelSelector extends StatelessWidget {
+  const LevelSelector(
+      {super.key,
+      required this.letters,
+      required this.levelI,
+      required this.onChanged});
+
+  final String letters;
+  final int levelI;
+  final Function onChanged;
+
+  @override
+  Widget build(BuildContext context) {
     var curChar = letters[levelI];
     return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
       IconButton(
@@ -335,7 +405,7 @@ class LevelSelector extends StatelessWidget {
               return;
             }
 
-            appState.appConfig.randomGroups.levelI -= 1;
+            onChanged(levelI - 1);
           }),
       Text(curChar),
       IconButton(
@@ -346,7 +416,7 @@ class LevelSelector extends StatelessWidget {
               return;
             }
 
-            appState.appConfig.randomGroups.levelI += 1;
+            onChanged(levelI + 1);
           })
     ]);
   }
