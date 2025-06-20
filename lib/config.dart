@@ -114,6 +114,23 @@ class TtsConfig extends SharedState {
   }
 }
 
+class SharedExerciseConfig extends SharedState {
+  SharedExerciseConfig(SharedPreferences prefs)
+      : super(prefs, 'shared_exercise');
+
+  bool get repeat => getBool('repeat') ?? false;
+
+  set repeat(bool v) {
+    setBool('repeat', v);
+  }
+
+  int get exerciseNum => getInt('exercise_num') ?? 2;
+
+  set exerciseNum(int n) {
+    setInt('exercise_num', max(n, 1));
+  }
+}
+
 class RandomGroupsConfig extends SharedState {
   RandomGroupsConfig(SharedPreferences prefs) : super(prefs, 'random_groups');
 
@@ -136,18 +153,6 @@ class RandomGroupsConfig extends SharedState {
     setInt('group_size', s);
   }
 
-  int get groupNum => getInt('group_num') ?? 2;
-
-  set groupNum(int n) {
-    setInt('group_num', max(n, 1));
-  }
-
-  bool get repeat => getBool('repeat') ?? false;
-
-  set repeat(bool v) {
-    setBool('repeat', v);
-  }
-
   bool get forceLatest => getBool('force_latest') ?? true;
 
   set forceLatest(bool v) {
@@ -158,17 +163,19 @@ class RandomGroupsConfig extends SharedState {
 class AppConfig extends ChangeNotifier {
   CwConfig cw;
   TtsConfig tts;
+  SharedExerciseConfig sharedExercise;
   RandomGroupsConfig randomGroups;
 
-  AppConfig(this.cw, this.tts, this.randomGroups) {
+  AppConfig(this.cw, this.tts, this.sharedExercise, this.randomGroups) {
     cw.addListener(notifyListeners);
     tts.addListener(notifyListeners);
     randomGroups.addListener(notifyListeners);
+    sharedExercise.addListener(notifyListeners);
   }
 
   static AppConfig buildFromShared(SharedPreferences prefs) {
-    return AppConfig(
-        CwConfig(prefs), TtsConfig(prefs), RandomGroupsConfig(prefs));
+    return AppConfig(CwConfig(prefs), TtsConfig(prefs),
+        SharedExerciseConfig(prefs), RandomGroupsConfig(prefs));
   }
 }
 

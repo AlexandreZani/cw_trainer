@@ -20,13 +20,44 @@ class SettingsPage extends StatelessWidget {
         CWSettings(appState: appState),
         const Divider(),
         TTSSettings(appState: appState),
+        SharedExerciseSettings(appState: appState),
         const Divider(),
         RandomGroupsSettings(appState: appState),
+      ],
+    );
+  }
+}
+
+class SharedExerciseSettings extends StatelessWidget {
+  const SharedExerciseSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Divider(),
+        const ListTile(title: Text('Exercises')),
+        const Divider(),
         BoolSetting(
-          label: "Force Latest Letter",
-          initialValue: appState.appConfig.randomGroups.forceLatest,
+          label: "Continuous Exercise",
+          initialValue: appState.appConfig.sharedExercise.repeat,
           onChanged: (bool v) {
-            appState.appConfig.randomGroups.forceLatest = v;
+            appState.appConfig.sharedExercise.repeat = v;
+          },
+        ),
+        NumSettingChevron(
+          label: "Exercise Number",
+          initialValue: appState.appConfig.sharedExercise.exerciseNum,
+          min: 1,
+          max: 15,
+          step: 1,
+          onSelected: (int i) {
+            appState.appConfig.sharedExercise.exerciseNum = i;
           },
         ),
       ],
@@ -59,21 +90,11 @@ class RandomGroupsSettings extends StatelessWidget {
             appState.appConfig.randomGroups.groupSize = i;
           },
         ),
-        NumSettingChevron(
-          label: "Number of Groups",
-          initialValue: appState.appConfig.randomGroups.groupNum,
-          min: 1,
-          max: 15,
-          step: 1,
-          onSelected: (int i) {
-            appState.appConfig.randomGroups.groupNum = i;
-          },
-        ),
         BoolSetting(
-          label: "Repeat",
-          initialValue: appState.appConfig.randomGroups.repeat,
+          label: "Force Latest Letter",
+          initialValue: appState.appConfig.randomGroups.forceLatest,
           onChanged: (bool v) {
-            appState.appConfig.randomGroups.repeat = v;
+            appState.appConfig.randomGroups.forceLatest = v;
           },
         ),
       ],

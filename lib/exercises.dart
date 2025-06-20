@@ -43,12 +43,14 @@ class RandomGroupsExercise extends Exercise {
   final Random _random = Random();
   final RandomGroupsConfig _config;
   final TtsConfig _ttsConfig;
+  final SharedExerciseConfig _sharedExercise;
   int _remainingGroups;
 
   RandomGroupsExercise(super._appConfig)
       : _config = _appConfig.randomGroups,
         _ttsConfig = _appConfig.tts,
-        _remainingGroups = _appConfig.randomGroups.groupNum;
+        _remainingGroups = _appConfig.sharedExercise.exerciseNum,
+        _sharedExercise = _appConfig.sharedExercise;
 
   String _randomGroup() {
     String group = '';
@@ -70,7 +72,7 @@ class RandomGroupsExercise extends Exercise {
   @override
   void _replenishQueue() {
     log.finest('_replenishQueue $_remainingGroups');
-    if (!_config.repeat) {
+    if (!_sharedExercise.repeat) {
       if (_remainingGroups <= 0) {
         return;
       }
