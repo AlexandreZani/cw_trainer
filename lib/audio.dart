@@ -18,13 +18,12 @@ class CwAudioHandler extends BaseAudioHandler {
   final FlutterTts _flutterTts = FlutterTts();
   bool _paused = false;
 
-  ExerciseType _exerciseType = ExerciseType.words;
   final AppConfig _appConfig;
   Exercise _currentExercise;
   AudioItem? _currentAudioItem;
 
   CwAudioHandler(this._appConfig)
-      : _currentExercise = Exercise.getByType(_appConfig, ExerciseType.words) {
+      : _currentExercise = Exercise.getCurrent(_appConfig) {
     _player.playbackEventStream.listen((PlaybackEvent event) {
       if (_player.playing) {
         _onPlaying();
@@ -40,21 +39,6 @@ class CwAudioHandler extends BaseAudioHandler {
       playing: false,
       androidCompactActionIndices: [0],
     ));
-  }
-
-  @override
-  Future<dynamic> customAction(String name,
-      [Map<String, dynamic>? extras]) async {
-    switch (name) {
-      case 'startExercise':
-        _currentExercise = extras!['exercise'];
-        return play();
-
-      case 'setExerciseType':
-        _exerciseType = extras!['exerciseType'];
-        return;
-    }
-    return super.customAction(name, extras);
   }
 
   MorseGenerator _getMorseGenerator() {
@@ -108,7 +92,8 @@ class CwAudioHandler extends BaseAudioHandler {
   }
 
   void _resetExercise() {
-    _currentExercise = Exercise.getByType(_appConfig, _exerciseType);
+    log.fine('_resetExercise');
+    _currentExercise = Exercise.getCurrent(_appConfig);
   }
 
   Future<void> _onExerciseFinished() async {

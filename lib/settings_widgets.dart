@@ -282,20 +282,6 @@ class NumSettingList<T extends num> extends StatelessWidget {
   }
 }
 
-class PracticeSettings extends StatelessWidget {
-  const PracticeSettings({
-    super.key,
-    required this.appState,
-  });
-
-  final MyAppState appState;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(children: [WordsLevelSelector(appState: appState)]);
-  }
-}
-
 class LevelSetting extends StatelessWidget {
   const LevelSetting({
     super.key,
@@ -337,7 +323,7 @@ class LevelSelectorForExercise extends StatelessWidget {
       case ExerciseType.randomGroups:
         return RandomGroupLevelSelector(appState: appState);
       case ExerciseType.words:
-        throw UnimplementedError();
+        return WordsLevelSelector(appState: appState);
     }
   }
 }

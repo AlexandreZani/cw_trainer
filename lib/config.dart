@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cw_trainer/exercises.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -128,6 +129,23 @@ class SharedExerciseConfig extends SharedState {
 
   set exerciseNum(int n) {
     setInt('exercise_num', max(n, 1));
+  }
+
+  ExerciseType get curExerciseType {
+    int i = getInt('cur_exercise_type') ?? 0;
+    return switch (i) {
+      0 => ExerciseType.randomGroups,
+      1 => ExerciseType.words,
+      _ => ExerciseType.randomGroups,
+    };
+  }
+
+  set curExerciseType(ExerciseType type) {
+    int i = switch (type) {
+      ExerciseType.randomGroups => 0,
+      ExerciseType.words => 1,
+    };
+    setInt('cur_exercise_type', i);
   }
 }
 

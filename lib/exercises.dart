@@ -39,6 +39,10 @@ abstract class Exercise {
       ExerciseType.words => WordsExercise(config),
     };
   }
+
+  static Exercise getCurrent(AppConfig config) {
+    return getByType(config, config.sharedExercise.curExerciseType);
+  }
 }
 
 class RandomGroupsExercise extends Exercise {
