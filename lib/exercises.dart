@@ -64,13 +64,11 @@ class RandomGroupsExercise extends Exercise {
   final log = Logger('RandomGroupsExercise');
   final Random _random = Random();
   final RandomGroupsConfig _config;
-  final TtsConfig _ttsConfig;
   final SharedExerciseConfig _sharedExercise;
   int _remainingGroups;
 
   RandomGroupsExercise(super._appConfig)
       : _config = _appConfig.randomGroups,
-        _ttsConfig = _appConfig.tts,
         _remainingGroups = _appConfig.sharedExercise.exerciseNum,
         _sharedExercise = _appConfig.sharedExercise;
 
@@ -115,13 +113,11 @@ class WordsExercise extends Exercise {
   final log = Logger('WordsExercise');
   final Random _random = Random();
   final WordsExerciseConfig _config;
-  final TtsConfig _ttsConfig;
   final SharedExerciseConfig _sharedExercise;
   int _remainingWords;
 
   WordsExercise(super._appConfig)
       : _config = _appConfig.wordsExercise,
-        _ttsConfig = _appConfig.tts,
         _remainingWords = _appConfig.sharedExercise.exerciseNum,
         _sharedExercise = _appConfig.sharedExercise;
 
