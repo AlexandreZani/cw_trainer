@@ -1,7 +1,7 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:cw_trainer/audio.dart';
 import 'package:cw_trainer/exercises.dart';
 import 'package:cw_trainer/main.dart';
-import 'package:cw_trainer/practice_page.dart';
 import 'package:cw_trainer/settings_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -22,21 +22,58 @@ class PracticePage extends StatelessWidget {
   Widget build(BuildContext context) {
     log.finest('building playback page');
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Spacer(),
-        ExerciseSelector(
-          appState: appState,
-          audioHandler: audioHandler,
-        ),
-        const Spacer(),
-        PlayControls(audioHandler: audioHandler, log: log),
-        const Spacer(),
-        PracticeSettings(appState: appState),
-        const Spacer(),
-      ],
-    );
+    return StreamBuilder(
+        stream: audioHandler.playbackState,
+        builder: (context, snapshot) {
+          var topWidget = switch (
+              (snapshot.data?.controls.contains(MediaControl.stop) ?? false)) {
+            true =>
+              CaptionDisplay(appState: appState, audioHandler: audioHandler),
+            false =>
+              ExerciseSelector(appState: appState, audioHandler: audioHandler)
+          };
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Spacer(),
+              topWidget,
+              const Spacer(),
+              PlayControls(audioHandler: audioHandler, log: log),
+              const Spacer(),
+              PracticeSettings(appState: appState),
+              const Spacer(),
+            ],
+          );
+        });
+  }
+}
+
+class CaptionDisplay extends StatelessWidget {
+  const CaptionDisplay(
+      {super.key, required this.appState, required this.audioHandler});
+
+  final MyAppState appState;
+  final AudioHandler audioHandler;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: audioHandler.customState,
+        builder: (context, snapshot) {
+          CustomAudioState? data = snapshot.data as CustomAudioState?;
+          String caption = data?.audioItem?.caption ?? "";
+
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Text(
+                caption,
+                style: const TextStyle(fontSize: 18),
+              )
+            ],
+          );
+        });
   }
 }
 
@@ -49,35 +86,26 @@ class ExerciseSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: audioHandler.playbackState,
-        builder: (context, snapshot) {
-          List<DropdownMenuEntry> entries = [
-            const DropdownMenuEntry(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        DropdownMenu(
+          dropdownMenuEntries: const [
+            DropdownMenuEntry(
                 value: ExerciseType.randomGroups, label: "Random Groups"),
-            const DropdownMenuEntry(
-                value: ExerciseType.words, label: "Random Words"),
-          ];
-
-          if (snapshot.data?.controls.contains(MediaControl.stop) ?? false) {
-            return const Spacer();
-          }
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              DropdownMenu(
-                dropdownMenuEntries: entries,
-                initialSelection:
-                    appState.appConfig.sharedExercise.curExerciseType,
-                onSelected: (type) {
-                  appState.appConfig.sharedExercise.curExerciseType = type;
-                  audioHandler.stop();
-                },
-              ),
-            ],
-          );
-        });
+            DropdownMenuEntry(value: ExerciseType.words, label: "Random Words")
+          ],
+          initialSelection: appState.appConfig.sharedExercise.curExerciseType,
+          onSelected: (type) {
+            if (type == null) {
+              return;
+            }
+            appState.appConfig.sharedExercise.curExerciseType = type;
+          },
+        ),
+      ],
+    );
   }
 }
 

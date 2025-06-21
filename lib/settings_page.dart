@@ -63,6 +63,13 @@ class SharedExerciseSettings extends StatelessWidget {
             appState.appConfig.sharedExercise.exerciseNum = i;
           },
         ),
+        BoolSetting(
+          label: "Display Text During CW",
+          initialValue: appState.appConfig.sharedExercise.displayTextDuringCw,
+          onChanged: (bool v) {
+            appState.appConfig.sharedExercise.displayTextDuringCw = v;
+          },
+        ),
       ],
     );
   }

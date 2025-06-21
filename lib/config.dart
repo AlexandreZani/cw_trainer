@@ -147,6 +147,12 @@ class SharedExerciseConfig extends SharedState {
     };
     setInt('cur_exercise_type', i);
   }
+
+  bool get displayTextDuringCw => getBool('display_text_during_cw') ?? true;
+
+  set displayTextDuringCw(bool v) {
+    setBool('display_text_during_cw', v);
+  }
 }
 
 class RandomGroupsConfig extends SharedState {

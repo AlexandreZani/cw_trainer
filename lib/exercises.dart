@@ -13,7 +13,7 @@ enum ExerciseType {
 
 abstract class Exercise {
   final AppConfig _appConfig;
-  final Queue<AudioItem> _queue = Queue.from([AudioItem.silence(300)]);
+  final Queue<AudioItem> _queue = Queue.from([AudioItem.silence(300, "")]);
 
   Exercise(this._appConfig);
 
@@ -42,6 +42,21 @@ abstract class Exercise {
 
   static Exercise getCurrent(AppConfig config) {
     return getByType(config, config.sharedExercise.curExerciseType);
+  }
+
+  AudioItem silenceBeforeTts(String caption) {
+    int delayMs = (_appConfig.tts.delay * 1000).round();
+    if (_appConfig.sharedExercise.displayTextDuringCw) {
+      return AudioItem.silence(delayMs, caption.toUpperCase());
+    }
+    return AudioItem.silence(delayMs, "");
+  }
+
+  AudioItem morseAudioItem(String value) {
+    if (_appConfig.sharedExercise.displayTextDuringCw) {
+      return AudioItem.morse(value, value.toUpperCase());
+    }
+    return AudioItem.morse(value, "");
   }
 }
 
@@ -87,11 +102,10 @@ class RandomGroupsExercise extends Exercise {
     }
 
     String group = _randomGroup();
-    int delayMs = (_ttsConfig.delay * 1000).round();
 
     _queue.addAll([
-      AudioItem.morse(group),
-      AudioItem.silence(delayMs),
+      morseAudioItem(group),
+      silenceBeforeTts(group),
       AudioItem.spell(group),
     ]);
   }
@@ -136,11 +150,10 @@ class WordsExercise extends Exercise {
 
     int i = _random.nextInt(words.length);
     String word = words[i];
-    int delayMs = (_ttsConfig.delay * 1000).round();
 
     _queue.addAll([
-      AudioItem.morse(word),
-      AudioItem.silence(delayMs),
+      morseAudioItem(word),
+      silenceBeforeTts(word),
       AudioItem.text(word),
     ]);
   }

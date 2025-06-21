@@ -20,7 +20,16 @@ class CwAudioHandler extends BaseAudioHandler {
 
   final AppConfig _appConfig;
   Exercise _currentExercise;
-  AudioItem? _currentAudioItem;
+  AudioItem? __currentAudioItem;
+
+  AudioItem? get _currentAudioItem => __currentAudioItem;
+
+  set _currentAudioItem(AudioItem? item) {
+    __currentAudioItem = item;
+    CustomAudioState state = customState.valueOrNull as CustomAudioState? ??
+        CustomAudioState(audioItem: null);
+    customState.add(state.copyWith(audioItem: item));
+  }
 
   CwAudioHandler(this._appConfig)
       : _currentExercise = Exercise.getCurrent(_appConfig) {
@@ -265,4 +274,17 @@ void writeToFile(List<int> frames) async {
   }
 */
   await sink.close();
+}
+
+class CustomAudioState {
+  static const _fakeNull = Object();
+  CustomAudioState({this.audioItem});
+
+  final AudioItem? audioItem;
+
+  CustomAudioState copyWith({Object? audioItem = _fakeNull}) {
+    return CustomAudioState(
+        audioItem:
+            audioItem == _fakeNull ? this.audioItem : audioItem as AudioItem?);
+  }
 }
