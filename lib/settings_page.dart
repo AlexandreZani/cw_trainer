@@ -27,8 +27,36 @@ class SettingsPage extends StatelessWidget {
         RandomGroupsSettings(appState: appState),
         const Divider(),
         WordsExerciseSettings(appState: appState),
+        const Divider(),
+        AboutSettings(appState: appState),
+        const Divider(),
       ],
     );
+  }
+}
+
+class AboutSettings extends StatelessWidget {
+  const AboutSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      ListTile(
+        title: const Text('About'),
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      const MyHomePage(currentPage: Pages.about)));
+        },
+      ),
+    ]);
   }
 }
 

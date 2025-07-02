@@ -194,20 +194,37 @@ class WordsExerciseConfig extends SharedState {
   }
 }
 
+class MiscConfig extends SharedState {
+  static const int licenseVersion = 10;
+
+  MiscConfig(SharedPreferences prefs) : super(prefs, 'misc');
+
+  bool get licenseAccepted {
+    var accepted = getInt('license_accepted') ?? 0;
+    return licenseVersion <= accepted;
+  }
+
+  void acceptLicense() {
+    setInt('license_accepted', licenseVersion);
+  }
+}
+
 class AppConfig extends ChangeNotifier {
   CwConfig cw;
   TtsConfig tts;
   SharedExerciseConfig sharedExercise;
   RandomGroupsConfig randomGroups;
   WordsExerciseConfig wordsExercise;
+  MiscConfig misc;
 
   AppConfig(this.cw, this.tts, this.sharedExercise, this.randomGroups,
-      this.wordsExercise) {
+      this.wordsExercise, this.misc) {
     cw.addListener(notifyListeners);
     tts.addListener(notifyListeners);
     randomGroups.addListener(notifyListeners);
     sharedExercise.addListener(notifyListeners);
     wordsExercise.addListener(notifyListeners);
+    misc.addListener(notifyListeners);
   }
 
   static AppConfig buildFromShared(SharedPreferences prefs) {
@@ -216,7 +233,8 @@ class AppConfig extends ChangeNotifier {
         TtsConfig(prefs),
         SharedExerciseConfig(prefs),
         RandomGroupsConfig(prefs),
-        WordsExerciseConfig(prefs));
+        WordsExerciseConfig(prefs),
+        MiscConfig(prefs));
   }
 }
 

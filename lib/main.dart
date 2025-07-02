@@ -2,6 +2,7 @@ import 'package:cw_trainer/audio.dart';
 import 'package:cw_trainer/exercises.dart';
 import 'package:cw_trainer/practice_page.dart';
 import 'package:cw_trainer/settings_page.dart';
+import 'package:cw_trainer/info_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cw_trainer/config.dart';
@@ -76,6 +77,8 @@ class MyAppState extends ChangeNotifier {
 enum Pages {
   practice,
   settings,
+  license,
+  about,
 }
 
 class MyHomePage extends StatelessWidget {
@@ -85,17 +88,26 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
+    var licenseAccepted = appState.appConfig.misc.licenseAccepted;
+
+    AppBar appBar = AppBar(
+      title: const Text('CW Trainer'),
+      backgroundColor: const Color.fromRGBO(0x34, 0xde, 0xeb, 0.2),
+    );
+
+    if (!licenseAccepted) {
+      return LicenseConsentPage(appBar: appBar, appState: appState);
+    }
 
     var navBarIndex = switch (currentPage) {
       Pages.practice => 0,
       Pages.settings => 1,
+      Pages.license => 1,
+      Pages.about => 1,
     };
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('CW Trainer'),
-        backgroundColor: const Color.fromRGBO(0x34, 0xde, 0xeb, 0.2),
-      ),
+      appBar: appBar,
       bottomNavigationBar: NavigationBar(
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
           selectedIndex: navBarIndex,
@@ -124,6 +136,8 @@ class MyHomePage extends StatelessWidget {
         Pages.practice =>
           PracticePage(appState: appState, audioHandler: _audioHandler),
         Pages.settings => SettingsPage(appState: appState),
+        Pages.license => LicenseDisplayPage(),
+        Pages.about => AboutPage(),
       },
     );
   }
