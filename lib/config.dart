@@ -1,52 +1,42 @@
 import 'dart:math';
 
 import 'package:cw_trainer/exercises.dart';
+import 'package:cw_trainer/shared_state_base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedState extends ChangeNotifier {
-  final SharedPreferences _prefs;
-  final String _prefix;
-  SharedState(this._prefs, this._prefix) : super();
+class SharedState extends SharedStateBase {
+  SharedState(super.prefs, super.prefix);
 
-  String key(String k) {
-    return '${_prefix}_$k';
+  Set<E>? getSet<E>(String k, E? Function(String) parse) {
+    List<String>? strings = getStringList(k);
+    if (strings == null) {
+      return null;
+    }
+
+    Set<E> es = {};
+    for (final s in strings) {
+      final e = parse(s);
+      if (e == null) {
+        return null;
+      }
+
+      es.add(e);
+    }
+
+    return es;
   }
 
-  int? getInt(String k) {
-    return _prefs.getInt(key(k));
+  Set<int>? getIntSet(String k) {
+    return getSet(k, int.tryParse);
   }
 
-  double? getDouble(String k) {
-    return _prefs.getDouble(key(k));
+  void setSet<E>(String k, Set<E> es, String Function(E) toString) {
+    setStringList(k, es.map(toString).toList());
   }
 
-  String? getString(String k) {
-    return _prefs.getString(key(k));
-  }
-
-  bool? getBool(String k) {
-    return _prefs.getBool(k);
-  }
-
-  void setInt(String k, int v) {
-    _prefs.setInt(key(k), v);
-    notifyListeners();
-  }
-
-  void setDouble(String k, double v) {
-    _prefs.setDouble(key(k), v);
-    notifyListeners();
-  }
-
-  void setString(String k, String v) {
-    _prefs.setString(key(k), v);
-    notifyListeners();
-  }
-
-  void setBool(String k, bool v) {
-    _prefs.setBool(k, v);
-    notifyListeners();
+  void setIntSet(String k, Set<int> v) {
+    setStringList(k, v.map((i) => i.toString()).toList());
   }
 }
 
