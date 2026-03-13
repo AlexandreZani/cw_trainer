@@ -19,7 +19,7 @@ class CwAudioHandler extends BaseAudioHandler {
   bool _paused = false;
 
   final AppConfig _appConfig;
-  Exercise _currentExercise;
+  ExerciseController _currentExercise;
   AudioItem? __currentAudioItem;
 
   AudioItem? get _currentAudioItem => __currentAudioItem;
@@ -32,7 +32,7 @@ class CwAudioHandler extends BaseAudioHandler {
   }
 
   CwAudioHandler(this._appConfig)
-      : _currentExercise = Exercise.getCurrent(_appConfig) {
+      : _currentExercise = ExerciseController.getCurrent(_appConfig) {
     _player.playbackEventStream.listen((PlaybackEvent event) {
       if (_player.playing) {
         _onPlaying();
@@ -102,7 +102,7 @@ class CwAudioHandler extends BaseAudioHandler {
 
   void _resetExercise() {
     log.fine('_resetExercise');
-    _currentExercise = Exercise.getCurrent(_appConfig);
+    _currentExercise = ExerciseController.getCurrent(_appConfig);
   }
 
   Future<void> _onExerciseFinished() async {
