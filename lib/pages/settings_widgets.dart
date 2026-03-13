@@ -1,6 +1,6 @@
-import 'package:cw_trainer/exercises.dart';
+import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/main.dart';
-import 'package:cw_trainer/words.dart';
+import 'package:cw_trainer/exercises/words.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;

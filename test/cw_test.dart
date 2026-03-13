@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import 'package:cw_trainer/cw.dart';
+import 'package:cw_trainer/audio/cw.dart';
 
 void main() {
   test('wpm and ewpm round trip', () {

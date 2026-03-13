@@ -1,11 +1,11 @@
-import 'package:cw_trainer/audio.dart';
-import 'package:cw_trainer/exercises.dart';
-import 'package:cw_trainer/practice_page.dart';
-import 'package:cw_trainer/settings_page.dart';
-import 'package:cw_trainer/info_pages.dart';
+import 'package:cw_trainer/audio/audio.dart';
+import 'package:cw_trainer/exercises/exercises.dart';
+import 'package:cw_trainer/pages/practice_page.dart';
+import 'package:cw_trainer/pages/settings_page.dart';
+import 'package:cw_trainer/pages/info_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cw_trainer/config.dart';
+import 'package:cw_trainer/config/config.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logging/logging.dart';

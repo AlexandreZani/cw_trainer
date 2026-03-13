@@ -1,9 +1,9 @@
 import 'dart:collection';
 import 'dart:math';
 
-import 'package:cw_trainer/audio_item_type.dart';
-import 'package:cw_trainer/config.dart';
-import 'package:cw_trainer/words.dart';
+import 'package:cw_trainer/audio/audio_item_type.dart';
+import 'package:cw_trainer/config/config.dart';
+import 'package:cw_trainer/exercises/words.dart';
 import 'package:logging/logging.dart';
 
 enum ExerciseType {

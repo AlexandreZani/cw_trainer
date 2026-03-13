@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:cw_trainer/exercises.dart';
-import 'package:cw_trainer/shared_state_base.dart';
+import 'package:cw_trainer/exercises/exercises.dart';
+import 'package:cw_trainer/config/shared_state_base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
