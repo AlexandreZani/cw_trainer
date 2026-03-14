@@ -5,27 +5,30 @@ import 'package:cw_trainer/config/config.dart';
 import 'package:cw_trainer/exercises/exercise_base.dart';
 import 'package:logging/logging.dart';
 
-class RandomGroupsExercise extends ExerciseBase {
+abstract class RandomGroupsExerciseBase extends ExerciseBase {
   final log = Logger('RandomGroupsExercise');
   final Random _random = Random();
   final RandomGroupsConfig _config;
   final SharedExerciseConfig _sharedExercise;
   int _remainingGroups;
 
-  RandomGroupsExercise(super._appConfig)
+  RandomGroupsExerciseBase(super._appConfig)
       : _config = _appConfig.randomGroups,
         _remainingGroups = _appConfig.sharedExercise.exerciseNum,
         _sharedExercise = _appConfig.sharedExercise;
 
+  String charPool();
+
   String _randomGroup() {
+    String letters = charPool();
+    //print(letters);
     String group = '';
-    int maxIndex = _config.levelI;
     while (group.length < _config.groupSize) {
-      int i = _random.nextInt(maxIndex + 1);
-      group += _config.letters[i];
+      int i = _random.nextInt(letters.length);
+      group += letters[i];
     }
 
-    String latest = _config.letters[maxIndex];
+    String latest = letters[letters.length - 1];
     if (_config.forceLatest && !group.contains(latest)) {
       int i = _random.nextInt(group.length);
       group = group.replaceRange(i, i + 1, latest);
@@ -50,6 +53,16 @@ class RandomGroupsExercise extends ExerciseBase {
       morseAudioItem(group),
       silenceBeforeTts(group),
       AudioItem.spell(group),
+      silenceAfterTts(group),
     ];
+  }
+}
+
+class RandomGroupsExercise extends RandomGroupsExerciseBase {
+  RandomGroupsExercise(super._appConfig);
+
+  @override
+  String charPool() {
+    return _config.letters;
   }
 }

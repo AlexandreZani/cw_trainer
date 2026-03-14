@@ -94,7 +94,8 @@ class ExerciseSelector extends StatelessWidget {
           dropdownMenuEntries: const [
             DropdownMenuEntry(
                 value: ExerciseType.randomGroups, label: "Random Groups"),
-            DropdownMenuEntry(value: ExerciseType.words, label: "Random Words")
+            DropdownMenuEntry(value: ExerciseType.words, label: "Random Words"),
+            DropdownMenuEntry(value: ExerciseType.licwRecognition, label: "Recognition")
           ],
           initialSelection: appState.appConfig.sharedExercise.curExerciseType,
           onSelected: (type) {

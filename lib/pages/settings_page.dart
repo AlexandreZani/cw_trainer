@@ -1,4 +1,5 @@
 import 'package:cw_trainer/exercises/exercises.dart';
+import 'package:cw_trainer/exercises/licw_exercise.dart';
 import 'package:cw_trainer/main.dart';
 import 'package:cw_trainer/pages/settings_widgets.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,8 @@ class SettingsPage extends StatelessWidget {
         RandomGroupsSettings(appState: appState),
         const Divider(),
         WordsExerciseSettings(appState: appState),
+        const Divider(),
+        LicwSettings(appState: appState),
         const Divider(),
         AboutSettings(appState: appState),
         const Divider(),
@@ -212,12 +215,22 @@ class TTSSettings extends StatelessWidget {
         ),
         NumSettingChevron(
           label: "Delay Before Speaking",
-          initialValue: appState.appConfig.tts.delay,
+          initialValue: appState.appConfig.tts.delayBefore,
           min: 0.0,
           max: 3.0,
-          step: 0.5,
+          step: 0.25,
           onSelected: (double i) {
-            appState.appConfig.tts.delay = i;
+            appState.appConfig.tts.delayBefore = i;
+          },
+        ),
+        NumSettingChevron(
+          label: "Delay After Speaking",
+          initialValue: appState.appConfig.tts.delayAfter,
+          min: 0.0,
+          max: 3.0,
+          step: 0.25,
+          onSelected: (double i) {
+            appState.appConfig.tts.delayAfter = i;
           },
         ),
         BoolSetting(
@@ -284,6 +297,40 @@ class CWSettings extends StatelessWidget {
             appState.appConfig.cw.sampleRate = i;
           },
         ),
+      ],
+    );
+  }
+}
+
+class LicwSettings extends StatelessWidget {
+  const LicwSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const ListTile(title: Text('LICW Exercises')),
+        const Divider(),
+        MultiSelector(
+            label: "BC1 Groups",
+            labels: bc1Groups,
+            selected: appState.appConfig.licw.bc1GroupsSelected,
+            onSelected: (i) {
+              Set<int> selected = appState.appConfig.licw.bc1GroupsSelected;
+
+              if (selected.contains(i)) {
+                selected.remove(i);
+              } else {
+                selected.add(i);
+              }
+
+              appState.appConfig.licw.bc1GroupsSelected = selected;
+            }),
       ],
     );
   }

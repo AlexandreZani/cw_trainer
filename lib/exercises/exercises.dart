@@ -3,12 +3,14 @@ import 'dart:collection';
 import 'package:cw_trainer/audio/audio_item_type.dart';
 import 'package:cw_trainer/config/config.dart';
 import 'package:cw_trainer/exercises/exercise_base.dart';
+import 'package:cw_trainer/exercises/licw_exercise.dart';
 import 'package:cw_trainer/exercises/random_groups_exercise.dart';
 import 'package:cw_trainer/exercises/words_exercise.dart';
 
 enum ExerciseType {
   randomGroups,
   words,
+  licwRecognition,
 }
 
 class ExerciseController {
@@ -37,6 +39,8 @@ class ExerciseController {
       ExerciseType.randomGroups =>
         ExerciseController(config, RandomGroupsExercise(config)),
       ExerciseType.words => ExerciseController(config, WordsExercise(config)),
+      ExerciseType.licwRecognition =>
+        ExerciseController(config, LicwRecognitionExercise(config))
     };
   }
 

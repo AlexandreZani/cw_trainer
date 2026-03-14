@@ -11,7 +11,15 @@ abstract class ExerciseBase {
   List<AudioItem>? replenishQueue();
 
   AudioItem silenceBeforeTts(String caption) {
-    int delayMs = (_appConfig.tts.delay * 1000).round();
+    int delayMs = (_appConfig.tts.delayBefore * 1000).round();
+    if (_appConfig.sharedExercise.displayTextDuringCw) {
+      return AudioItem.silence(delayMs, caption.toUpperCase());
+    }
+    return AudioItem.silence(delayMs, "");
+  }
+
+  AudioItem silenceAfterTts(String caption) {
+    int delayMs = (_appConfig.tts.delayAfter * 1000).round();
     if (_appConfig.sharedExercise.displayTextDuringCw) {
       return AudioItem.silence(delayMs, caption.toUpperCase());
     }

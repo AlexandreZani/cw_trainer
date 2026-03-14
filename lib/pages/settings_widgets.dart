@@ -1,4 +1,5 @@
 import 'package:cw_trainer/exercises/exercises.dart';
+import 'package:cw_trainer/exercises/licw_exercise.dart';
 import 'package:cw_trainer/main.dart';
 import 'package:cw_trainer/exercises/words.dart';
 import 'package:flutter/material.dart';
@@ -296,6 +297,7 @@ class LevelSetting extends StatelessWidget {
     var selector = switch (exerciseType) {
       ExerciseType.words => WordsLevelSelector(appState: appState),
       ExerciseType.randomGroups => RandomGroupLevelSelector(appState: appState),
+      ExerciseType.licwRecognition => LicwBc1GroupSelector(appState: appState),
     };
     return ListTile(
       title: Row(children: [
@@ -324,6 +326,8 @@ class LevelSelectorForExercise extends StatelessWidget {
         return RandomGroupLevelSelector(appState: appState);
       case ExerciseType.words:
         return WordsLevelSelector(appState: appState);
+      case ExerciseType.licwRecognition:
+        return LicwBc1GroupSelector(appState: appState);
     }
   }
 }
@@ -405,5 +409,70 @@ class LevelSelector extends StatelessWidget {
             onChanged(levelI + 1);
           })
     ]);
+  }
+}
+
+class MultiSelector extends StatelessWidget {
+  const MultiSelector(
+      {super.key,
+      required this.label,
+      required this.labels,
+      required this.selected,
+      required this.onSelected});
+
+  final String label;
+  final List<String> labels;
+  final Set<int> selected;
+  final Function onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+        title: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label),
+        const SizedBox(height: 4),
+        Wrap(
+            spacing: 4,
+            children: labels
+                .asMap()
+                .entries
+                .map((e) => FilterChip(
+                      label: Text(e.value),
+                      selected: selected.contains(e.key),
+                      showCheckmark: false,
+                      onSelected: (_) {
+                        onSelected(e.key);
+                      },
+                    ))
+                .toList()),
+      ],
+    ));
+  }
+}
+
+class LicwBc1GroupSelector extends StatelessWidget {
+  const LicwBc1GroupSelector({super.key, required this.appState});
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiSelector(
+        label: "BC1 Groups",
+        labels: bc1Groups,
+        selected: appState.appConfig.licw.bc1GroupsSelected,
+        onSelected: (i) {
+          Set<int> selected = appState.appConfig.licw.bc1GroupsSelected;
+
+          if (selected.contains(i)) {
+            selected.remove(i);
+          } else {
+            selected.add(i);
+          }
+
+          appState.appConfig.licw.bc1GroupsSelected = selected;
+        });
   }
 }

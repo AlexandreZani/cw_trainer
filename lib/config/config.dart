@@ -73,7 +73,8 @@ class TtsConfig extends SharedState {
   double get rate => getDouble('rate') ?? 0.7;
   double get pitch => getDouble('pitch') ?? 1.0;
   double get volume => getDouble('volume') ?? 1.0;
-  double get delay => getDouble('delay') ?? 1.0;
+  double get delayBefore => getDouble('delay') ?? 1.0;
+  double get delayAfter => getDouble('delay_after') ?? 1.0;
   bool get spellWithItu => getBool('spell_with_itu') ?? true;
 
   set enable(bool enable) {
@@ -96,8 +97,12 @@ class TtsConfig extends SharedState {
     setDouble('volume', volume);
   }
 
-  set delay(double delay) {
+  set delayBefore(double delay) {
     setDouble('delay', delay);
+  }
+
+  set delayAfter(double delay) {
+    setDouble('delay_after', delay);
   }
 
   set spellWithItu(bool spellWithItu) {
@@ -126,6 +131,7 @@ class SharedExerciseConfig extends SharedState {
     return switch (i) {
       0 => ExerciseType.randomGroups,
       1 => ExerciseType.words,
+      2 => ExerciseType.licwRecognition,
       _ => ExerciseType.randomGroups,
     };
   }
@@ -134,6 +140,7 @@ class SharedExerciseConfig extends SharedState {
     int i = switch (type) {
       ExerciseType.randomGroups => 0,
       ExerciseType.words => 1,
+      ExerciseType.licwRecognition => 2,
     };
     setInt('cur_exercise_type', i);
   }
@@ -184,6 +191,24 @@ class WordsExerciseConfig extends SharedState {
   }
 }
 
+class LicwConfig extends SharedState {
+  LicwConfig(SharedPreferences prefs) : super(prefs, 'licw');
+
+  Set<int> get bc1GroupsSelected => getIntSet('bc1_groups_selected') ?? {};
+
+  set bc1GroupsSelected(Set<int> v) {
+    setIntSet('bc1_groups_selected', v);
+  }
+
+  void selectBc1Group(int i) {
+    bc1GroupsSelected.add(i);
+  }
+
+  void unselectBc1Group(int i) {
+    bc1GroupsSelected.remove(i);
+  }
+}
+
 class MiscConfig extends SharedState {
   static const int licenseVersion = 10;
 
@@ -205,15 +230,17 @@ class AppConfig extends ChangeNotifier {
   SharedExerciseConfig sharedExercise;
   RandomGroupsConfig randomGroups;
   WordsExerciseConfig wordsExercise;
+  LicwConfig licw;
   MiscConfig misc;
 
   AppConfig(this.cw, this.tts, this.sharedExercise, this.randomGroups,
-      this.wordsExercise, this.misc) {
+      this.wordsExercise, this.licw, this.misc) {
     cw.addListener(notifyListeners);
     tts.addListener(notifyListeners);
     randomGroups.addListener(notifyListeners);
     sharedExercise.addListener(notifyListeners);
     wordsExercise.addListener(notifyListeners);
+    licw.addListener(notifyListeners);
     misc.addListener(notifyListeners);
   }
 
@@ -224,6 +251,7 @@ class AppConfig extends ChangeNotifier {
         SharedExerciseConfig(prefs),
         RandomGroupsConfig(prefs),
         WordsExerciseConfig(prefs),
+        LicwConfig(prefs),
         MiscConfig(prefs));
   }
 }
