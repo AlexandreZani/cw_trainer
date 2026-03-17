@@ -78,11 +78,15 @@ class CaptionDisplay extends StatelessWidget {
 }
 
 class ExerciseSelector extends StatelessWidget {
-  const ExerciseSelector(
-      {super.key, required this.appState, required this.audioHandler});
+  ExerciseSelector(
+      {super.key, required this.appState, required this.audioHandler})
+      : currentCourse = appState.appConfig.sharedExercise.currentCourse,
+        curExerciseType = appState.appConfig.sharedExercise.curExerciseType;
 
   final MyAppState appState;
   final AudioHandler audioHandler;
+  final CourseType currentCourse;
+  final ExerciseType curExerciseType;
 
   @override
   Widget build(BuildContext context) {
@@ -90,21 +94,21 @@ class ExerciseSelector extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: [
-        DropdownMenu(
-          dropdownMenuEntries: const [
-            DropdownMenuEntry(
-                value: ExerciseType.randomGroups, label: "Random Groups"),
-            DropdownMenuEntry(value: ExerciseType.words, label: "Random Words"),
-            DropdownMenuEntry(value: ExerciseType.licwRecognition, label: "Recognition")
-          ],
-          initialSelection: appState.appConfig.sharedExercise.curExerciseType,
-          onSelected: (type) {
-            if (type == null) {
-              return;
-            }
-            appState.appConfig.sharedExercise.curExerciseType = type;
-          },
-        ),
+        const Spacer(),
+        ConfigEnumPicker(
+            values: const [CourseType.legacy, CourseType.licwBc1],
+            initialValue: currentCourse,
+            onSelected: (v) {
+              appState.appConfig.sharedExercise.currentCourse = v;
+            }),
+        const Spacer(),
+        ConfigEnumPicker(
+            values: currentCourse.supportedExercises,
+            initialValue: curExerciseType,
+            onSelected: (v) {
+              appState.appConfig.sharedExercise.curExerciseType = v;
+            }),
+        const Spacer(),
       ],
     );
   }

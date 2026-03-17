@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cw_trainer/config/config_types.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/config/shared_state_base.dart';
 import 'package:flutter/foundation.dart';
@@ -37,6 +38,25 @@ class SharedState extends SharedStateBase {
 
   void setIntSet(String k, Set<int> v) {
     setStringList(k, v.map((i) => i.toString()).toList());
+  }
+
+  void setEnum(String k, ConfigEnum v) {
+    setInt(k, v.i);
+  }
+
+  T? getEnum<T>(String k, List<T> values) {
+    int? i = getInt(k);
+    if (i == null) {
+      return null;
+    }
+
+    for (T e in values) {
+      var ce = e as ConfigEnum;
+      if (ce.i == i && !ce.deprecated) {
+        return e;
+      }
+    }
+    return null;
   }
 }
 
@@ -127,28 +147,31 @@ class SharedExerciseConfig extends SharedState {
   }
 
   ExerciseType get curExerciseType {
-    int i = getInt('cur_exercise_type') ?? 0;
-    return switch (i) {
-      0 => ExerciseType.randomGroups,
-      1 => ExerciseType.words,
-      2 => ExerciseType.licwRecognition,
-      _ => ExerciseType.randomGroups,
-    };
+    ExerciseType e = getEnum('cur_exercise_type', ExerciseType.values) ??
+        ExerciseType.randomGroups;
+
+    if (!currentCourse.supportedExercises.contains(e)) {
+      return currentCourse.supportedExercises[0];
+    }
+
+    return e;
   }
 
   set curExerciseType(ExerciseType type) {
-    int i = switch (type) {
-      ExerciseType.randomGroups => 0,
-      ExerciseType.words => 1,
-      ExerciseType.licwRecognition => 2,
-    };
-    setInt('cur_exercise_type', i);
+    setEnum('cur_exercise_type', type);
   }
 
   bool get displayTextDuringCw => getBool('display_text_during_cw') ?? true;
 
   set displayTextDuringCw(bool v) {
     setBool('display_text_during_cw', v);
+  }
+
+  CourseType get currentCourse =>
+      getEnum('current_course', CourseType.values) ?? CourseType.legacy;
+
+  set currentCourse(CourseType v) {
+    setEnum('current_course', v);
   }
 }
 
@@ -198,14 +221,6 @@ class LicwConfig extends SharedState {
 
   set bc1GroupsSelected(Set<int> v) {
     setIntSet('bc1_groups_selected', v);
-  }
-
-  void selectBc1Group(int i) {
-    bc1GroupsSelected.add(i);
-  }
-
-  void unselectBc1Group(int i) {
-    bc1GroupsSelected.remove(i);
   }
 }
 

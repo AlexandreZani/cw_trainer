@@ -5,17 +5,37 @@ import 'package:cw_trainer/config/config.dart';
 import 'package:cw_trainer/exercises/exercise_base.dart';
 import 'package:logging/logging.dart';
 
-abstract class RandomGroupsExerciseBase extends ExerciseBase {
-  final log = Logger('RandomGroupsExercise');
+abstract class RepeatedExerciseBase extends ExerciseBase {
+  final log = Logger('RepeatedExerciseBase');
+  final SharedExerciseConfig _sharedExerciseConfig;
+  int _remainingExercises;
+
+  RepeatedExerciseBase(super._appConfig)
+      : _sharedExerciseConfig = _appConfig.sharedExercise,
+        _remainingExercises = _appConfig.sharedExercise.exerciseNum;
+
+  List<AudioItem> nextExerciseChunk();
+
+  @override
+  List<AudioItem>? replenishQueue() {
+    log.finest('_replenishQueue $_remainingExercises');
+    if (!_sharedExerciseConfig.repeat) {
+      if (_remainingExercises <= 0) {
+        return null;
+      }
+      _remainingExercises -= 1;
+    }
+
+    return nextExerciseChunk();
+  }
+}
+
+abstract class RandomGroupsExerciseBase extends RepeatedExerciseBase {
   final Random _random = Random();
   final RandomGroupsConfig _config;
-  final SharedExerciseConfig _sharedExercise;
-  int _remainingGroups;
 
   RandomGroupsExerciseBase(super._appConfig)
-      : _config = _appConfig.randomGroups,
-        _remainingGroups = _appConfig.sharedExercise.exerciseNum,
-        _sharedExercise = _appConfig.sharedExercise;
+      : _config = _appConfig.randomGroups;
 
   String charPool();
 
@@ -38,15 +58,7 @@ abstract class RandomGroupsExerciseBase extends ExerciseBase {
   }
 
   @override
-  List<AudioItem>? replenishQueue() {
-    log.finest('_replenishQueue $_remainingGroups');
-    if (!_sharedExercise.repeat) {
-      if (_remainingGroups <= 0) {
-        return null;
-      }
-      _remainingGroups -= 1;
-    }
-
+  List<AudioItem> nextExerciseChunk() {
     String group = _randomGroup();
 
     return [

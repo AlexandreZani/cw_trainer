@@ -10,24 +10,24 @@ abstract class ExerciseBase {
 
   List<AudioItem>? replenishQueue();
 
-  AudioItem silenceBeforeTts(String caption) {
+  AudioItem silenceBeforeTts(String caption, {bool forceCaption = false}) {
     int delayMs = (_appConfig.tts.delayBefore * 1000).round();
-    if (_appConfig.sharedExercise.displayTextDuringCw) {
+    if (_appConfig.sharedExercise.displayTextDuringCw || forceCaption) {
       return AudioItem.silence(delayMs, caption.toUpperCase());
     }
     return AudioItem.silence(delayMs, "");
   }
 
-  AudioItem silenceAfterTts(String caption) {
+  AudioItem silenceAfterTts(String caption, {bool forceCaption = false}) {
     int delayMs = (_appConfig.tts.delayAfter * 1000).round();
-    if (_appConfig.sharedExercise.displayTextDuringCw) {
+    if (_appConfig.sharedExercise.displayTextDuringCw || forceCaption) {
       return AudioItem.silence(delayMs, caption.toUpperCase());
     }
     return AudioItem.silence(delayMs, "");
   }
 
-  AudioItem morseAudioItem(String value) {
-    if (_appConfig.sharedExercise.displayTextDuringCw) {
+  AudioItem morseAudioItem(String value, {bool forceCaption = false}) {
+    if (_appConfig.sharedExercise.displayTextDuringCw || forceCaption) {
       return AudioItem.morse(value, value.toUpperCase());
     }
     return AudioItem.morse(value, "");

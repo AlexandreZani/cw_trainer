@@ -1,3 +1,4 @@
+import 'package:cw_trainer/config/config_types.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/exercises/licw_exercise.dart';
 import 'package:cw_trainer/main.dart';
@@ -298,6 +299,7 @@ class LevelSetting extends StatelessWidget {
       ExerciseType.words => WordsLevelSelector(appState: appState),
       ExerciseType.randomGroups => RandomGroupLevelSelector(appState: appState),
       ExerciseType.licwRecognition => LicwBc1GroupSelector(appState: appState),
+      ExerciseType.licwFamiliarity => LicwBc1GroupSelector(appState: appState),
     };
     return ListTile(
       title: Row(children: [
@@ -327,6 +329,8 @@ class LevelSelectorForExercise extends StatelessWidget {
       case ExerciseType.words:
         return WordsLevelSelector(appState: appState);
       case ExerciseType.licwRecognition:
+        return LicwBc1GroupSelector(appState: appState);
+      case ExerciseType.licwFamiliarity:
         return LicwBc1GroupSelector(appState: appState);
     }
   }
@@ -474,5 +478,38 @@ class LicwBc1GroupSelector extends StatelessWidget {
 
           appState.appConfig.licw.bc1GroupsSelected = selected;
         });
+  }
+}
+
+class ConfigEnumPicker<T extends ConfigEnum> extends StatelessWidget {
+  const ConfigEnumPicker({
+    super.key,
+    required this.initialValue,
+    required this.onSelected,
+    required this.values,
+  });
+
+  final T initialValue;
+  final List<T> values;
+  final Function onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownMenu(
+      onSelected: (T? v) {
+        if (v != null) {
+          onSelected(v);
+        }
+      },
+      initialSelection: initialValue,
+      dropdownMenuEntries: values.map(
+        (T v) {
+          return DropdownMenuEntry(
+            label: v.displayName,
+            value: v,
+          );
+        },
+      ).toList(),
+    );
   }
 }

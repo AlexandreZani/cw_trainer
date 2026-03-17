@@ -2,20 +2,56 @@ import 'dart:collection';
 
 import 'package:cw_trainer/audio/audio_item_type.dart';
 import 'package:cw_trainer/config/config.dart';
+import 'package:cw_trainer/config/config_types.dart';
 import 'package:cw_trainer/exercises/exercise_base.dart';
 import 'package:cw_trainer/exercises/licw_exercise.dart';
 import 'package:cw_trainer/exercises/random_groups_exercise.dart';
 import 'package:cw_trainer/exercises/words_exercise.dart';
 
-enum ExerciseType {
-  randomGroups,
-  words,
-  licwRecognition,
+enum CourseType with ConfigEnum {
+  legacy(0, 'Legacy'),
+  licwBc1(1, 'LICW BC1');
+
+  const CourseType(this.i, this.displayName, {this.deprecated = false});
+  CourseType? fromInt(int i) => ConfigEnum.fromIntInner(CourseType.values, i);
+
+  List<ExerciseType> get supportedExercises => switch (this) {
+        CourseType.legacy => const [ExerciseType.randomGroups, ExerciseType.words],
+        CourseType.licwBc1 => const [
+            ExerciseType.licwRecognition,
+            ExerciseType.licwFamiliarity
+          ],
+      };
+
+  @override
+  final int i;
+  @override
+  final String displayName;
+  @override
+  final bool deprecated;
+}
+
+enum ExerciseType with ConfigEnum {
+  randomGroups(0, 'Random Groups'),
+  words(1, 'Random Words'),
+  licwRecognition(2, 'Recognition'),
+  licwFamiliarity(3, 'Familiarity');
+
+  const ExerciseType(this.i, this.displayName, {this.deprecated = false});
+  ExerciseType? fromInt(int i) =>
+      ConfigEnum.fromIntInner(ExerciseType.values, i);
+
+  @override
+  final int i;
+  @override
+  final String displayName;
+  @override
+  final bool deprecated;
 }
 
 class ExerciseController {
   final AppConfig _appConfig;
-  final Queue<AudioItem> _queue = Queue.from([AudioItem.silence(300, "")]);
+  final Queue<AudioItem> _queue = Queue.from([AudioItem.silence(300, '')]);
   final ExerciseBase _exercise;
 
   ExerciseController(this._appConfig, this._exercise);
@@ -34,14 +70,17 @@ class ExerciseController {
     return _queue.removeFirst();
   }
 
-  static ExerciseController getByType(AppConfig config, ExerciseType type) {
+  static ExerciseBase _getExerciseByType(AppConfig config, ExerciseType type) {
     return switch (type) {
-      ExerciseType.randomGroups =>
-        ExerciseController(config, RandomGroupsExercise(config)),
-      ExerciseType.words => ExerciseController(config, WordsExercise(config)),
-      ExerciseType.licwRecognition =>
-        ExerciseController(config, LicwRecognitionExercise(config))
+      ExerciseType.randomGroups => RandomGroupsExercise(config),
+      ExerciseType.words => WordsExercise(config),
+      ExerciseType.licwRecognition => LicwRecognitionExercise(config),
+      ExerciseType.licwFamiliarity => LicwFamiliarityExercise(config),
     };
+  }
+
+  static ExerciseController getByType(AppConfig config, ExerciseType type) {
+    return ExerciseController(config, _getExerciseByType(config, type));
   }
 
   static ExerciseController getCurrent(AppConfig config) {
