@@ -298,8 +298,9 @@ class LevelSetting extends StatelessWidget {
     var selector = switch (exerciseType) {
       ExerciseType.words => WordsLevelSelector(appState: appState),
       ExerciseType.randomGroups => RandomGroupLevelSelector(appState: appState),
-      ExerciseType.licwRecognition => LicwBc1GroupSelector(appState: appState),
-      ExerciseType.licwFamiliarity => LicwBc1GroupSelector(appState: appState),
+      ExerciseType.recognition => LicwBc1GroupSelector(appState: appState),
+      ExerciseType.familiarity => LicwBc1GroupSelector(appState: appState),
+      ExerciseType.copyGroups => LicwBc1GroupSelector(appState: appState),
     };
     return ListTile(
       title: Row(children: [
@@ -328,9 +329,11 @@ class LevelSelectorForExercise extends StatelessWidget {
         return RandomGroupLevelSelector(appState: appState);
       case ExerciseType.words:
         return WordsLevelSelector(appState: appState);
-      case ExerciseType.licwRecognition:
+      case ExerciseType.recognition:
         return LicwBc1GroupSelector(appState: appState);
-      case ExerciseType.licwFamiliarity:
+      case ExerciseType.familiarity:
+        return LicwBc1GroupSelector(appState: appState);
+      case ExerciseType.copyGroups:
         return LicwBc1GroupSelector(appState: appState);
     }
   }

@@ -16,7 +16,7 @@ class AudioItem {
         caption = textString.toUpperCase(),
         milliseconds = 0;
 
-  AudioItem.morse(this.textString, this.caption)
+  AudioItem.morse(this.textString, {this.caption = ''})
       : type = AudioItemType.morse,
         milliseconds = 0;
 
@@ -25,7 +25,10 @@ class AudioItem {
         caption = textString.toUpperCase(),
         milliseconds = 0;
 
-  AudioItem.silence(this.milliseconds, this.caption)
+  AudioItem.silence(this.milliseconds, {this.caption = ''})
       : type = AudioItemType.silence,
         textString = '';
+
+  static AudioItem silenceFromDouble(double seconds, {String caption = ''}) =>
+      AudioItem.silence((seconds * 1000).round(), caption: caption);
 }

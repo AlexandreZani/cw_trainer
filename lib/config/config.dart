@@ -173,6 +173,12 @@ class SharedExerciseConfig extends SharedState {
   set currentCourse(CourseType v) {
     setEnum('current_course', v);
   }
+
+  double get betweenGroups => getDouble('between_groups') ?? 1;
+
+  set betweenGroups(double delay) {
+    setDouble('between_groups', delay);
+  }
 }
 
 class RandomGroupsConfig extends SharedState {

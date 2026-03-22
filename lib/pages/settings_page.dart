@@ -94,6 +94,16 @@ class SharedExerciseSettings extends StatelessWidget {
             appState.appConfig.sharedExercise.exerciseNum = i;
           },
         ),
+        NumSettingChevron(
+          label: "Time Between Exercises",
+          initialValue: appState.appConfig.sharedExercise.betweenGroups,
+          min: 0.0,
+          max: 3.0,
+          step: 0.25,
+          onSelected: (double i) {
+            appState.appConfig.sharedExercise.betweenGroups = i;
+          },
+        ),
         BoolSetting(
           label: "Display Text During CW",
           initialValue: appState.appConfig.sharedExercise.displayTextDuringCw,

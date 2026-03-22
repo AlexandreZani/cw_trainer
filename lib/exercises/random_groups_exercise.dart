@@ -7,74 +7,113 @@ import 'package:logging/logging.dart';
 
 abstract class RepeatedExerciseBase extends ExerciseBase {
   final log = Logger('RepeatedExerciseBase');
+  final bool voiceBefore;
+  final bool voiceAfter;
+  final int repeatNum;
+  final bool recapAtEnd;
   final SharedExerciseConfig _sharedExerciseConfig;
   int _remainingExercises;
+  List<AudioItem> _recap;
 
-  RepeatedExerciseBase(super._appConfig)
+  RepeatedExerciseBase(super._appConfig,
+      {required this.voiceBefore,
+      required this.voiceAfter,
+      required this.repeatNum,
+      required this.recapAtEnd})
       : _sharedExerciseConfig = _appConfig.sharedExercise,
-        _remainingExercises = _appConfig.sharedExercise.exerciseNum;
+        _remainingExercises = _appConfig.sharedExercise.exerciseNum,
+        _recap = [];
 
-  List<AudioItem> nextExerciseChunk();
+  String nextExerciseChunk();
 
   @override
   List<AudioItem>? replenishQueue() {
     log.finest('_replenishQueue $_remainingExercises');
-    if (!_sharedExerciseConfig.repeat) {
+    if (!_sharedExerciseConfig.repeat || recapAtEnd) {
       if (_remainingExercises <= 0) {
-        return null;
+        if (_recap.isEmpty) {
+          return null;
+        }
+
+        List<AudioItem> chunk = _recap;
+        _recap = [];
+        return chunk;
       }
       _remainingExercises -= 1;
     }
 
-    return nextExerciseChunk();
+    String text = nextExerciseChunk();
+    if (recapAtEnd) {
+      if (_recap.isEmpty) {
+        _recap.add(
+            AudioItem.silenceFromDouble(_sharedExerciseConfig.betweenGroups));
+      }
+
+      _recap.addAll([
+        AudioItem.spell(text),
+        AudioItem.silenceFromDouble(_sharedExerciseConfig.betweenGroups)
+      ]);
+    }
+
+    List<AudioItem> chunk = [];
+    if (voiceBefore) {
+      chunk.addAll([
+        AudioItem.spell(text),
+        silenceAfterTts(text),
+      ]);
+    }
+
+    for (int i = 0; i < repeatNum; i++) {
+      chunk.add(AudioItem.morse(text));
+      if (i < repeatNum - 1) {
+        chunk.add(
+            AudioItem.silenceFromDouble(_sharedExerciseConfig.betweenGroups));
+      }
+    }
+
+    if (voiceAfter) {
+      chunk.add(silenceBeforeTts(''));
+      chunk.add(AudioItem.spell(text));
+    }
+
+    return chunk;
   }
 }
 
-abstract class RandomGroupsExerciseBase extends RepeatedExerciseBase {
+class RandomGroupGenerator {
   final Random _random = Random();
   final RandomGroupsConfig _config;
 
-  RandomGroupsExerciseBase(super._appConfig)
-      : _config = _appConfig.randomGroups;
+  RandomGroupGenerator(this._config);
 
-  String charPool();
+  String randomGroup(String characters, {int? groupSize}) {
+    groupSize = groupSize ?? _config.groupSize;
 
-  String _randomGroup() {
-    String letters = charPool();
-    //print(letters);
     String group = '';
-    while (group.length < _config.groupSize) {
-      int i = _random.nextInt(letters.length);
-      group += letters[i];
-    }
-
-    String latest = letters[letters.length - 1];
-    if (_config.forceLatest && !group.contains(latest)) {
-      int i = _random.nextInt(group.length);
-      group = group.replaceRange(i, i + 1, latest);
+    while (group.length < groupSize) {
+      int i = _random.nextInt(characters.length);
+      group += characters[i];
     }
 
     return group;
   }
-
-  @override
-  List<AudioItem> nextExerciseChunk() {
-    String group = _randomGroup();
-
-    return [
-      morseAudioItem(group),
-      silenceBeforeTts(group),
-      AudioItem.spell(group),
-      silenceAfterTts(group),
-    ];
-  }
 }
 
-class RandomGroupsExercise extends RandomGroupsExerciseBase {
-  RandomGroupsExercise(super._appConfig);
+class RandomGroupsExercise extends RepeatedExerciseBase {
+  final RandomGroupsConfig _config;
+  final RandomGroupGenerator _gen;
+
+  RandomGroupsExercise(super.appConfig)
+      : _config = appConfig.randomGroups,
+        _gen = RandomGroupGenerator(appConfig.randomGroups),
+        super(
+            voiceBefore: false,
+            voiceAfter: true,
+            repeatNum: 1,
+            recapAtEnd: false);
 
   @override
-  String charPool() {
-    return _config.letters;
+  String nextExerciseChunk() {
+    return _gen.randomGroup(_config.letters);
   }
 }

@@ -3,23 +3,29 @@ import 'dart:collection';
 import 'package:cw_trainer/audio/audio_item_type.dart';
 import 'package:cw_trainer/config/config.dart';
 import 'package:cw_trainer/config/config_types.dart';
+import 'package:cw_trainer/exercises/copy_exercise.dart';
 import 'package:cw_trainer/exercises/exercise_base.dart';
-import 'package:cw_trainer/exercises/licw_exercise.dart';
+import 'package:cw_trainer/exercises/familiarity_exercise.dart';
 import 'package:cw_trainer/exercises/random_groups_exercise.dart';
+import 'package:cw_trainer/exercises/recognition_exercise.dart';
 import 'package:cw_trainer/exercises/words_exercise.dart';
 
 enum CourseType with ConfigEnum {
   legacy(0, 'Legacy'),
-  licwBc1(1, 'LICW BC1');
+  bc1(1, 'BC1');
 
   const CourseType(this.i, this.displayName, {this.deprecated = false});
   CourseType? fromInt(int i) => ConfigEnum.fromIntInner(CourseType.values, i);
 
   List<ExerciseType> get supportedExercises => switch (this) {
-        CourseType.legacy => const [ExerciseType.randomGroups, ExerciseType.words],
-        CourseType.licwBc1 => const [
-            ExerciseType.licwRecognition,
-            ExerciseType.licwFamiliarity
+        CourseType.legacy => const [
+            ExerciseType.randomGroups,
+            ExerciseType.words
+          ],
+        CourseType.bc1 => const [
+            ExerciseType.recognition,
+            ExerciseType.familiarity,
+            ExerciseType.copyGroups,
           ],
       };
 
@@ -34,8 +40,9 @@ enum CourseType with ConfigEnum {
 enum ExerciseType with ConfigEnum {
   randomGroups(0, 'Random Groups'),
   words(1, 'Random Words'),
-  licwRecognition(2, 'Recognition'),
-  licwFamiliarity(3, 'Familiarity');
+  recognition(2, 'Recognition'),
+  familiarity(3, 'Familiarity'),
+  copyGroups(4, 'Copy Groups');
 
   const ExerciseType(this.i, this.displayName, {this.deprecated = false});
   ExerciseType? fromInt(int i) =>
@@ -51,7 +58,7 @@ enum ExerciseType with ConfigEnum {
 
 class ExerciseController {
   final AppConfig _appConfig;
-  final Queue<AudioItem> _queue = Queue.from([AudioItem.silence(300, '')]);
+  final Queue<AudioItem> _queue = Queue.from([AudioItem.silence(300)]);
   final ExerciseBase _exercise;
 
   ExerciseController(this._appConfig, this._exercise);
@@ -74,8 +81,9 @@ class ExerciseController {
     return switch (type) {
       ExerciseType.randomGroups => RandomGroupsExercise(config),
       ExerciseType.words => WordsExercise(config),
-      ExerciseType.licwRecognition => LicwRecognitionExercise(config),
-      ExerciseType.licwFamiliarity => LicwFamiliarityExercise(config),
+      ExerciseType.recognition => RecognitionExercise(config),
+      ExerciseType.familiarity => FamiliarityExercise(config),
+      ExerciseType.copyGroups => CopyGroupsExercise(config),
     };
   }
 

@@ -96,7 +96,7 @@ class ExerciseSelector extends StatelessWidget {
       children: [
         const Spacer(),
         ConfigEnumPicker(
-            values: const [CourseType.legacy, CourseType.licwBc1],
+            values: const [CourseType.legacy, CourseType.bc1],
             initialValue: currentCourse,
             onSelected: (v) {
               appState.appConfig.sharedExercise.currentCourse = v;

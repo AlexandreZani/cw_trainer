@@ -13,23 +13,23 @@ abstract class ExerciseBase {
   AudioItem silenceBeforeTts(String caption, {bool forceCaption = false}) {
     int delayMs = (_appConfig.tts.delayBefore * 1000).round();
     if (_appConfig.sharedExercise.displayTextDuringCw || forceCaption) {
-      return AudioItem.silence(delayMs, caption.toUpperCase());
+      return AudioItem.silence(delayMs, caption: caption.toUpperCase());
     }
-    return AudioItem.silence(delayMs, "");
+    return AudioItem.silence(delayMs);
   }
 
   AudioItem silenceAfterTts(String caption, {bool forceCaption = false}) {
     int delayMs = (_appConfig.tts.delayAfter * 1000).round();
     if (_appConfig.sharedExercise.displayTextDuringCw || forceCaption) {
-      return AudioItem.silence(delayMs, caption.toUpperCase());
+      return AudioItem.silence(delayMs, caption: caption.toUpperCase());
     }
-    return AudioItem.silence(delayMs, "");
+    return AudioItem.silence(delayMs);
   }
 
   AudioItem morseAudioItem(String value, {bool forceCaption = false}) {
     if (_appConfig.sharedExercise.displayTextDuringCw || forceCaption) {
-      return AudioItem.morse(value, value.toUpperCase());
+      return AudioItem.morse(value, caption: value.toUpperCase());
     }
-    return AudioItem.morse(value, "");
+    return AudioItem.morse(value);
   }
 }
