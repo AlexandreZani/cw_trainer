@@ -8,6 +8,7 @@ import 'package:cw_trainer/exercises/exercise_base.dart';
 import 'package:cw_trainer/exercises/familiarity_exercise.dart';
 import 'package:cw_trainer/exercises/random_groups_exercise.dart';
 import 'package:cw_trainer/exercises/recognition_exercise.dart';
+import 'package:cw_trainer/exercises/sending_exercise.dart';
 import 'package:cw_trainer/exercises/words_exercise.dart';
 
 enum CourseType with ConfigEnum {
@@ -26,6 +27,7 @@ enum CourseType with ConfigEnum {
             ExerciseType.recognition,
             ExerciseType.familiarity,
             ExerciseType.copyGroups,
+            ExerciseType.sending,
           ],
       };
 
@@ -42,7 +44,8 @@ enum ExerciseType with ConfigEnum {
   words(1, 'Random Words'),
   recognition(2, 'Recognition'),
   familiarity(3, 'Familiarity'),
-  copyGroups(4, 'Copy Groups');
+  copyGroups(4, 'Copy Groups'),
+  sending(5, 'Sending Exercise');
 
   const ExerciseType(this.i, this.displayName, {this.deprecated = false});
   ExerciseType? fromInt(int i) =>
@@ -84,6 +87,7 @@ class ExerciseController {
       ExerciseType.recognition => RecognitionExercise(config),
       ExerciseType.familiarity => FamiliarityExercise(config),
       ExerciseType.copyGroups => CopyGroupsExercise(config),
+      ExerciseType.sending => SendingExercise(config),
     };
   }
 

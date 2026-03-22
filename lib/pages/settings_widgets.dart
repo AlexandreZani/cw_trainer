@@ -301,6 +301,7 @@ class LevelSetting extends StatelessWidget {
       ExerciseType.recognition => LicwBc1GroupSelector(appState: appState),
       ExerciseType.familiarity => LicwBc1GroupSelector(appState: appState),
       ExerciseType.copyGroups => LicwBc1GroupSelector(appState: appState),
+      ExerciseType.sending => LicwBc1GroupSelector(appState: appState),
     };
     return ListTile(
       title: Row(children: [
@@ -334,6 +335,8 @@ class LevelSelectorForExercise extends StatelessWidget {
       case ExerciseType.familiarity:
         return LicwBc1GroupSelector(appState: appState);
       case ExerciseType.copyGroups:
+        return LicwBc1GroupSelector(appState: appState);
+      case ExerciseType.sending:
         return LicwBc1GroupSelector(appState: appState);
     }
   }
