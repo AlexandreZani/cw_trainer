@@ -76,6 +76,8 @@ abstract class RepeatedExerciseBase extends ExerciseBase {
       chunk.add(AudioItem.spell(text));
     }
 
+    chunk.add(AudioItem.silenceFromDouble(_sharedExerciseConfig.betweenGroups));
+
     return chunk;
   }
 }
