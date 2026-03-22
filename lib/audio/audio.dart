@@ -119,6 +119,9 @@ class CwAudioHandler extends BaseAudioHandler {
   @override
   Future<void> play() async {
     log.finest('AudioPlayerHandler play');
+    if (!_paused) {
+      _resetExercise();
+    }
     _paused = false;
 
     if (_currentAudioItem == null && !_readyNext()) {
