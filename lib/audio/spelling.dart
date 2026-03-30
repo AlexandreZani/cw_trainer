@@ -40,6 +40,14 @@ Map<String, String> ituPhoneticAlphabet = {
   ',': 'Comma',
   '/': 'Slash',
   '?': 'Question Mark',
+
+  // Prosigns
+  '\x04': 'AR', // AR
+  '\x17': 'SK', // SK
+  '\x02': 'BT', // BT
+
+  // Abbreviations
+  '\x03': 'Break In' // BK
 };
 
 extension StringX on String {

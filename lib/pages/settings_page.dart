@@ -1,6 +1,7 @@
-import 'package:cw_trainer/exercises/exercises.dart';
+import 'package:cw_trainer/audio/cw.dart';
 import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/main.dart';
+import 'package:cw_trainer/pages/exercise_settings.dart';
 import 'package:cw_trainer/pages/settings_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -121,9 +122,14 @@ class RandomGroupsSettings extends StatelessWidget {
       children: [
         const ListTile(title: Text('Random Groups')),
         const Divider(),
-        LevelSetting(
-          appState: appState,
-          exerciseType: ExerciseType.randomGroups,
+        ListTile(
+          title: Row(
+            children: [
+              const Text("Level", textAlign: TextAlign.left),
+              const Spacer(),
+              RandomGroupLevelSelector(appState: appState),
+            ],
+          ),
         ),
         GroupSize(
           appState: appState,
@@ -154,9 +160,14 @@ class WordsExerciseSettings extends StatelessWidget {
       children: [
         const ListTile(title: Text('Words Exercise')),
         const Divider(),
-        LevelSetting(
-          appState: appState,
-          exerciseType: ExerciseType.words,
+        ListTile(
+          title: Row(
+            children: [
+              const Text("Level", textAlign: TextAlign.left),
+              const Spacer(),
+              WordsLevelSelector(appState: appState),
+            ],
+          ),
         ),
       ],
     );
@@ -297,26 +308,23 @@ class LicwSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const ListTile(title: Text('LICW Exercises')),
-        const Divider(),
-        MultiSelector(
-            label: "BC1 Groups",
-            labels: bc1Groups,
-            selected: appState.appConfig.licw.bc1GroupsSelected,
-            onSelected: (i) {
-              Set<int> selected = appState.appConfig.licw.bc1GroupsSelected;
-
-              if (selected.contains(i)) {
-                selected.remove(i);
-              } else {
-                selected.add(i);
-              }
-
-              appState.appConfig.licw.bc1GroupsSelected = selected;
-            }),
-      ],
-    );
+    return Column(children: [
+      const ListTile(title: Text('LICW Exercises')),
+      const Divider(),
+      MultiSelector(
+          label: "BC1 Groups",
+          labels: bc1Groups.map(txtForDisplay).toList(),
+          getSelected: () => appState.appConfig.licw.bc1GroupsSelected,
+          setSelected: (selected) {
+            appState.appConfig.licw.bc1GroupsSelected = selected;
+          }),
+      MultiSelector(
+          label: "BC2 Groups",
+          labels: bc2Groups.map(txtForDisplay).toList(),
+          getSelected: () => appState.appConfig.licw.bc2GroupsSelected,
+          setSelected: (selected) {
+            appState.appConfig.licw.bc2GroupsSelected = selected;
+          }),
+    ]);
   }
 }

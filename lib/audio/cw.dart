@@ -2,6 +2,8 @@ import 'package:characters/characters.dart';
 
 import 'dart:math' as math;
 
+import 'package:cw_trainer/audio/cw.dart';
+
 class MorseGenerator {
   final int sampleRate;
   final int dotNumFrames;
@@ -83,7 +85,8 @@ class MorseGenerator {
     return numFrames;
   }
 
-  List<int> stringToPcm(String s) {
+  List<int> stringToPcm(String os) {
+    String s = expandAbbrev(os); // Handles abbreviations.
     List<int> pcm = List.filled(stringNumFrames(s), 128);
     int curFrame = 0;
 
@@ -148,6 +151,16 @@ class MorseGenerator {
   }
 }
 
+final Map<String, String> prosignDisplay = {
+  '\x04': 'AR',
+  '\x17': 'SK',
+  '\x02': 'BT',
+};
+
+final Map<String, String> abbreviations = {
+  '\x03': 'BK',
+};
+
 String cwChar(String c) {
   const codes = {
     'A': '.-',
@@ -199,6 +212,11 @@ String cwChar(String c) {
     '+': '.-.-.',
     '*': '-..-',
     '@': '.--.-.',
+
+    // Prosigns
+    '\x04': '.-.-.', // AR
+    '\x17': '...-.-', // SK
+    '\x02': '-...-', // BT
   };
 
   if (c.length != 1) {
@@ -210,4 +228,17 @@ String cwChar(String c) {
   }
 
   return codes[c.toUpperCase()]!;
+}
+
+String expandAbbrev(String s) {
+  return s.split("").map((e) => abbreviations[e] ?? e).join();
+}
+
+String txtForDisplay(String s) {
+  return s.split("").map((e) {
+    if (prosignDisplay.containsKey(e)) {
+      return "<${prosignDisplay[e]}>";
+    }
+    return abbreviations[e] ?? e;
+  }).join();
 }

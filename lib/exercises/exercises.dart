@@ -13,7 +13,8 @@ import 'package:cw_trainer/exercises/words_exercise.dart';
 
 enum CourseType with ConfigEnum {
   legacy(0, 'Legacy'),
-  bc1(1, 'BC1');
+  bc1(1, 'BC1'),
+  bc2(2, 'BC2');
 
   const CourseType(this.i, this.displayName, {this.deprecated = false});
   CourseType? fromInt(int i) => ConfigEnum.fromIntInner(CourseType.values, i);
@@ -24,6 +25,12 @@ enum CourseType with ConfigEnum {
             ExerciseType.words
           ],
         CourseType.bc1 => const [
+            ExerciseType.recognition,
+            ExerciseType.familiarity,
+            ExerciseType.copyGroups,
+            ExerciseType.sending,
+          ],
+        CourseType.bc2 => const [
             ExerciseType.recognition,
             ExerciseType.familiarity,
             ExerciseType.copyGroups,
@@ -80,22 +87,25 @@ class ExerciseController {
     return _queue.removeFirst();
   }
 
-  static ExerciseBase _getExerciseByType(AppConfig config, ExerciseType type) {
+  static ExerciseBase _getExerciseByType(
+      AppConfig config, CourseType course, ExerciseType type) {
     return switch (type) {
       ExerciseType.randomGroups => RandomGroupsExercise(config),
       ExerciseType.words => WordsExercise(config),
-      ExerciseType.recognition => RecognitionExercise(config),
-      ExerciseType.familiarity => FamiliarityExercise(config),
-      ExerciseType.copyGroups => CopyGroupsExercise(config),
-      ExerciseType.sending => SendingExercise(config),
+      ExerciseType.recognition => RecognitionExercise(config, course),
+      ExerciseType.familiarity => FamiliarityExercise(config, course),
+      ExerciseType.copyGroups => CopyGroupsExercise(config, course),
+      ExerciseType.sending => SendingExercise(config, course),
     };
   }
 
-  static ExerciseController getByType(AppConfig config, ExerciseType type) {
-    return ExerciseController(config, _getExerciseByType(config, type));
+  static ExerciseController getByType(
+      AppConfig config, CourseType course, ExerciseType type) {
+    return ExerciseController(config, _getExerciseByType(config, course, type));
   }
 
   static ExerciseController getCurrent(AppConfig config) {
-    return getByType(config, config.sharedExercise.curExerciseType);
+    return getByType(config, config.sharedExercise.currentCourse,
+        config.sharedExercise.curExerciseType);
   }
 }

@@ -228,6 +228,12 @@ class LicwConfig extends SharedState {
   set bc1GroupsSelected(Set<int> v) {
     setIntSet('bc1_groups_selected', v);
   }
+
+  Set<int> get bc2GroupsSelected => getIntSet('bc2_groups_selected') ?? {};
+
+  set bc2GroupsSelected(Set<int> v) {
+    setIntSet('bc2_groups_selected', v);
+  }
 }
 
 class MiscConfig extends SharedState {

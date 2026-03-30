@@ -1,8 +1,5 @@
 import 'package:cw_trainer/config/config_types.dart';
-import 'package:cw_trainer/exercises/exercises.dart';
-import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/main.dart';
-import 'package:cw_trainer/pages/exercise_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;
@@ -329,16 +326,17 @@ class MultiSelector extends StatelessWidget {
       {super.key,
       required this.label,
       required this.labels,
-      required this.selected,
-      required this.onSelected});
+      required this.getSelected,
+      required this.setSelected});
 
   final String label;
   final List<String> labels;
-  final Set<int> selected;
-  final Function onSelected;
+  final Set<int> Function() getSelected;
+  final Function(Set<int>) setSelected;
 
   @override
   Widget build(BuildContext context) {
+    Set<int> selected = getSelected();
     return ListTile(
         title: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,38 +352,19 @@ class MultiSelector extends StatelessWidget {
                       label: Text(e.value),
                       selected: selected.contains(e.key),
                       showCheckmark: false,
-                      onSelected: (_) {
-                        onSelected(e.key);
+                      onSelected: (bool select) {
+                        Set<int> selected = getSelected();
+                        if (select) {
+                          selected.add(e.key);
+                        } else {
+                          selected.remove(e.key);
+                        }
+                        setSelected(selected);
                       },
                     ))
                 .toList()),
       ],
     ));
-  }
-}
-
-class LicwBc1GroupSelector extends StatelessWidget {
-  const LicwBc1GroupSelector({super.key, required this.appState});
-
-  final MyAppState appState;
-
-  @override
-  Widget build(BuildContext context) {
-    return MultiSelector(
-        label: "BC1 Groups",
-        labels: bc1Groups,
-        selected: appState.appConfig.licw.bc1GroupsSelected,
-        onSelected: (i) {
-          Set<int> selected = appState.appConfig.licw.bc1GroupsSelected;
-
-          if (selected.contains(i)) {
-            selected.remove(i);
-          } else {
-            selected.add(i);
-          }
-
-          appState.appConfig.licw.bc1GroupsSelected = selected;
-        });
   }
 }
 
@@ -418,35 +397,6 @@ class ConfigEnumPicker<T extends ConfigEnum> extends StatelessWidget {
           );
         },
       ).toList(),
-    );
-  }
-}
-
-class LevelSetting extends StatelessWidget {
-  const LevelSetting({
-    super.key,
-    required this.appState,
-    required this.exerciseType,
-  });
-  final MyAppState appState;
-  final ExerciseType exerciseType;
-
-  @override
-  Widget build(BuildContext context) {
-    var selector = switch (exerciseType) {
-      ExerciseType.words => WordsLevelSelector(appState: appState),
-      ExerciseType.randomGroups => RandomGroupLevelSelector(appState: appState),
-      ExerciseType.recognition => LicwBc1GroupSelector(appState: appState),
-      ExerciseType.familiarity => LicwBc1GroupSelector(appState: appState),
-      ExerciseType.copyGroups => LicwBc1GroupSelector(appState: appState),
-      ExerciseType.sending => LicwBc1GroupSelector(appState: appState),
-    };
-    return ListTile(
-      title: Row(children: [
-        const Text("Level", textAlign: TextAlign.left),
-        const Spacer(),
-        selector,
-      ]),
     );
   }
 }

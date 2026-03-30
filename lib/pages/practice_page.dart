@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:cw_trainer/audio/audio.dart';
+import 'package:cw_trainer/audio/cw.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/main.dart';
 import 'package:cw_trainer/pages/exercise_settings.dart';
@@ -62,7 +63,7 @@ class CaptionDisplay extends StatelessWidget {
         stream: audioHandler.customState,
         builder: (context, snapshot) {
           CustomAudioState? data = snapshot.data as CustomAudioState?;
-          String caption = data?.audioItem?.caption ?? "";
+          String caption = txtForDisplay(data?.audioItem?.caption ?? "");
 
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -97,7 +98,7 @@ class ExerciseSelector extends StatelessWidget {
       children: [
         const Spacer(),
         ConfigEnumPicker(
-            values: const [CourseType.legacy, CourseType.bc1],
+            values: const [CourseType.legacy, CourseType.bc1, CourseType.bc2],
             initialValue: currentCourse,
             onSelected: (v) {
               appState.appConfig.sharedExercise.currentCourse = v;
