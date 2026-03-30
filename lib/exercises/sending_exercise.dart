@@ -1,5 +1,5 @@
 import 'package:cw_trainer/config/config.dart';
-import 'package:cw_trainer/exercises/licw_exercise.dart';
+import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/exercises/random_groups_exercise.dart';
 
 class SendingExercise extends RepeatedExerciseBase {

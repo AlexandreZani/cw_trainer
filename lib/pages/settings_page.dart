@@ -1,5 +1,5 @@
 import 'package:cw_trainer/exercises/exercises.dart';
-import 'package:cw_trainer/exercises/licw_exercise.dart';
+import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/main.dart';
 import 'package:cw_trainer/pages/settings_widgets.dart';
 import 'package:flutter/material.dart';
