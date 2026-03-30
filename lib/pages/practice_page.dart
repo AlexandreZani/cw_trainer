@@ -2,6 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:cw_trainer/audio/audio.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/main.dart';
+import 'package:cw_trainer/pages/exercise_settings.dart';
 import 'package:cw_trainer/pages/settings_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -40,7 +41,7 @@ class PracticePage extends StatelessWidget {
               const Spacer(),
               PlayControls(audioHandler: audioHandler, log: log),
               const Spacer(),
-              PracticeSettings(appState: appState),
+              ExerciseSettings(appState: appState),
               const Spacer(),
             ],
           );
@@ -171,24 +172,5 @@ class PlayControls extends StatelessWidget {
             children: children,
           );
         });
-  }
-}
-
-class PracticeSettings extends StatelessWidget {
-  const PracticeSettings({
-    super.key,
-    required this.appState,
-  });
-
-  final MyAppState appState;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(children: [
-      LevelSelectorForExercise(
-        appState: appState,
-        exerciseType: appState.appConfig.sharedExercise.curExerciseType,
-      )
-    ]);
   }
 }

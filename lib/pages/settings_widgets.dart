@@ -2,7 +2,7 @@ import 'package:cw_trainer/config/config_types.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/exercises/licw_exercise.dart';
 import 'package:cw_trainer/main.dart';
-import 'package:cw_trainer/exercises/words.dart';
+import 'package:cw_trainer/pages/exercise_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:math' as math;
@@ -284,104 +284,6 @@ class NumSettingList<T extends num> extends StatelessWidget {
   }
 }
 
-class LevelSetting extends StatelessWidget {
-  const LevelSetting({
-    super.key,
-    required this.appState,
-    required this.exerciseType,
-  });
-  final MyAppState appState;
-  final ExerciseType exerciseType;
-
-  @override
-  Widget build(BuildContext context) {
-    var selector = switch (exerciseType) {
-      ExerciseType.words => WordsLevelSelector(appState: appState),
-      ExerciseType.randomGroups => RandomGroupLevelSelector(appState: appState),
-      ExerciseType.recognition => LicwBc1GroupSelector(appState: appState),
-      ExerciseType.familiarity => LicwBc1GroupSelector(appState: appState),
-      ExerciseType.copyGroups => LicwBc1GroupSelector(appState: appState),
-      ExerciseType.sending => LicwBc1GroupSelector(appState: appState),
-    };
-    return ListTile(
-      title: Row(children: [
-        const Text("Level", textAlign: TextAlign.left),
-        const Spacer(),
-        selector,
-      ]),
-    );
-  }
-}
-
-class LevelSelectorForExercise extends StatelessWidget {
-  const LevelSelectorForExercise({
-    super.key,
-    required this.appState,
-    required this.exerciseType,
-  });
-
-  final MyAppState appState;
-  final ExerciseType exerciseType;
-
-  @override
-  Widget build(BuildContext context) {
-    switch (exerciseType) {
-      case ExerciseType.randomGroups:
-        return RandomGroupLevelSelector(appState: appState);
-      case ExerciseType.words:
-        return WordsLevelSelector(appState: appState);
-      case ExerciseType.recognition:
-        return LicwBc1GroupSelector(appState: appState);
-      case ExerciseType.familiarity:
-        return LicwBc1GroupSelector(appState: appState);
-      case ExerciseType.copyGroups:
-        return LicwBc1GroupSelector(appState: appState);
-      case ExerciseType.sending:
-        return LicwBc1GroupSelector(appState: appState);
-    }
-  }
-}
-
-class RandomGroupLevelSelector extends StatelessWidget {
-  const RandomGroupLevelSelector({
-    super.key,
-    required this.appState,
-  });
-
-  final MyAppState appState;
-
-  @override
-  Widget build(BuildContext context) {
-    return LevelSelector(
-      letters: appState.appConfig.randomGroups.letters,
-      levelI: appState.appConfig.randomGroups.levelI,
-      onChanged: (int i) {
-        appState.appConfig.randomGroups.levelI = i;
-      },
-    );
-  }
-}
-
-class WordsLevelSelector extends StatelessWidget {
-  const WordsLevelSelector({
-    super.key,
-    required this.appState,
-  });
-
-  final MyAppState appState;
-
-  @override
-  Widget build(BuildContext context) {
-    return LevelSelector(
-      letters: order,
-      levelI: appState.appConfig.wordsExercise.levelI,
-      onChanged: (int i) {
-        appState.appConfig.wordsExercise.levelI = i;
-      },
-    );
-  }
-}
-
 class LevelSelector extends StatelessWidget {
   const LevelSelector(
       {super.key,
@@ -516,6 +418,149 @@ class ConfigEnumPicker<T extends ConfigEnum> extends StatelessWidget {
           );
         },
       ).toList(),
+    );
+  }
+}
+
+class LevelSetting extends StatelessWidget {
+  const LevelSetting({
+    super.key,
+    required this.appState,
+    required this.exerciseType,
+  });
+  final MyAppState appState;
+  final ExerciseType exerciseType;
+
+  @override
+  Widget build(BuildContext context) {
+    var selector = switch (exerciseType) {
+      ExerciseType.words => WordsLevelSelector(appState: appState),
+      ExerciseType.randomGroups => RandomGroupLevelSelector(appState: appState),
+      ExerciseType.recognition => LicwBc1GroupSelector(appState: appState),
+      ExerciseType.familiarity => LicwBc1GroupSelector(appState: appState),
+      ExerciseType.copyGroups => LicwBc1GroupSelector(appState: appState),
+      ExerciseType.sending => LicwBc1GroupSelector(appState: appState),
+    };
+    return ListTile(
+      title: Row(children: [
+        const Text("Level", textAlign: TextAlign.left),
+        const Spacer(),
+        selector,
+      ]),
+    );
+  }
+}
+
+class ExerciseNumber extends StatelessWidget {
+  const ExerciseNumber({
+    super.key,
+    required this.appState,
+    required this.allowContinuous,
+  });
+
+  final MyAppState appState;
+  final bool allowContinuous;
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> children = [];
+    if (!allowContinuous || !appState.appConfig.sharedExercise.repeat) {
+      children.add(NumSettingChevron(
+        label: "Exercise Number",
+        initialValue: appState.appConfig.sharedExercise.exerciseNum,
+        min: 1,
+        max: 15,
+        step: 1,
+        onSelected: (int i) {
+          appState.appConfig.sharedExercise.exerciseNum = i;
+        },
+      ));
+    }
+
+    if (allowContinuous) {
+      children.add(BoolSetting(
+        label: "Continuous Exercise",
+        initialValue: appState.appConfig.sharedExercise.repeat,
+        onChanged: (bool v) {
+          appState.appConfig.sharedExercise.repeat = v;
+        },
+      ));
+    }
+    return Column(
+      children: children,
+    );
+  }
+}
+
+class GroupSize extends StatelessWidget {
+  const GroupSize({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        NumSettingChevron(
+          label: "Letters Per Group",
+          initialValue: appState.appConfig.randomGroups.groupSize,
+          min: 1,
+          max: 10,
+          step: 1,
+          onSelected: (int i) {
+            appState.appConfig.randomGroups.groupSize = i;
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class DelayBeforeSpeakingSetting extends StatelessWidget {
+  const DelayBeforeSpeakingSetting({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return NumSettingChevron(
+      label: "Delay Before Speaking",
+      initialValue: appState.appConfig.tts.delayBefore,
+      min: 0.0,
+      max: 3.0,
+      step: 0.25,
+      onSelected: (double i) {
+        appState.appConfig.tts.delayBefore = i;
+      },
+    );
+  }
+}
+
+class TimeBetweenExercisesSetting extends StatelessWidget {
+  const TimeBetweenExercisesSetting({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return NumSettingChevron(
+      label: "Time Between Exercises",
+      initialValue: appState.appConfig.sharedExercise.betweenGroups,
+      min: 0.0,
+      max: 3.0,
+      step: 0.25,
+      onSelected: (double i) {
+        appState.appConfig.sharedExercise.betweenGroups = i;
+      },
     );
   }
 }

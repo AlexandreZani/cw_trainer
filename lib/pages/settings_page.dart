@@ -94,16 +94,7 @@ class SharedExerciseSettings extends StatelessWidget {
             appState.appConfig.sharedExercise.exerciseNum = i;
           },
         ),
-        NumSettingChevron(
-          label: "Time Between Exercises",
-          initialValue: appState.appConfig.sharedExercise.betweenGroups,
-          min: 0.0,
-          max: 3.0,
-          step: 0.25,
-          onSelected: (double i) {
-            appState.appConfig.sharedExercise.betweenGroups = i;
-          },
-        ),
+        TimeBetweenExercisesSetting(appState: appState),
         BoolSetting(
           label: "Display Text During CW",
           initialValue: appState.appConfig.sharedExercise.displayTextDuringCw,
@@ -134,15 +125,8 @@ class RandomGroupsSettings extends StatelessWidget {
           appState: appState,
           exerciseType: ExerciseType.randomGroups,
         ),
-        NumSettingChevron(
-          label: "Letters Per Group",
-          initialValue: appState.appConfig.randomGroups.groupSize,
-          min: 1,
-          max: 10,
-          step: 1,
-          onSelected: (int i) {
-            appState.appConfig.randomGroups.groupSize = i;
-          },
+        GroupSize(
+          appState: appState,
         ),
         BoolSetting(
           label: "Force Latest Letter",
@@ -223,16 +207,7 @@ class TTSSettings extends StatelessWidget {
             appState.appConfig.tts.volume = i;
           },
         ),
-        NumSettingChevron(
-          label: "Delay Before Speaking",
-          initialValue: appState.appConfig.tts.delayBefore,
-          min: 0.0,
-          max: 3.0,
-          step: 0.25,
-          onSelected: (double i) {
-            appState.appConfig.tts.delayBefore = i;
-          },
-        ),
+        DelayBeforeSpeakingSetting(appState: appState),
         NumSettingChevron(
           label: "Delay After Speaking",
           initialValue: appState.appConfig.tts.delayAfter,
