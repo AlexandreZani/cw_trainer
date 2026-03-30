@@ -130,6 +130,7 @@ class PlayControls extends StatelessWidget {
         stream: audioHandler.playbackState,
         builder: (context, snapshot) {
           List<Widget> children = [];
+          double iconSize = 48 * 2.0;
 
           if (snapshot.data?.controls.contains(MediaControl.play) ?? true) {
             log.finest("add play button");
@@ -138,7 +139,7 @@ class PlayControls extends StatelessWidget {
                 log.finest('play');
                 await audioHandler.play();
               },
-              iconSize: 48,
+              iconSize: iconSize,
               icon: const Icon(Icons.play_arrow),
             ));
           }
@@ -149,7 +150,7 @@ class PlayControls extends StatelessWidget {
                 log.finest('pause');
                 await audioHandler.pause();
               },
-              iconSize: 48,
+              iconSize: iconSize,
               icon: const Icon(Icons.pause),
             ));
           }
@@ -160,7 +161,7 @@ class PlayControls extends StatelessWidget {
                 log.finest('stop');
                 await audioHandler.stop();
               },
-              iconSize: 48,
+              iconSize: iconSize,
               icon: const Icon(Icons.stop),
             ));
           }
