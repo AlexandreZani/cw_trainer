@@ -111,7 +111,7 @@ class CopyGroupsSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        DelayBeforeSpeakingSetting(appState: appState),
+        TimeBetweenExercisesSetting(appState: appState),
         GroupSize(appState: appState),
         ExerciseNumber(appState: appState, allowContinuous: false),
       ],

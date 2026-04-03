@@ -2,8 +2,6 @@ import 'package:characters/characters.dart';
 
 import 'dart:math' as math;
 
-import 'package:cw_trainer/audio/cw.dart';
-
 class MorseGenerator {
   final int sampleRate;
   final int dotNumFrames;

@@ -18,24 +18,32 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log.finest('building settings page');
-    return ListView(
-      children: [
-        CWSettings(appState: appState),
-        const Divider(),
-        TTSSettings(appState: appState),
-        const Divider(),
-        SharedExerciseSettings(appState: appState),
-        const Divider(),
+    List<Widget> children = [
+      CWSettings(appState: appState),
+      const Divider(),
+      TTSSettings(appState: appState),
+      const Divider(),
+      SharedExerciseSettings(appState: appState),
+      const Divider(),
+    ];
+
+    if (appState.appConfig.legacyEnabled) {
+      children.addAll([
         RandomGroupsSettings(appState: appState),
         const Divider(),
         WordsExerciseSettings(appState: appState),
         const Divider(),
-        LicwSettings(appState: appState),
-        const Divider(),
-        AboutSettings(appState: appState),
-        const Divider(),
-      ],
-    );
+      ]);
+    }
+
+    children.addAll([
+      LicwSettings(appState: appState),
+      const Divider(),
+      AboutSettings(appState: appState),
+      const Divider(),
+    ]);
+
+    return ListView(children: children);
   }
 }
 
@@ -131,9 +139,7 @@ class RandomGroupsSettings extends StatelessWidget {
             ],
           ),
         ),
-        GroupSize(
-          appState: appState,
-        ),
+        GroupSize(appState: appState),
         BoolSetting(
           label: "Force Latest Letter",
           initialValue: appState.appConfig.randomGroups.forceLatest,

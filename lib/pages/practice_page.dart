@@ -92,13 +92,19 @@ class ExerciseSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<CourseType> courses = [];
+    if (appState.appConfig.legacyEnabled) {
+      courses.add(CourseType.legacy);
+    }
+    courses.addAll([CourseType.bc1, CourseType.bc2]);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
       children: [
         const Spacer(),
         ConfigEnumPicker(
-            values: const [CourseType.legacy, CourseType.bc1, CourseType.bc2],
+            values: courses,
             initialValue: currentCourse,
             onSelected: (v) {
               appState.appConfig.sharedExercise.currentCourse = v;

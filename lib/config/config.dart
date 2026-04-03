@@ -259,6 +259,7 @@ class AppConfig extends ChangeNotifier {
   WordsExerciseConfig wordsExercise;
   LicwConfig licw;
   MiscConfig misc;
+  final bool legacyEnabled = false;
 
   AppConfig(this.cw, this.tts, this.sharedExercise, this.randomGroups,
       this.wordsExercise, this.licw, this.misc) {
