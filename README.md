@@ -21,3 +21,9 @@ flutter run
 ```
 ./update_icon.sh
 ```
+
+## To build Android App Bundle
+
+```
+build-aab
+```
