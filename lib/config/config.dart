@@ -168,7 +168,7 @@ class SharedExerciseConfig extends SharedState {
   }
 
   CourseType get currentCourse =>
-      getEnum('current_course', CourseType.values) ?? CourseType.legacy;
+      getEnum('current_course', CourseType.values) ?? CourseType.bc1;
 
   set currentCourse(CourseType v) {
     setEnum('current_course', v);
