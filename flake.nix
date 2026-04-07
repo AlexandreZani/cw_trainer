@@ -83,7 +83,22 @@
             JAVA_HOME = "${jdk}";
 
             # Needed for graphics hardware acceleration in the emulator
-            LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [ libGL ];
+            QT_QPA_PLATFORM = "xcb";
+            QT_PLUGIN_PATH = "${pkgs.qt5.qtbase}/${pkgs.qt5.qtbase.qtPluginPrefix}";
+
+            LD_LIBRARY_PATH =
+              with pkgs;
+              lib.makeLibraryPath [
+                libGL
+                libxkbcommon
+                xorg.libxcb
+                xorg.libX11
+                xorg.libXext
+                xorg.libXrender
+                xorg.libXi
+                xorg.libXtst
+                xcb-util-cursor
+              ];
 
             packages = [
               pkgs.virtualglLib
