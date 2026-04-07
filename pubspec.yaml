@@ -1,7 +1,7 @@
 name: cw_trainer
 description: 'Learn Morse code'
 publish_to: 'none'
-version: 0.1.0
+version: 0.1.0+2
 home_page: 'https://github.com/AlexandreZani/cw_trainer'
 repository: 'https://github.com/AlexandreZani/cw_trainer'
 issue_tracker: 'https://github.com/AlexandreZani/cw_trainer/issues'
@@ -13,6 +13,7 @@ dependencies:
   audio_service: ^0.18.13
   audio_session: ^0.1.19
   characters: ^1.3.0
+  cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
   flutter_pcm_sound: ^1.2.2
