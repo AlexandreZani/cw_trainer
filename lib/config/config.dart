@@ -63,7 +63,7 @@ class SharedState extends SharedStateBase {
 class CwConfig extends SharedState {
   CwConfig(SharedPreferences prefs) : super(prefs, 'cw');
 
-  int get wpm => getInt('wpm') ?? 20;
+  int get wpm => getInt('wpm') ?? 12;
   int get ewpm => getInt('ewpm') ?? 12;
   int get frequency => getInt('frequency') ?? 500;
   int get sampleRate => getInt('sample_rate') ?? 44100;
