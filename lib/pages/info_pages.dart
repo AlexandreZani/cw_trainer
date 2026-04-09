@@ -1,4 +1,5 @@
 import 'package:cw_trainer/main.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
@@ -89,28 +90,55 @@ class AboutPage extends StatelessWidget {
     super.key,
   });
 
-  Future<String> appVersion(BuildContext context) async {
-    var pubspecS =
+  Future<({String version, String androidVersion, String phoneModel})>
+      _pageData(BuildContext context) async {
+    final pubspecS =
         await DefaultAssetBundle.of(context).loadString("pubspec.yaml");
-    var pubspec = loadYaml(pubspecS);
-    return pubspec['version'];
+    final pubspec = loadYaml(pubspecS);
+    final version = pubspec['version'] as String;
+
+    final deviceInfo = DeviceInfoPlugin();
+    final android = await deviceInfo.androidInfo;
+
+    return (
+      version: version,
+      androidVersion: android.version.release,
+      phoneModel: android.model,
+    );
+  }
+
+  Uri _userReportUri({
+    required String appVersion,
+    required String androidVersion,
+    required String phoneModel,
+  }) {
+    return Uri.https(
+      'github.com',
+      '/AlexandreZani/cw_trainer/issues/new',
+      {
+        'template': 'user-report.yml',
+        'version': appVersion,
+        'android-version': androidVersion,
+        'phone-model': phoneModel,
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: appVersion(context),
+        future: _pageData(context),
         builder: (context, asyncSnapshot) {
           if (!asyncSnapshot.hasData) {
             return const CircularProgressIndicator();
           }
 
-          var version = asyncSnapshot.data!;
+          final data = asyncSnapshot.data!;
           return ListView(
             children: [
               Column(
                 children: [
-                  AboutEntry(name: "Version", value: version),
+                  AboutEntry(name: "Version", value: data.version),
                   const AboutEntry(name: "Author", value: "Alexandre Zani"),
                   const AboutEntry(
                     name: "Email",
@@ -118,9 +146,13 @@ class AboutPage extends StatelessWidget {
                     uri: "mailto:cw_trainer@zfc.io",
                   ),
                   const AboutEntry(name: "Call Sign", value: "K7ZFC"),
-                  const AboutEntry(
+                  AboutEntry(
                       name: "Found a Bug?",
-                      uri: 'https://github.com/AlexandreZani/cw_trainer/issues',
+                      uri: _userReportUri(
+                        appVersion: data.version,
+                        androidVersion: data.androidVersion,
+                        phoneModel: data.phoneModel,
+                      ).toString(),
                       value: "Let Me Know"),
                   ListTile(
                     title: const Text("View App License"),
