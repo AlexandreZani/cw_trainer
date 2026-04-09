@@ -223,13 +223,13 @@ class WordsExerciseConfig extends SharedState {
 class LicwConfig extends SharedState {
   LicwConfig(SharedPreferences prefs) : super(prefs, 'licw');
 
-  Set<int> get bc1GroupsSelected => getIntSet('bc1_groups_selected') ?? {};
+  Set<int> get bc1GroupsSelected => getIntSet('bc1_groups_selected') ?? {0};
 
   set bc1GroupsSelected(Set<int> v) {
     setIntSet('bc1_groups_selected', v);
   }
 
-  Set<int> get bc2GroupsSelected => getIntSet('bc2_groups_selected') ?? {};
+  Set<int> get bc2GroupsSelected => getIntSet('bc2_groups_selected') ?? {0};
 
   set bc2GroupsSelected(Set<int> v) {
     setIntSet('bc2_groups_selected', v);
