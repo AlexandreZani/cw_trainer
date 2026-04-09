@@ -1,0 +1,48 @@
+name: User Report
+description: Report a bug or unexpected behavior
+labels: [user-report]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened? What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Go to...
+        2. Tap...
+        3. See error
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: App Version
+      placeholder: Look in the app under Settings. Scroll to the bottom and tap on "About".
+    validations:
+      required: true
+
+  - type: input
+    id: android-version
+    attributes:
+      label: Android Version
+      placeholder: Open the Settings App. Then About Phone > Android Version
+
+  - type: input
+    id: phone-model
+    attributes:
+      label: Phone Model
+      placeholder: Open the Settings app. Then About Phone > Phone Model
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Screenshots, logs, or anything else relevant.
