@@ -8,6 +8,5 @@ let
   ];
 in
 {
-  "key.properties.age".publicKeys = keys;
-  "upload-keystore.jks.age".publicKeys = keys;
+  "android-signing.tar.age".publicKeys = keys;
 }

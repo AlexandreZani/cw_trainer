@@ -127,8 +127,7 @@
 
                   echo "Decrypting signing keys..."
                   cd secrets
-                  agenix -i $IDENTITY -d key.properties.age > ../android/key.properties
-                  agenix -i $IDENTITY -d upload-keystore.jks.age > ../android/upload-keystore.jks
+                  agenix -i $IDENTITY -d android-signing.tar.age | tar -xf - -C ../android
                   cd ..
 
                   echo "Building..."
