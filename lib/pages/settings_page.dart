@@ -19,6 +19,8 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     log.finest('building settings page');
     List<Widget> children = [
+      CourseSettings(appState: appState),
+      const Divider(),
       CWSettings(appState: appState),
       const Divider(),
       TTSSettings(appState: appState),
@@ -37,8 +39,6 @@ class SettingsPage extends StatelessWidget {
     }
 
     children.addAll([
-      LicwSettings(appState: appState),
-      const Divider(),
       AboutSettings(appState: appState),
       const Divider(),
     ]);
@@ -304,8 +304,8 @@ class CWSettings extends StatelessWidget {
   }
 }
 
-class LicwSettings extends StatelessWidget {
-  const LicwSettings({
+class CourseSettings extends StatelessWidget {
+  const CourseSettings({
     super.key,
     required this.appState,
   });
@@ -315,7 +315,7 @@ class LicwSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      const ListTile(title: Text('LICW Exercises')),
+      const ListTile(title: Text('Group Selection')),
       const Divider(),
       MultiSelector(
           label: "BC1 Groups",
