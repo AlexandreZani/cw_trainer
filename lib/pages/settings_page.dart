@@ -225,6 +225,7 @@ class TTSSettings extends StatelessWidget {
           },
         ),
         DelayBeforeSpeakingSetting(appState: appState),
+        DelayAfterSpeakingSetting(appState: appState),
         NumSettingChevron(
           label: "Delay After Speaking",
           initialValue: appState.appConfig.tts.delayAfter,

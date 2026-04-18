@@ -492,6 +492,29 @@ class DelayBeforeSpeakingSetting extends StatelessWidget {
   }
 }
 
+class DelayAfterSpeakingSetting extends StatelessWidget {
+  const DelayAfterSpeakingSetting({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return NumSettingChevron(
+      label: "Delay After Speaking",
+      initialValue: appState.appConfig.tts.delayAfter,
+      min: 0.0,
+      max: 3.0,
+      step: 0.25,
+      onSelected: (double i) {
+        appState.appConfig.tts.delayAfter = i;
+      },
+    );
+  }
+}
+
 class TimeBetweenGroupsSetting extends StatelessWidget {
   const TimeBetweenGroupsSetting({
     super.key,

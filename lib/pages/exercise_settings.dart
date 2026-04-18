@@ -138,3 +138,23 @@ class SendingPracticeSettings extends StatelessWidget {
     );
   }
 }
+
+class FamiliarityPracticeSettings extends StatelessWidget {
+  const FamiliarityPracticeSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        DelayAfterSpeakingSetting(appState: appState),
+        TimeBetweenGroupsSetting(appState: appState),
+        ExerciseNumber(appState: appState, allowContinuous: true),
+      ],
+    );
+  }
+}
