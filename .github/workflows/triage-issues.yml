@@ -1,0 +1,39 @@
+name: Mark New Issues As Requiring Triage
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    if: github.event.issue.user.login != 'AlexandreZani'
+    permissions:
+      issues: write
+    steps:
+      - name: Remove non-exempt labels and add to-triage
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const exempt = new Set(['user-report', 'question']);
+
+            const labelsToRemove = issue.labels
+              .map(l => l.name)
+              .filter(name => !exempt.has(name));
+
+            for (const label of labelsToRemove) {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                name: label,
+              });
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: ['to-triage'],
+            });
