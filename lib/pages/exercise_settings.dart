@@ -111,7 +111,7 @@ class CopyGroupsSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TimeBetweenExercisesSetting(appState: appState),
+        TimeBetweenGroupsSetting(appState: appState),
         GroupSize(appState: appState),
         ExerciseNumber(appState: appState, allowContinuous: false),
       ],
@@ -131,7 +131,7 @@ class SendingPracticeSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TimeBetweenExercisesSetting(appState: appState),
+        TimeBetweenGroupsSetting(appState: appState),
         GroupSize(appState: appState),
         ExerciseNumber(appState: appState, allowContinuous: true),
       ],

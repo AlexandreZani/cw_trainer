@@ -103,7 +103,7 @@ class SharedExerciseSettings extends StatelessWidget {
             appState.appConfig.sharedExercise.exerciseNum = i;
           },
         ),
-        TimeBetweenExercisesSetting(appState: appState),
+        TimeBetweenGroupsSetting(appState: appState),
         BoolSetting(
           label: "Display Text During CW",
           initialValue: appState.appConfig.sharedExercise.displayTextDuringCw,

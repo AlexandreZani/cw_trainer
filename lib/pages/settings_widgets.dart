@@ -492,8 +492,8 @@ class DelayBeforeSpeakingSetting extends StatelessWidget {
   }
 }
 
-class TimeBetweenExercisesSetting extends StatelessWidget {
-  const TimeBetweenExercisesSetting({
+class TimeBetweenGroupsSetting extends StatelessWidget {
+  const TimeBetweenGroupsSetting({
     super.key,
     required this.appState,
   });
@@ -503,7 +503,7 @@ class TimeBetweenExercisesSetting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NumSettingChevron(
-      label: "Time Between Exercises",
+      label: "Time Between Groups",
       initialValue: appState.appConfig.sharedExercise.betweenGroups,
       min: 0.0,
       max: 3.0,
