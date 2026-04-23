@@ -1,153 +1,143 @@
 import 'dart:math';
 
 import 'package:cw_trainer/config/config_types.dart';
+import 'package:cw_trainer/config/prefixed_shared_preferences.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
-import 'package:cw_trainer/config/shared_state_base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SharedState extends SharedStateBase {
-  SharedState(super.prefs, super.prefix);
+class SharedState extends ChangeNotifier {
+  final PrefixedSharedPreferences _prefs;
 
-  Set<E>? getSet<E>(String k, E? Function(String) parse) {
-    List<String>? strings = getStringList(k);
-    if (strings == null) {
-      return null;
-    }
+  SharedState(this._prefs) : super();
 
-    Set<E> es = {};
-    for (final s in strings) {
-      final e = parse(s);
-      if (e == null) {
-        return null;
-      }
-
-      es.add(e);
-    }
-
-    return es;
+  void _setInt(String k, int v) {
+    _prefs.setInt(k, v);
+    notifyListeners();
   }
 
-  Set<int>? getIntSet(String k) {
-    return getSet(k, int.tryParse);
+  void _setDouble(String k, double v) {
+    _prefs.setDouble(k, v);
+    notifyListeners();
   }
 
-  void setSet<E>(String k, Set<E> es, String Function(E) toString) {
-    setStringList(k, es.map(toString).toList());
+  void _setString(String k, String v) {
+    _prefs.setString(k, v);
+    notifyListeners();
   }
 
-  void setIntSet(String k, Set<int> v) {
-    setStringList(k, v.map((i) => i.toString()).toList());
+  void _setBool(String k, bool v) {
+    _prefs.setBool(k, v);
+    notifyListeners();
   }
 
-  void setEnum(String k, ConfigEnum v) {
-    setInt(k, v.i);
+  void _setIntSet(String k, Set<int> v) {
+    _prefs.setIntSet(k, v);
+    notifyListeners();
   }
 
-  T? getEnum<T>(String k, List<T> values) {
-    int? i = getInt(k);
-    if (i == null) {
-      return null;
-    }
-
-    for (T e in values) {
-      var ce = e as ConfigEnum;
-      if (ce.i == i && !ce.deprecated) {
-        return e;
-      }
-    }
-    return null;
+  void _setEnum(String k, ConfigEnum v) {
+    _prefs.setEnum(k, v);
+    notifyListeners();
   }
 }
 
 class CwConfig extends SharedState {
-  CwConfig(SharedPreferences prefs) : super(prefs, 'cw');
+  CwConfig(SharedPreferences prefs)
+      : super(PrefixedSharedPreferences(prefs, 'cw'));
 
-  int get wpm => getInt('wpm') ?? 12;
-  int get ewpm => getInt('ewpm') ?? 12;
-  int get frequency => getInt('frequency') ?? 500;
-  int get sampleRate => getInt('sample_rate') ?? 44100;
+  int get wpm => _prefs.getInt('wpm') ?? 12;
+  int get ewpm => _prefs.getInt('ewpm') ?? 12;
+  int get frequency => _prefs.getInt('frequency') ?? 500;
+  int get sampleRate => _prefs.getInt('sample_rate') ?? 44100;
 
-  set wpm(int wpm) {
-    setInt('wpm', wpm);
+  set wpm(int v) {
+    if (v < ewpm) {
+      _prefs.setInt('ewpm', v);
+    }
+    _setInt('wpm', v);
   }
 
-  set ewpm(int ewpm) {
-    setInt('ewpm', ewpm);
+  set ewpm(int v) {
+    if (wpm < v) {
+      _prefs.setInt('wpm', v);
+    }
+    _setInt('ewpm', v);
   }
 
   set frequency(int frequency) {
-    setInt('frequency', frequency);
+    _setInt('frequency', frequency);
   }
 
   set sampleRate(int frequency) {
-    setInt('sample_rate', frequency);
+    _setInt('sample_rate', frequency);
   }
 }
 
 class TtsConfig extends SharedState {
-  TtsConfig(SharedPreferences prefs) : super(prefs, 'tts');
+  TtsConfig(SharedPreferences prefs)
+      : super(PrefixedSharedPreferences(prefs, 'tts'));
 
-  bool get enable => getBool('enable') ?? true;
-  String get language => getString('language') ?? 'en-US';
-  double get rate => getDouble('rate') ?? 0.7;
-  double get pitch => getDouble('pitch') ?? 1.0;
-  double get volume => getDouble('volume') ?? 1.0;
-  double get delayBefore => getDouble('delay') ?? 1.0;
-  double get delayAfter => getDouble('delay_after') ?? 1.0;
-  bool get spellWithItu => getBool('spell_with_itu') ?? true;
+  bool get enable => _prefs.getBool('enable') ?? true;
+  String get language => _prefs.getString('language') ?? 'en-US';
+  double get rate => _prefs.getDouble('rate') ?? 0.7;
+  double get pitch => _prefs.getDouble('pitch') ?? 1.0;
+  double get volume => _prefs.getDouble('volume') ?? 1.0;
+  double get delayBefore => _prefs.getDouble('delay') ?? 1.0;
+  double get delayAfter => _prefs.getDouble('delay_after') ?? 1.0;
+  bool get spellWithItu => _prefs.getBool('spell_with_itu') ?? true;
 
   set enable(bool enable) {
-    setBool('enable', enable);
+    _setBool('enable', enable);
   }
 
   set language(String language) {
-    setString('language', language);
+    _setString('language', language);
   }
 
   set rate(double rate) {
-    setDouble('rate', rate);
+    _setDouble('rate', rate);
   }
 
   set pitch(double pitch) {
-    setDouble('pitch', pitch);
+    _setDouble('pitch', pitch);
   }
 
   set volume(double volume) {
-    setDouble('volume', volume);
+    _setDouble('volume', volume);
   }
 
   set delayBefore(double delay) {
-    setDouble('delay', delay);
+    _setDouble('delay', delay);
   }
 
   set delayAfter(double delay) {
-    setDouble('delay_after', delay);
+    _setDouble('delay_after', delay);
   }
 
   set spellWithItu(bool spellWithItu) {
-    setBool('spell_with_itu', spellWithItu);
+    _setBool('spell_with_itu', spellWithItu);
   }
 }
 
 class SharedExerciseConfig extends SharedState {
   SharedExerciseConfig(SharedPreferences prefs)
-      : super(prefs, 'shared_exercise');
+      : super(PrefixedSharedPreferences(prefs, 'shared_exercise'));
 
-  bool get repeat => getBool('repeat') ?? false;
+  bool get repeat => _prefs.getBool('repeat') ?? false;
 
   set repeat(bool v) {
-    setBool('repeat', v);
+    _setBool('repeat', v);
   }
 
-  int get exerciseNum => getInt('exercise_num') ?? 2;
+  int get exerciseNum => _prefs.getInt('exercise_num') ?? 2;
 
   set exerciseNum(int n) {
-    setInt('exercise_num', max(n, 1));
+    _setInt('exercise_num', max(n, 1));
   }
 
   ExerciseType get curExerciseType {
-    ExerciseType e = getEnum('cur_exercise_type', ExerciseType.values) ??
+    ExerciseType e = _prefs.getEnum('cur_exercise_type', ExerciseType.values) ??
         ExerciseType.randomGroups;
 
     if (!currentCourse.supportedExercises.contains(e)) {
@@ -158,96 +148,104 @@ class SharedExerciseConfig extends SharedState {
   }
 
   set curExerciseType(ExerciseType type) {
-    setEnum('cur_exercise_type', type);
+    _setEnum('cur_exercise_type', type);
   }
 
-  bool get displayTextDuringCw => getBool('display_text_during_cw') ?? true;
+  bool get displayTextDuringCw =>
+      _prefs.getBool('display_text_during_cw') ?? true;
 
   set displayTextDuringCw(bool v) {
-    setBool('display_text_during_cw', v);
+    _setBool('display_text_during_cw', v);
   }
 
   CourseType get currentCourse =>
-      getEnum('current_course', CourseType.values) ?? CourseType.bc1;
+      _prefs.getEnum('current_course', CourseType.values) ?? CourseType.bc1;
 
   set currentCourse(CourseType v) {
-    setEnum('current_course', v);
+    _setEnum('current_course', v);
   }
 
-  double get betweenGroups => getDouble('between_groups') ?? 1;
+  double get betweenGroups => _prefs.getDouble('between_groups') ?? 1;
 
   set betweenGroups(double delay) {
-    setDouble('between_groups', delay);
+    _setDouble('between_groups', delay);
   }
 }
 
 class RandomGroupsConfig extends SharedState {
-  RandomGroupsConfig(SharedPreferences prefs) : super(prefs, 'random_groups');
+  RandomGroupsConfig(SharedPreferences prefs)
+      : super(PrefixedSharedPreferences(prefs, 'random_groups'));
 
   String get letters =>
-      getString('letters') ?? 'KMURESNAPTLWI.JZ=FOY,VG5/Q92H38B?47C1D60X';
+      _prefs.getString('letters') ??
+      'KMURESNAPTLWI.JZ=FOY,VG5/Q92H38B?47C1D60X';
 
   set letters(String letters) {
-    setString('letters', letters);
+    _setString('letters', letters);
   }
 
-  int get levelI => getInt('level_i') ?? 1;
+  int get levelI => _prefs.getInt('level_i') ?? 1;
 
   set levelI(int i) {
-    setInt('level_i', i);
+    _setInt('level_i', i);
   }
 
-  int get groupSize => getInt('group_size') ?? 4;
+  int get groupSize => _prefs.getInt('group_size') ?? 4;
 
   set groupSize(int s) {
-    setInt('group_size', s);
+    _setInt('group_size', s);
   }
 
-  bool get forceLatest => getBool('force_latest') ?? true;
+  bool get forceLatest => _prefs.getBool('force_latest') ?? true;
 
   set forceLatest(bool v) {
-    setBool('force_latest', v);
+    _setBool('force_latest', v);
   }
 }
 
 class WordsExerciseConfig extends SharedState {
-  WordsExerciseConfig(SharedPreferences prefs) : super(prefs, 'words_exercise');
+  WordsExerciseConfig(SharedPreferences prefs)
+      : super(PrefixedSharedPreferences(prefs, 'words_exercise'));
 
-  int get levelI => getInt('level_i') ?? 2;
+  int get levelI => _prefs.getInt('level_i') ?? 2;
 
   set levelI(int i) {
-    setInt('level_i', i);
+    _setInt('level_i', i);
   }
 }
 
 class LicwConfig extends SharedState {
-  LicwConfig(SharedPreferences prefs) : super(prefs, 'licw');
+  LicwConfig(SharedPreferences prefs)
+      : super(PrefixedSharedPreferences(prefs, 'licw'));
 
-  Set<int> get bc1GroupsSelected => getIntSet('bc1_groups_selected') ?? {0};
+  Set<int> get bc1GroupsSelected =>
+      _prefs.getIntSet('bc1_groups_selected') ?? {0};
 
   set bc1GroupsSelected(Set<int> v) {
-    setIntSet('bc1_groups_selected', v);
+    _setIntSet('bc1_groups_selected', v);
   }
 
-  Set<int> get bc2GroupsSelected => getIntSet('bc2_groups_selected') ?? {0};
+  Set<int> get bc2GroupsSelected =>
+      _prefs.getIntSet('bc2_groups_selected') ?? {0};
 
   set bc2GroupsSelected(Set<int> v) {
-    setIntSet('bc2_groups_selected', v);
+    _setIntSet('bc2_groups_selected', v);
   }
 }
 
 class MiscConfig extends SharedState {
   static const int licenseVersion = 10;
 
-  MiscConfig(SharedPreferences prefs) : super(prefs, 'misc');
+  MiscConfig(SharedPreferences prefs)
+      : super(PrefixedSharedPreferences(prefs, 'misc'));
 
   bool get licenseAccepted {
-    var accepted = getInt('license_accepted') ?? 0;
+    var accepted = _prefs.getInt('license_accepted') ?? 0;
     return licenseVersion <= accepted;
   }
 
   void acceptLicense() {
-    setInt('license_accepted', licenseVersion);
+    _setInt('license_accepted', licenseVersion);
   }
 }
 
