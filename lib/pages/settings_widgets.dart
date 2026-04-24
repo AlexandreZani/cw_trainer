@@ -341,8 +341,20 @@ class MultiSelector extends StatelessWidget {
         title: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label),
-        const SizedBox(height: 4),
+        Row(
+          children: [
+            Text(label),
+            const Spacer(),
+            TextButton(
+              onPressed: () => setSelected(
+                  selected.length == labels.length
+                      ? {}
+                      : Set.from(Iterable.generate(labels.length))),
+              child: Text(
+                  selected.length == labels.length ? 'Select none' : 'Select all'),
+            ),
+          ],
+        ),
         Wrap(
             spacing: 4,
             children: labels
