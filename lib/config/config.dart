@@ -146,10 +146,22 @@ class RandomGroupsConfig {
   RandomGroupsConfig(NotifyingPrefixedSharedState Function(String) builder)
       : _prefs = builder('random_groups');
 
-  int get groupSize => _prefs.get('group_size') ?? 4;
+  int get minGroupSize => _prefs.get('min_group_size') ?? 2;
 
-  set groupSize(int s) {
-    _prefs.set('group_size', s);
+  set minGroupSize(int s) {
+    if (s > maxGroupSize) {
+      _prefs.nonNotifying().set('max_group_size', s);
+    }
+    _prefs.set('min_group_size', s);
+  }
+
+  int get maxGroupSize => _prefs.get('max_group_size') ?? 4;
+
+  set maxGroupSize(int s) {
+    if (s < minGroupSize) {
+      _prefs.nonNotifying().set('min_group_size', s);
+    }
+    _prefs.set('max_group_size', s);
   }
 }
 

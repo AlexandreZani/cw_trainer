@@ -472,13 +472,23 @@ class GroupSizeSetting extends StatelessWidget {
     return Column(
       children: [
         NumSettingChevron(
-          label: "Letters Per Group",
-          initialValue: appState.appConfig.randomGroups.groupSize,
+          label: "Min Letters Per Group",
+          initialValue: appState.appConfig.randomGroups.minGroupSize,
           min: 1,
           max: 10,
           step: 1,
           onSelected: (int i) {
-            appState.appConfig.randomGroups.groupSize = i;
+            appState.appConfig.randomGroups.minGroupSize = i;
+          },
+        ),
+        NumSettingChevron(
+          label: "Max Letters Per Group",
+          initialValue: appState.appConfig.randomGroups.maxGroupSize,
+          min: 1,
+          max: 10,
+          step: 1,
+          onSelected: (int i) {
+            appState.appConfig.randomGroups.maxGroupSize = i;
           },
         ),
       ],

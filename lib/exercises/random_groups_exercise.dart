@@ -88,8 +88,12 @@ class RandomGroupGenerator {
 
   RandomGroupGenerator(this._config);
 
+  int randomGroupSize() =>
+      _random.nextInt(_config.maxGroupSize - _config.minGroupSize) +
+      _config.minGroupSize;
+
   String randomGroup(String characters, {int? groupSize}) {
-    groupSize = groupSize ?? _config.groupSize;
+    groupSize = groupSize ?? randomGroupSize();
 
     String group = '';
     while (group.length < groupSize) {
