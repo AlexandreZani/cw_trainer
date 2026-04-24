@@ -14,7 +14,7 @@ class ExerciseSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (appState.appConfig.sharedExercise.curExerciseType) {
-      case ExerciseType.recognition:
+      case ExerciseType.ttr:
         return RecognitionPracticeSettings(appState: appState);
       case ExerciseType.familiarity:
         return FamiliarityPracticeSettings(appState: appState);

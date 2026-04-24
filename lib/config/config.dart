@@ -107,7 +107,7 @@ class SharedExerciseConfig {
 
   ExerciseType get curExerciseType {
     ExerciseType e = _prefs.getEnum('cur_exercise_type', ExerciseType.values) ??
-        ExerciseType.recognition;
+        ExerciseType.ttr;
 
     if (!currentCourse.supportedExercises.contains(e)) {
       return currentCourse.supportedExercises[0];

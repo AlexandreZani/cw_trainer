@@ -6,7 +6,7 @@ import 'package:cw_trainer/config/config_types.dart';
 import 'package:cw_trainer/exercises/copy_exercise.dart';
 import 'package:cw_trainer/exercises/exercise_base.dart';
 import 'package:cw_trainer/exercises/familiarity_exercise.dart';
-import 'package:cw_trainer/exercises/recognition_exercise.dart';
+import 'package:cw_trainer/exercises/ttr_exercise.dart';
 import 'package:cw_trainer/exercises/sending_exercise.dart';
 
 enum CourseType with ConfigEnum {
@@ -18,13 +18,13 @@ enum CourseType with ConfigEnum {
 
   List<ExerciseType> get supportedExercises => switch (this) {
         CourseType.bc1 => const [
-            ExerciseType.recognition,
+            ExerciseType.ttr,
             ExerciseType.familiarity,
             ExerciseType.copyGroups,
             ExerciseType.sending,
           ],
         CourseType.bc2 => const [
-            ExerciseType.recognition,
+            ExerciseType.ttr,
             ExerciseType.familiarity,
             ExerciseType.copyGroups,
             ExerciseType.sending,
@@ -38,7 +38,7 @@ enum CourseType with ConfigEnum {
 }
 
 enum ExerciseType with ConfigEnum {
-  recognition(2, 'Recognition'),
+  ttr(2, 'TTR'),
   familiarity(3, 'Familiarity'),
   copyGroups(4, 'Copy Groups'),
   sending(5, 'Sending Exercise');
@@ -79,7 +79,7 @@ class ExerciseController {
   static ExerciseBase _getExerciseByType(
       AppConfig config, CourseType course, ExerciseType type) {
     return switch (type) {
-      ExerciseType.recognition => RecognitionExercise(config, course),
+      ExerciseType.ttr => TTRExercise(config, course),
       ExerciseType.familiarity => FamiliarityExercise(config, course),
       ExerciseType.copyGroups => CopyGroupsExercise(config, course),
       ExerciseType.sending => SendingExercise(config, course),

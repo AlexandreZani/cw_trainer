@@ -3,12 +3,12 @@ import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/exercises/random_groups_exercise.dart';
 
-class RecognitionExercise extends RepeatedExerciseBase {
+class TTRExercise extends RepeatedExerciseBase {
   final LicwConfig _config;
   final CourseType _course;
   final RandomGroupGenerator _gen;
 
-  RecognitionExercise(super.appConfig, this._course)
+  TTRExercise(super.appConfig, this._course)
       : _config = appConfig.licw,
         _gen = RandomGroupGenerator(appConfig.randomGroups),
         super(
