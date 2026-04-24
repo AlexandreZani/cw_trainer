@@ -22,8 +22,23 @@ flutter run
 ./update_icon.sh
 ```
 
-## To build Android App Bundle
+## To release a new version
+
+First bump up the version in `pubspec.yaml`.
+
+Then, create a tag for that new version and push it:
+
+```
+VERSION_TAG=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+
+git tag $VERSION_TAG
+git push origin $VERSION_TAG
+```
+
+Build the Android App Bundle
 
 ```
 build-aab
 ```
+
+Upload to the Google Play Developer Console.
