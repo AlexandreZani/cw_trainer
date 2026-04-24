@@ -47,7 +47,6 @@ class RecognitionPracticeSettings extends StatelessWidget {
       children: [
         DelayBeforeSpeakingSetting(appState: appState),
         GroupSizeSetting(appState: appState),
-        ExerciseNumber(appState: appState, allowContinuous: true)
       ],
     );
   }
@@ -87,7 +86,6 @@ class SendingPracticeSettings extends StatelessWidget {
       children: [
         TimeBetweenGroupsSetting(appState: appState),
         GroupSizeSetting(appState: appState),
-        ExerciseNumber(appState: appState, allowContinuous: true),
       ],
     );
   }
@@ -107,7 +105,6 @@ class FamiliarityPracticeSettings extends StatelessWidget {
       children: [
         DelayAfterSpeakingSetting(appState: appState),
         TimeBetweenGroupsSetting(appState: appState),
-        ExerciseNumber(appState: appState, allowContinuous: true),
       ],
     );
   }
