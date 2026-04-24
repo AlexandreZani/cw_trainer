@@ -107,7 +107,7 @@ class SharedExerciseConfig {
 
   ExerciseType get curExerciseType {
     ExerciseType e = _prefs.getEnum('cur_exercise_type', ExerciseType.values) ??
-        ExerciseType.randomGroups;
+        ExerciseType.recognition;
 
     if (!currentCourse.supportedExercises.contains(e)) {
       return currentCourse.supportedExercises[0];
@@ -146,42 +146,10 @@ class RandomGroupsConfig {
   RandomGroupsConfig(NotifyingPrefixedSharedState Function(String) builder)
       : _prefs = builder('random_groups');
 
-  String get letters =>
-      _prefs.get('letters') ?? 'KMURESNAPTLWI.JZ=FOY,VG5/Q92H38B?47C1D60X';
-
-  set letters(String letters) {
-    _prefs.set('letters', letters);
-  }
-
-  int get levelI => _prefs.get('level_i') ?? 1;
-
-  set levelI(int i) {
-    _prefs.set('level_i', i);
-  }
-
   int get groupSize => _prefs.get('group_size') ?? 4;
 
   set groupSize(int s) {
     _prefs.set('group_size', s);
-  }
-
-  bool get forceLatest => _prefs.get('force_latest') ?? true;
-
-  set forceLatest(bool v) {
-    _prefs.set('force_latest', v);
-  }
-}
-
-class WordsExerciseConfig {
-  final NotifyingPrefixedSharedState _prefs;
-
-  WordsExerciseConfig(NotifyingPrefixedSharedState Function(String) builder)
-      : _prefs = builder('words_exercise');
-
-  int get levelI => _prefs.get('level_i') ?? 2;
-
-  set levelI(int i) {
-    _prefs.set('level_i', i);
   }
 }
 
@@ -224,7 +192,6 @@ class MiscConfig {
 
 class AppConfig extends ChangeNotifier {
   final SharedPreferences _prefs;
-  final bool legacyEnabled = false;
 
   NotifyingPrefixedSharedState _builder(String prefix) =>
       NotifyingPrefixedSharedState(_prefs, prefix, notifyListeners);
@@ -233,7 +200,6 @@ class AppConfig extends ChangeNotifier {
   TtsConfig get tts => TtsConfig(_builder);
   SharedExerciseConfig get sharedExercise => SharedExerciseConfig(_builder);
   RandomGroupsConfig get randomGroups => RandomGroupsConfig(_builder);
-  WordsExerciseConfig get wordsExercise => WordsExerciseConfig(_builder);
   LicwConfig get licw => LicwConfig(_builder);
   MiscConfig get misc => MiscConfig(_builder);
 

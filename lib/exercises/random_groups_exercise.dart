@@ -100,22 +100,3 @@ class RandomGroupGenerator {
     return group;
   }
 }
-
-class RandomGroupsExercise extends RepeatedExerciseBase {
-  final RandomGroupsConfig _config;
-  final RandomGroupGenerator _gen;
-
-  RandomGroupsExercise(super.appConfig)
-      : _config = appConfig.randomGroups,
-        _gen = RandomGroupGenerator(appConfig.randomGroups),
-        super(
-            voiceBefore: false,
-            voiceAfter: true,
-            repeatNum: 1,
-            recapAtEnd: false);
-
-  @override
-  String nextExerciseChunk() {
-    return _gen.randomGroup(_config.letters);
-  }
-}

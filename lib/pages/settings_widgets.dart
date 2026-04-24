@@ -442,8 +442,8 @@ class ExerciseNumber extends StatelessWidget {
   }
 }
 
-class GroupSize extends StatelessWidget {
-  const GroupSize({
+class GroupSizeSetting extends StatelessWidget {
+  const GroupSizeSetting({
     super.key,
     required this.appState,
   });

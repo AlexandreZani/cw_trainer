@@ -92,11 +92,7 @@ class ExerciseSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<CourseType> courses = [];
-    if (appState.appConfig.legacyEnabled) {
-      courses.add(CourseType.legacy);
-    }
-    courses.addAll([CourseType.bc1, CourseType.bc2]);
+    List<CourseType> courses = [CourseType.bc1, CourseType.bc2];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,

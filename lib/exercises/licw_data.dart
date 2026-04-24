@@ -24,7 +24,6 @@ final bc2Groups = [
 
 String licwSignsForCourse(LicwConfig config, CourseType course) {
   return switch (course) {
-    CourseType.legacy => throw UnimplementedError(),
     CourseType.bc1 => getSelectedSigns(bc1Groups, config.bc1GroupsSelected),
     CourseType.bc2 => getSelectedSigns(bc2Groups, config.bc2GroupsSelected),
   };

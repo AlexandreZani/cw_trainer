@@ -1,7 +1,6 @@
 import 'package:cw_trainer/audio/cw.dart';
 import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/main.dart';
-import 'package:cw_trainer/pages/exercise_settings.dart';
 import 'package:cw_trainer/pages/settings_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -18,7 +17,7 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log.finest('building settings page');
-    List<Widget> children = [
+    return ListView(children: [
       CourseSettings(appState: appState),
       const Divider(),
       CWSettings(appState: appState),
@@ -27,23 +26,9 @@ class SettingsPage extends StatelessWidget {
       const Divider(),
       SharedExerciseSettings(appState: appState),
       const Divider(),
-    ];
-
-    if (appState.appConfig.legacyEnabled) {
-      children.addAll([
-        RandomGroupsSettings(appState: appState),
-        const Divider(),
-        WordsExerciseSettings(appState: appState),
-        const Divider(),
-      ]);
-    }
-
-    children.addAll([
       AboutSettings(appState: appState),
       const Divider(),
     ]);
-
-    return ListView(children: children);
   }
 }
 
@@ -103,6 +88,7 @@ class SharedExerciseSettings extends StatelessWidget {
             appState.appConfig.sharedExercise.exerciseNum = i;
           },
         ),
+        GroupSizeSetting(appState: appState),
         TimeBetweenGroupsSetting(appState: appState),
         BoolSetting(
           label: "Display Text During CW",
@@ -110,70 +96,6 @@ class SharedExerciseSettings extends StatelessWidget {
           onChanged: (bool v) {
             appState.appConfig.sharedExercise.displayTextDuringCw = v;
           },
-        ),
-      ],
-    );
-  }
-}
-
-class RandomGroupsSettings extends StatelessWidget {
-  const RandomGroupsSettings({
-    super.key,
-    required this.appState,
-  });
-
-  final MyAppState appState;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const ListTile(title: Text('Random Groups')),
-        const Divider(),
-        ListTile(
-          title: Row(
-            children: [
-              const Text("Level", textAlign: TextAlign.left),
-              const Spacer(),
-              RandomGroupLevelSelector(appState: appState),
-            ],
-          ),
-        ),
-        GroupSize(appState: appState),
-        BoolSetting(
-          label: "Force Latest Letter",
-          initialValue: appState.appConfig.randomGroups.forceLatest,
-          onChanged: (bool v) {
-            appState.appConfig.randomGroups.forceLatest = v;
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class WordsExerciseSettings extends StatelessWidget {
-  const WordsExerciseSettings({
-    super.key,
-    required this.appState,
-  });
-
-  final MyAppState appState;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const ListTile(title: Text('Words Exercise')),
-        const Divider(),
-        ListTile(
-          title: Row(
-            children: [
-              const Text("Level", textAlign: TextAlign.left),
-              const Spacer(),
-              WordsLevelSelector(appState: appState),
-            ],
-          ),
         ),
       ],
     );
