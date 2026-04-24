@@ -40,7 +40,7 @@ enum CourseType with ConfigEnum {
 enum ExerciseType with ConfigEnum {
   ttr(2, 'TTR'),
   familiarity(3, 'Familiarity'),
-  copyGroups(4, 'Copy Groups'),
+  copyGroups(4, 'Flow Practice'),
   sending(5, 'Sending Exercise');
 
   const ExerciseType(this.i, this.displayName);
