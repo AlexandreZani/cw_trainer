@@ -1,7 +1,7 @@
 name: cw_trainer
 description: 'Learn Morse code'
 publish_to: 'none'
-version: 0.1.0+5
+version: 0.1.0+6
 home_page: 'https://github.com/AlexandreZani/cw_trainer'
 repository: 'https://github.com/AlexandreZani/cw_trainer'
 issue_tracker: 'https://github.com/AlexandreZani/cw_trainer/issues'
