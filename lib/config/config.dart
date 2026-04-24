@@ -188,6 +188,12 @@ class MiscConfig {
   void acceptLicense() {
     _prefs.set('license_accepted', licenseVersion);
   }
+
+  bool get advancedSettingsEnabled => _prefs.get('advanced') ?? false;
+
+  set advancedSettingsEnabled(bool v) {
+    _prefs.set('advanced', v);
+  }
 }
 
 class AppConfig extends ChangeNotifier {

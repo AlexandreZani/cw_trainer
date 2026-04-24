@@ -26,9 +26,31 @@ class SettingsPage extends StatelessWidget {
       const Divider(),
       SharedExerciseSettings(appState: appState),
       const Divider(),
+      AdvancedSettings(appState: appState),
+      const Divider(),
       AboutSettings(appState: appState),
       const Divider(),
     ]);
+  }
+}
+
+class AdvancedSettings extends StatelessWidget {
+  const AdvancedSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return BoolSetting(
+      label: "Advanced Settings",
+      initialValue: appState.appConfig.misc.advancedSettingsEnabled,
+      onChanged: (bool v) {
+        appState.appConfig.misc.advancedSettingsEnabled = v;
+      },
+    );
   }
 }
 
@@ -90,12 +112,15 @@ class SharedExerciseSettings extends StatelessWidget {
         ),
         GroupSizeSetting(appState: appState),
         TimeBetweenGroupsSetting(appState: appState),
-        BoolSetting(
-          label: "Display Text During CW",
-          initialValue: appState.appConfig.sharedExercise.displayTextDuringCw,
-          onChanged: (bool v) {
-            appState.appConfig.sharedExercise.displayTextDuringCw = v;
-          },
+        AdvancedSetting(
+          appState: appState,
+          child: BoolSetting(
+            label: "Display Text During CW",
+            initialValue: appState.appConfig.sharedExercise.displayTextDuringCw,
+            onChanged: (bool v) {
+              appState.appConfig.sharedExercise.displayTextDuringCw = v;
+            },
+          ),
         ),
       ],
     );
@@ -116,44 +141,56 @@ class TTSSettings extends StatelessWidget {
       children: [
         const ListTile(title: Text('Text-to-Speech')),
         const Divider(),
-        NumSettingChevron(
-          label: "Speech Rate",
-          initialValue: appState.appConfig.tts.rate,
-          min: 0.1,
-          max: 1.0,
-          step: 0.1,
-          onSelected: (double i) {
-            appState.appConfig.tts.rate = i;
-          },
+        AdvancedSetting(
+          appState: appState,
+          child: NumSettingChevron(
+            label: "Speech Rate",
+            initialValue: appState.appConfig.tts.rate,
+            min: 0.1,
+            max: 1.0,
+            step: 0.1,
+            onSelected: (double i) {
+              appState.appConfig.tts.rate = i;
+            },
+          ),
         ),
-        NumSettingChevron(
-          label: "Pitch",
-          initialValue: appState.appConfig.tts.pitch,
-          min: 0.1,
-          max: 1.0,
-          step: 0.1,
-          onSelected: (double i) {
-            appState.appConfig.tts.pitch = i;
-          },
+        AdvancedSetting(
+          appState: appState,
+          child: NumSettingChevron(
+            label: "Pitch",
+            initialValue: appState.appConfig.tts.pitch,
+            min: 0.1,
+            max: 1.0,
+            step: 0.1,
+            onSelected: (double i) {
+              appState.appConfig.tts.pitch = i;
+            },
+          ),
         ),
-        NumSettingChevron(
-          label: "Volume",
-          initialValue: appState.appConfig.tts.volume,
-          min: 0.1,
-          max: 1.0,
-          step: 0.1,
-          onSelected: (double i) {
-            appState.appConfig.tts.volume = i;
-          },
+        AdvancedSetting(
+          appState: appState,
+          child: NumSettingChevron(
+            label: "Volume",
+            initialValue: appState.appConfig.tts.volume,
+            min: 0.1,
+            max: 1.0,
+            step: 0.1,
+            onSelected: (double i) {
+              appState.appConfig.tts.volume = i;
+            },
+          ),
         ),
         DelayBeforeSpeakingSetting(appState: appState),
         DelayAfterSpeakingSetting(appState: appState),
-        BoolSetting(
-          label: "Spell with ITU",
-          initialValue: appState.appConfig.tts.spellWithItu,
-          onChanged: (bool v) {
-            appState.appConfig.tts.spellWithItu = v;
-          },
+        AdvancedSetting(
+          appState: appState,
+          child: BoolSetting(
+            label: "Spell with ITU",
+            initialValue: appState.appConfig.tts.spellWithItu,
+            onChanged: (bool v) {
+              appState.appConfig.tts.spellWithItu = v;
+            },
+          ),
         ),
       ],
     );
@@ -185,13 +222,16 @@ class CWSettings extends StatelessWidget {
             appState.appConfig.cw.frequency = i;
           },
         ),
-        ListSetting(
-          label: "Sample Rate",
-          initialValue: appState.appConfig.cw.sampleRate,
-          values: const [44100, 22050, 11025],
-          onSelected: (int i) {
-            appState.appConfig.cw.sampleRate = i;
-          },
+        AdvancedSetting(
+          appState: appState,
+          child: ListSetting(
+            label: "Sample Rate",
+            initialValue: appState.appConfig.cw.sampleRate,
+            values: const [44100, 22050, 11025],
+            onSelected: (int i) {
+              appState.appConfig.cw.sampleRate = i;
+            },
+          ),
         ),
       ],
     );

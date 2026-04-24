@@ -401,6 +401,23 @@ class ConfigEnumPicker<T extends ConfigEnum> extends StatelessWidget {
   }
 }
 
+class AdvancedSetting extends StatelessWidget {
+  final MyAppState appState;
+  final StatelessWidget child;
+
+  const AdvancedSetting(
+      {super.key, required this.appState, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    if (appState.appConfig.misc.advancedSettingsEnabled) {
+      return child;
+    }
+
+    return const Column();
+  }
+}
+
 class ExerciseNumber extends StatelessWidget {
   const ExerciseNumber({
     super.key,
