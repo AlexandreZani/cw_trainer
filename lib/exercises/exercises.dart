@@ -13,7 +13,7 @@ enum CourseType with ConfigEnum {
   bc1(1, 'BC1'),
   bc2(2, 'BC2');
 
-  const CourseType(this.i, this.displayName, {this.deprecated = false});
+  const CourseType(this.i, this.displayName);
   CourseType? fromInt(int i) => ConfigEnum.fromIntInner(CourseType.values, i);
 
   List<ExerciseType> get supportedExercises => switch (this) {
@@ -35,8 +35,6 @@ enum CourseType with ConfigEnum {
   final int i;
   @override
   final String displayName;
-  @override
-  final bool deprecated;
 }
 
 enum ExerciseType with ConfigEnum {

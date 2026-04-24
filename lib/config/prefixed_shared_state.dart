@@ -52,7 +52,7 @@ class PrefixedSharedState {
 
     for (T e in values) {
       var ce = e as ConfigEnum;
-      if (ce.i == i && !ce.deprecated) {
+      if (ce.i == i) {
         return e;
       }
     }
