@@ -11,8 +11,7 @@ class ExerciseSettings extends StatelessWidget {
 
   final MyAppState appState;
 
-  @override
-  Widget build(BuildContext context) {
+  Widget perExerciseSettings() {
     switch (appState.appConfig.sharedExercise.curExerciseType) {
       case ExerciseType.ttr:
         return RecognitionPracticeSettings(appState: appState);
@@ -23,6 +22,14 @@ class ExerciseSettings extends StatelessWidget {
       case ExerciseType.sending:
         return SendingPracticeSettings(appState: appState);
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      CwSpeedSettings(appState: appState),
+      perExerciseSettings(),
+    ]);
   }
 }
 

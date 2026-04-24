@@ -537,3 +537,40 @@ class TimeBetweenGroupsSetting extends StatelessWidget {
     );
   }
 }
+
+class CwSpeedSettings extends StatelessWidget {
+  const CwSpeedSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        NumSettingChevron(
+          label: "WPM",
+          initialValue: appState.appConfig.cw.wpm,
+          min: 5,
+          max: 40,
+          step: 1,
+          onSelected: (int i) {
+            appState.appConfig.cw.wpm = i;
+          },
+        ),
+        NumSettingChevron(
+          label: "EWPM",
+          initialValue: appState.appConfig.cw.ewpm,
+          min: 5,
+          max: 40,
+          step: 1,
+          onSelected: (int i) {
+            appState.appConfig.cw.ewpm = i;
+          },
+        ),
+      ],
+    );
+  }
+}

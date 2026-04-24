@@ -174,26 +174,7 @@ class CWSettings extends StatelessWidget {
       children: [
         const ListTile(title: Text('CW')),
         const Divider(),
-        NumSettingChevron(
-          label: "WPM",
-          initialValue: appState.appConfig.cw.wpm,
-          min: 5,
-          max: 40,
-          step: 1,
-          onSelected: (int i) {
-            appState.appConfig.cw.wpm = i;
-          },
-        ),
-        NumSettingChevron(
-          label: "EWPM",
-          initialValue: appState.appConfig.cw.ewpm,
-          min: 5,
-          max: 40,
-          step: 1,
-          onSelected: (int i) {
-            appState.appConfig.cw.ewpm = i;
-          },
-        ),
+        CwSpeedSettings(appState: appState),
         NumSettingChevron(
           label: "Frequency",
           initialValue: appState.appConfig.cw.frequency,
