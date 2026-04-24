@@ -2,6 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:cw_trainer/audio/audio.dart';
 import 'package:cw_trainer/audio/cw.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
+import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/main.dart';
 import 'package:cw_trainer/pages/exercise_settings.dart';
 import 'package:cw_trainer/pages/settings_widgets.dart';
@@ -40,7 +41,7 @@ class PracticePage extends StatelessWidget {
               const Spacer(),
               topWidget,
               const Spacer(),
-              PlayControls(audioHandler: audioHandler, log: log),
+              PlayControls(appState: appState, audioHandler: audioHandler, log: log),
               const Spacer(),
               ExerciseSettings(appState: appState),
               const Spacer(),
@@ -121,12 +122,20 @@ class ExerciseSelector extends StatelessWidget {
 class PlayControls extends StatelessWidget {
   const PlayControls({
     super.key,
+    required this.appState,
     required this.audioHandler,
     required this.log,
   });
 
+  final MyAppState appState;
   final AudioHandler audioHandler;
   final Logger log;
+
+  bool get _canPlay {
+    final licw = appState.appConfig.licw;
+    final course = appState.appConfig.sharedExercise.currentCourse;
+    return licwSignsForCourse(licw, course).isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,10 +148,12 @@ class PlayControls extends StatelessWidget {
           if (snapshot.data?.controls.contains(MediaControl.play) ?? true) {
             log.finest("add play button");
             children.add(IconButton(
-              onPressed: () async {
-                log.finest('play');
-                await audioHandler.play();
-              },
+              onPressed: _canPlay
+                  ? () async {
+                      log.finest('play');
+                      await audioHandler.play();
+                    }
+                  : null,
               iconSize: iconSize,
               icon: const Icon(Icons.play_arrow),
             ));
