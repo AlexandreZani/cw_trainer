@@ -148,16 +148,6 @@ class TTSSettings extends StatelessWidget {
         ),
         DelayBeforeSpeakingSetting(appState: appState),
         DelayAfterSpeakingSetting(appState: appState),
-        NumSettingChevron(
-          label: "Delay After Speaking",
-          initialValue: appState.appConfig.tts.delayAfter,
-          min: 0.0,
-          max: 3.0,
-          step: 0.25,
-          onSelected: (double i) {
-            appState.appConfig.tts.delayAfter = i;
-          },
-        ),
         BoolSetting(
           label: "Spell with ITU",
           initialValue: appState.appConfig.tts.spellWithItu,
