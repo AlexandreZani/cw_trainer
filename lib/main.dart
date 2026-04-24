@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cw_trainer/config/config.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logging/logging.dart';
 
 late AudioHandler _audioHandler;
@@ -26,8 +25,7 @@ void main() async {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
 
-  var prefs = await SharedPreferences.getInstance();
-  AppConfig config = AppConfig.buildFromShared(prefs);
+  AppConfig config = await readAppConfigFromShared();
 
   _audioHandler = await AudioService.init(
     builder: () => CwAudioHandler(config),
