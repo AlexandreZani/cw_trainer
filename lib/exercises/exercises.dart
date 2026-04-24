@@ -43,7 +43,7 @@ enum ExerciseType with ConfigEnum {
   copyGroups(4, 'Copy Groups'),
   sending(5, 'Sending Exercise');
 
-  const ExerciseType(this.i, this.displayName, {this.deprecated = false});
+  const ExerciseType(this.i, this.displayName);
   ExerciseType? fromInt(int i) =>
       ConfigEnum.fromIntInner(ExerciseType.values, i);
 
@@ -51,8 +51,6 @@ enum ExerciseType with ConfigEnum {
   final int i;
   @override
   final String displayName;
-  @override
-  final bool deprecated;
 }
 
 class ExerciseController {
