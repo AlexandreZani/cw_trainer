@@ -48,12 +48,12 @@ class TtsConfig {
 
   bool get enable => _prefs.get('enable') ?? true;
   String get language => _prefs.get('language') ?? 'en-US';
-  double get rate => _prefs.get('rate') ?? 0.7;
+  double get rate => _prefs.get('rate') ?? 0.5;
   double get pitch => _prefs.get('pitch') ?? 1.0;
   double get volume => _prefs.get('volume') ?? 1.0;
   double get delayBefore => _prefs.get('delay') ?? 1.0;
   double get delayAfter => _prefs.get('delay_after') ?? 1.0;
-  bool get spellWithItu => _prefs.get('spell_with_itu') ?? true;
+  bool get spellWithItu => _prefs.get('spell_with_itu') ?? false;
 
   set enable(bool enable) {
     _prefs.set('enable', enable);
