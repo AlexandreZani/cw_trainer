@@ -40,12 +40,14 @@ class ListSetting<T extends dynamic> extends StatelessWidget {
     required this.label,
     required this.onSelected,
     required this.values,
+    this.tToString,
   });
 
   final T initialValue;
   final String label;
   final List<T> values;
   final Function onSelected;
+  final String Function(T)? tToString;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,7 @@ class ListSetting<T extends dynamic> extends StatelessWidget {
           dropdownMenuEntries: values.map(
             (T v) {
               return DropdownMenuEntry(
-                label: v.toString(),
+                label: tToString?.call(v) ?? v.toString(),
                 value: v,
               );
             },
@@ -346,12 +348,12 @@ class MultiSelector extends StatelessWidget {
             Text(label),
             const Spacer(),
             TextButton(
-              onPressed: () => setSelected(
-                  selected.length == labels.length
-                      ? {}
-                      : Set.from(Iterable.generate(labels.length))),
-              child: Text(
-                  selected.length == labels.length ? 'Select none' : 'Select all'),
+              onPressed: () => setSelected(selected.length == labels.length
+                  ? {}
+                  : Set.from(Iterable.generate(labels.length))),
+              child: Text(selected.length == labels.length
+                  ? 'Select none'
+                  : 'Select all'),
             ),
           ],
         ),
