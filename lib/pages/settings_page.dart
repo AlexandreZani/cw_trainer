@@ -26,31 +26,11 @@ class SettingsPage extends StatelessWidget {
       const Divider(),
       SharedExerciseSettings(appState: appState),
       const Divider(),
-      AdvancedSettings(appState: appState),
+      MiscSettings(appState: appState),
       const Divider(),
       AboutSettings(appState: appState),
       const Divider(),
     ]);
-  }
-}
-
-class AdvancedSettings extends StatelessWidget {
-  const AdvancedSettings({
-    super.key,
-    required this.appState,
-  });
-
-  final MyAppState appState;
-
-  @override
-  Widget build(BuildContext context) {
-    return BoolSetting(
-      label: "Advanced Settings",
-      initialValue: appState.appConfig.misc.advancedSettingsEnabled,
-      onChanged: (bool v) {
-        appState.appConfig.misc.advancedSettingsEnabled = v;
-      },
-    );
   }
 }
 
@@ -265,6 +245,48 @@ class CourseSettings extends StatelessWidget {
           setSelected: (selected) {
             appState.appConfig.licw.bc2GroupsSelected = selected;
           }),
+    ]);
+  }
+}
+
+class MiscSettings extends StatelessWidget {
+  const MiscSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      BoolSetting(
+        label: "Advanced Settings",
+        initialValue: appState.appConfig.misc.advancedSettingsEnabled,
+        onChanged: (bool v) {
+          appState.appConfig.misc.advancedSettingsEnabled = v;
+        },
+      ),
+      AdvancedSetting(
+        appState: appState,
+        child: ListSettingChevron(
+          initialValue: appState.appConfig.misc.themeMode,
+          label: "Theme",
+          onSelected: (ThemeMode m) {
+            appState.appConfig.misc.themeMode = m;
+          },
+          values: const [
+            ThemeMode.system,
+            ThemeMode.light,
+            ThemeMode.dark,
+          ],
+          tToString: (ThemeMode m) => switch (m) {
+            ThemeMode.system => "System",
+            ThemeMode.light => "Light Mode",
+            ThemeMode.dark => "Dark Mode",
+          },
+        ),
+      ),
     ]);
   }
 }

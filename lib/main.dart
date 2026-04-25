@@ -49,15 +49,35 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(appConfig),
-      child: MaterialApp(
-        title: 'CW Trainer',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromRGBO(0x34, 0xde, 0xeb, 1.0)),
+      child: const _MaterialAppWrapper(),
+    );
+  }
+}
+
+class _MaterialAppWrapper extends StatelessWidget {
+  const _MaterialAppWrapper();
+
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+    return MaterialApp(
+      title: 'CW Trainer',
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromRGBO(0x34, 0xde, 0xeb, 1.0),
+          brightness: Brightness.light,
         ),
-        home: const MyHomePage(currentPage: Pages.practice),
       ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromRGBO(0x34, 0xde, 0xeb, 1.0),
+          brightness: Brightness.dark,
+        ),
+      ),
+      home: const MyHomePage(currentPage: Pages.practice),
+      themeMode: appState.appConfig.misc.themeMode,
     );
   }
 }

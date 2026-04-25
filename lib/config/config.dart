@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cw_trainer/config/prefixed_shared_state.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CwConfig {
@@ -205,6 +206,22 @@ class MiscConfig {
 
   set advancedSettingsEnabled(bool v) {
     _prefs.set('advanced', v);
+  }
+
+  ThemeMode get themeMode => switch (_prefs.get('theme_mode') as int?) {
+        0 => ThemeMode.system,
+        1 => ThemeMode.light,
+        2 => ThemeMode.dark,
+        _ => ThemeMode.system,
+      };
+
+  set themeMode(ThemeMode v) {
+    int i = switch (v) {
+      ThemeMode.system => 0,
+      ThemeMode.light => 1,
+      ThemeMode.dark => 2,
+    };
+    _prefs.set('theme_mode', i);
   }
 }
 

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cw_trainer/config/config_types.dart';
 import 'package:cw_trainer/main.dart';
 import 'package:flutter/material.dart';
@@ -76,6 +78,88 @@ class ListSetting<T extends dynamic> extends StatelessWidget {
   }
 }
 
+class ChevronSetting<T> extends StatelessWidget {
+  const ChevronSetting({
+    super.key,
+    required this.initialValue,
+    required this.label,
+    required this.onLeft,
+    required this.onRight,
+    required this.onClick,
+    this.tToString,
+  });
+
+  final T initialValue;
+  final String label;
+  final VoidCallback onLeft;
+  final VoidCallback onRight;
+  final VoidCallback onClick;
+  final String Function(T)? tToString;
+
+  String stringFor(T v) => tToString?.call(v) ?? v.toString();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Row(children: [
+        Text(label, textAlign: TextAlign.left),
+        const Spacer(),
+        IconButton(
+            iconSize: 48,
+            icon: const Icon(Icons.chevron_left),
+            onPressed: onLeft),
+        TextButton(
+            onPressed: onClick,
+            style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+            child: Text(stringFor(initialValue))),
+        IconButton(
+          iconSize: 48,
+          icon: const Icon(Icons.chevron_right),
+          onPressed: onRight,
+        ),
+      ]),
+    );
+  }
+}
+
+class ListSettingChevron<T extends dynamic> extends StatelessWidget {
+  const ListSettingChevron({
+    super.key,
+    required this.initialValue,
+    required this.label,
+    required this.onSelected,
+    required this.values,
+    this.tToString,
+  });
+
+  final T initialValue;
+  final String label;
+  final List<T> values;
+  final Function(T) onSelected;
+  final String Function(T)? tToString;
+
+  @override
+  Widget build(BuildContext context) {
+    return ChevronSetting(
+      initialValue: initialValue,
+      label: label,
+      tToString: tToString,
+      onLeft: () {
+        int i = values.indexOf(initialValue);
+        onSelected(values[max(i - 1, 0)]);
+      },
+      onRight: () {
+        int i = values.indexOf(initialValue);
+        onSelected(values[min(max(i + 1, 0), values.length - 1)]);
+      },
+      onClick: () {},
+    );
+  }
+}
+
 class NumSettingChevron<T extends num> extends StatelessWidget {
   const NumSettingChevron({
     super.key,
@@ -101,42 +185,29 @@ class NumSettingChevron<T extends num> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var f = NumberFormat("######.##", "en_US");
-    return ListTile(
-      title: Row(children: [
-        Text(label, textAlign: TextAlign.left),
-        const Spacer(),
-        IconButton(
-            iconSize: 48,
-            icon: const Icon(Icons.chevron_left),
-            onPressed: () {
-              onSelectedInner(initialValue - step);
-            }),
-        TextButton(
-            onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return NumDialog(
-                      label: label,
-                      f: f,
-                      initialValue: initialValue,
-                      onSelected: onSelectedInner,
-                    );
-                  });
-            },
-            style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-            child: Text(f.format(initialValue))),
-        IconButton(
-            iconSize: 48,
-            icon: const Icon(Icons.chevron_right),
-            onPressed: () {
-              onSelectedInner(initialValue + step);
-            }),
-      ]),
+    NumberFormat format = NumberFormat("######.##", "en_US");
+    return ChevronSetting(
+      initialValue: initialValue,
+      label: label,
+      onLeft: () {
+        onSelectedInner(initialValue - step);
+      },
+      onClick: () {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return NumDialog(
+                label: label,
+                f: format,
+                initialValue: initialValue,
+                onSelected: onSelectedInner,
+              );
+            });
+      },
+      onRight: () {
+        onSelectedInner(initialValue + step);
+      },
+      tToString: format.format,
     );
   }
 }
