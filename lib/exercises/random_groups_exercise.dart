@@ -89,7 +89,7 @@ class RandomGroupGenerator {
   RandomGroupGenerator(this._config);
 
   int randomGroupSize() =>
-      _random.nextInt(_config.maxGroupSize - _config.minGroupSize) +
+      _random.nextInt(_config.maxGroupSize - _config.minGroupSize + 1) +
       _config.minGroupSize;
 
   String randomGroup(String characters, {int? groupSize}) {
