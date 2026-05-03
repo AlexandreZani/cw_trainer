@@ -2,6 +2,7 @@ import 'package:cw_trainer/config/config.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/exercises/random_groups_exercise.dart';
+import 'package:cw_trainer/exercises/repeated_exercise_base.dart';
 
 class CopyGroupsExercise extends RepeatedExerciseBase {
   final LicwConfig _config;
@@ -15,7 +16,8 @@ class CopyGroupsExercise extends RepeatedExerciseBase {
             voiceBefore: false,
             voiceAfter: false,
             repeatNum: 1,
-            recapAtEnd: true);
+            recapAtEnd: true,
+            spellText: true);
 
   @override
   String nextExerciseChunk() {
