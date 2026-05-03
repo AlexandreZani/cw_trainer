@@ -35,6 +35,7 @@
 
             # Reuse the same Android SDK, JDK and Flutter versions across all derivations
             androidComposition = pkgs.androidenv.composeAndroidPackages {
+              cmdLineToolsVersion = "11.0";
               includeEmulator = "if-supported";
               includeNDK = "if-supported";
               includeSystemImages = "if-supported";
