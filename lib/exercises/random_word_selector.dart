@@ -10,6 +10,14 @@ List<String> filterWordlist(Set<String> supported, List<String> wordlist) {
       .toList();
 }
 
+bool supportsAtLeast(Set<String> supported, List<String> wordlist, int n) {
+  return wordlist
+          .where((word) => supported.containsAll(word.split('')))
+          .take(n)
+          .length ==
+      n;
+}
+
 class RandomWordSelector {
   final Random _random = Random();
   final CourseType _course;
