@@ -5,6 +5,8 @@ import 'package:cw_trainer/config/config.dart';
 import 'package:cw_trainer/config/config_types.dart';
 import 'package:cw_trainer/exercises/copy_exercise.dart';
 import 'package:cw_trainer/exercises/exercise_base.dart';
+import 'package:cw_trainer/exercises/exercise_definition.dart';
+import 'package:cw_trainer/exercises/exercise_list.dart';
 import 'package:cw_trainer/exercises/familiarity_exercise.dart';
 import 'package:cw_trainer/exercises/ttr_exercise.dart';
 import 'package:cw_trainer/exercises/sending_exercise.dart';
@@ -111,4 +113,7 @@ class ExerciseController {
 
     return supported;
   }
+
+  static List<ExerciseDefinition> getAvailableExercises2(AppConfig config) =>
+      exercises.where((e) => e.isAvailable(config)).toList();
 }

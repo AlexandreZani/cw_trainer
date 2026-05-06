@@ -1,3 +1,4 @@
+import 'package:cw_trainer/exercises/exercise_definition.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/main.dart';
 import 'package:cw_trainer/pages/settings_widgets.dart';
@@ -32,6 +33,36 @@ class ExerciseSettings extends StatelessWidget {
       CwSpeedSettings(appState: appState),
       perExerciseSettings(),
     ]);
+  }
+}
+
+class ExerciseSettingsFromDefinition extends StatelessWidget {
+  final ExerciseDefinition def;
+  final MyAppState appState;
+
+  const ExerciseSettingsFromDefinition(
+      {super.key, required this.def, required this.appState});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+        children: def
+            .getPracticeSettings()
+            .map((e) => switch (e) {
+                  PracticeSettings.cwSpeed =>
+                    CwSpeedSettings(appState: appState),
+                  PracticeSettings.delayAfterSpeaking =>
+                    DelayAfterSpeakingSetting(appState: appState),
+                  PracticeSettings.delayBeforeSpeaking =>
+                    DelayBeforeSpeakingSetting(appState: appState),
+                  PracticeSettings.numberOfGroups =>
+                    ExerciseNumber(appState: appState, allowContinuous: false),
+                  PracticeSettings.groupSize =>
+                    GroupSizeSetting(appState: appState),
+                  PracticeSettings.timeBetweenGroups =>
+                    TimeBetweenGroupsSetting(appState: appState),
+                })
+            .toList());
   }
 }
 

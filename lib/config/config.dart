@@ -121,6 +121,12 @@ class SharedExerciseConfig {
     _prefs.set('cur_exercise_type', type);
   }
 
+  int get currentExerciseId => _prefs.get('current_exercise_id') ?? 0;
+
+  set currentExerciseId(int v) {
+    _prefs.set('current_exercise_id', v);
+  }
+
   bool get displayTextDuringCw => _prefs.get('display_text_during_cw') ?? true;
 
   set displayTextDuringCw(bool v) {

@@ -2,6 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:cw_trainer/audio/audio.dart';
 import 'package:cw_trainer/audio/cw.dart';
 import 'package:cw_trainer/config/config.dart';
+import 'package:cw_trainer/exercises/exercise_definition.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/main.dart';
@@ -79,6 +80,30 @@ class CaptionDisplay extends StatelessWidget {
             ],
           );
         });
+  }
+}
+
+class ExercisePicker extends StatelessWidget {
+  final AppConfig appConfig;
+
+  const ExercisePicker({super.key, required this.appConfig});
+
+  @override
+  Widget build(BuildContext context) {
+    List<ExerciseDefinition> available =
+        ExerciseController.getAvailableExercises2(appConfig);
+    return DropdownMenu(
+      // TODO: Handle case where current exercise id is not available.
+      initialSelection: appConfig.sharedExercise.currentExerciseId,
+      dropdownMenuEntries: available
+          .map((e) => DropdownMenuEntry(value: e.id, label: e.name))
+          .toList(),
+      onSelected: (int? v) {
+        if (v != null) {
+          appConfig.sharedExercise.currentExerciseId = v;
+        }
+      },
+    );
   }
 }
 

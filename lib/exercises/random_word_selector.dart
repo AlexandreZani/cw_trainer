@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cw_trainer/exercises/exercise_for_description.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/config/config.dart';
@@ -20,7 +21,7 @@ bool supportsAtLeast(String supported, List<String> wordlist, int n) {
       n;
 }
 
-class RandomWordSelector {
+class RandomWordSelector extends ChunkGeneratorBase {
   final Random _random = Random();
   final CourseType _course;
   final LicwConfig _licwConfig;
@@ -28,10 +29,15 @@ class RandomWordSelector {
   String _supported = "";
   List<String> _wordlist = [];
 
-  RandomWordSelector(this._licwConfig, this._course, this._baseWordlist);
+  RandomWordSelector(
+      {required CourseType course,
+      required LicwConfig licwConfig,
+      required List<String> baseWordlist})
+      : _course = course,
+        _licwConfig = licwConfig,
+        _baseWordlist = baseWordlist;
 
-  String curSupported() =>
-      signsForCourse(_licwConfig, _course);
+  String curSupported() => signsForCourse(_licwConfig, _course);
 
   List<String> curWordlist() {
     var curSigns = curSupported();
@@ -50,4 +56,7 @@ class RandomWordSelector {
     var i = _random.nextInt(curWordlist().length);
     return curWordlist()[i];
   }
+
+  @override
+  String? nextChunk() => getWord();
 }

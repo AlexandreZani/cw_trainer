@@ -9,7 +9,10 @@ class WordExercise extends RepeatedExerciseBase {
   final RandomWordSelector _gen;
 
   WordExercise(super.appConfig, CourseType course)
-      : _gen = RandomWordSelector(appConfig.licw, course, bcWordlist),
+      : _gen = RandomWordSelector(
+            licwConfig: appConfig.licw,
+            course: course,
+            baseWordlist: bcWordlist),
         super(
             voiceBefore: false,
             voiceAfter: true,
