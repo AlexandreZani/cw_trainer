@@ -22,11 +22,15 @@ final bc2Groups = [
   "\x04\x17\x02",
 ];
 
-String licwSignsForCourse(LicwConfig config, CourseType course) {
+String signsForCourse(LicwConfig config, CourseType course) {
   return switch (course) {
     CourseType.bc1 => getSelectedSigns(bc1Groups, config.bc1GroupsSelected),
     CourseType.bc2 => getSelectedSigns(bc2Groups, config.bc2GroupsSelected),
   };
+}
+
+String currentSigns(AppConfig appConfig) {
+  return signsForCourse(appConfig.licw, appConfig.sharedExercise.currentCourse);
 }
 
 String getSelectedSigns(List<String> groups, Set<int> selected) {

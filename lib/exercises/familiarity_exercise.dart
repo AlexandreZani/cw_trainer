@@ -21,6 +21,6 @@ class FamiliarityExercise extends RepeatedExerciseBase {
 
   @override
   String nextExerciseChunk() {
-    return _gen.randomGroup(licwSignsForCourse(_config, _course), groupSize: 1);
+    return _gen.randomGroup(signsForCourse(_config, _course), groupSize: 1);
   }
 }

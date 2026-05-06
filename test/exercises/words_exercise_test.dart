@@ -6,7 +6,7 @@ void main() {
   group('filterWordlist', () {
     test('finds some', () {
       const wordlist = ['hello', 'elo', 'world'];
-      var supported = 'helo'.split('').toSet();
+      var supported = 'helo';
 
       const expected = ['hello', 'elo'];
 
@@ -15,7 +15,7 @@ void main() {
 
     test('finds none', () {
       const wordlist = ['hello', 'elo', 'world'];
-      var supported = 'l'.split('').toSet();
+      var supported = 'l';
 
       expect(filterWordlist(supported, wordlist), equals([]));
     });
@@ -24,7 +24,7 @@ void main() {
   group('supportsAtLeast', () {
     test('finds 2', () {
       const wordlist = ['hello', 'elo', 'world'];
-      var supported = 'helo'.split('').toSet();
+      var supported = 'helo';
 
       expect(supportsAtLeast(supported, wordlist, 2), isTrue);
       expect(supportsAtLeast(supported, wordlist, 3), isFalse);

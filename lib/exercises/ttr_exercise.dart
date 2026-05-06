@@ -21,6 +21,6 @@ class TTRExercise extends RepeatedExerciseBase {
 
   @override
   String nextExerciseChunk() {
-    return _gen.randomGroup(licwSignsForCourse(_config, _course));
+    return _gen.randomGroup(signsForCourse(_config, _course));
   }
 }

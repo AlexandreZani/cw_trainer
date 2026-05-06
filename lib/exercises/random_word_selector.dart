@@ -4,15 +4,17 @@ import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/config/config.dart';
 
-List<String> filterWordlist(Set<String> supported, List<String> wordlist) {
+List<String> filterWordlist(String supported, List<String> wordlist) {
+  Set<String> supportedChars = supported.toLowerCase().split('').toSet();
   return wordlist
-      .where((word) => supported.containsAll(word.split('')))
+      .where((word) => supportedChars.containsAll(word.split('')))
       .toList();
 }
 
-bool supportsAtLeast(Set<String> supported, List<String> wordlist, int n) {
+bool supportsAtLeast(String supported, List<String> wordlist, int n) {
+  Set<String> supportedChars = supported.toLowerCase().split('').toSet();
   return wordlist
-          .where((word) => supported.containsAll(word.split('')))
+          .where((word) => supportedChars.containsAll(word.split('')))
           .take(n)
           .length ==
       n;
@@ -23,13 +25,13 @@ class RandomWordSelector {
   final CourseType _course;
   final LicwConfig _licwConfig;
   final List<String> _baseWordlist;
-  Set<String> _supported = {};
+  String _supported = "";
   List<String> _wordlist = [];
 
   RandomWordSelector(this._licwConfig, this._course, this._baseWordlist);
 
-  Set<String> curSupported() =>
-      licwSignsForCourse(_licwConfig, _course).split('').toSet();
+  String curSupported() =>
+      signsForCourse(_licwConfig, _course);
 
   List<String> curWordlist() {
     var curSigns = curSupported();
@@ -42,6 +44,9 @@ class RandomWordSelector {
   }
 
   String getWord() {
+    if (curWordlist().isEmpty) {
+      return "not enough letters";
+    }
     var i = _random.nextInt(curWordlist().length);
     return curWordlist()[i];
   }

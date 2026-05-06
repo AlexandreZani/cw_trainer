@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:cw_trainer/audio/audio.dart';
 import 'package:cw_trainer/audio/cw.dart';
+import 'package:cw_trainer/config/config.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/main.dart';
@@ -41,7 +42,8 @@ class PracticePage extends StatelessWidget {
               const Spacer(),
               topWidget,
               const Spacer(),
-              PlayControls(appState: appState, audioHandler: audioHandler, log: log),
+              PlayControls(
+                  appState: appState, audioHandler: audioHandler, log: log),
               const Spacer(),
               ExerciseSettings(appState: appState),
               const Spacer(),
@@ -108,7 +110,8 @@ class ExerciseSelector extends StatelessWidget {
             }),
         const Spacer(),
         ConfigEnumPicker(
-            values: currentCourse.supportedExercises,
+            values:
+                ExerciseController.getAvailableExercises(appState.appConfig),
             initialValue: curExerciseType,
             onSelected: (v) {
               appState.appConfig.sharedExercise.curExerciseType = v;
@@ -134,7 +137,7 @@ class PlayControls extends StatelessWidget {
   bool get _canPlay {
     final licw = appState.appConfig.licw;
     final course = appState.appConfig.sharedExercise.currentCourse;
-    return licwSignsForCourse(licw, course).isNotEmpty;
+    return signsForCourse(licw, course).isNotEmpty;
   }
 
   @override

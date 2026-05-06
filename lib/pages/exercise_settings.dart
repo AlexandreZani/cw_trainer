@@ -21,6 +21,8 @@ class ExerciseSettings extends StatelessWidget {
         return CopyGroupsSettings(appState: appState);
       case ExerciseType.sending:
         return SendingPracticeSettings(appState: appState);
+      case ExerciseType.words:
+        return WordsPracticeSettings(appState: appState);
     }
   }
 
@@ -105,6 +107,24 @@ class FamiliarityPracticeSettings extends StatelessWidget {
       children: [
         DelayAfterSpeakingSetting(appState: appState),
         TimeBetweenGroupsSetting(appState: appState),
+      ],
+    );
+  }
+}
+
+class WordsPracticeSettings extends StatelessWidget {
+  const WordsPracticeSettings({
+    super.key,
+    required this.appState,
+  });
+
+  final MyAppState appState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        DelayBeforeSpeakingSetting(appState: appState),
       ],
     );
   }

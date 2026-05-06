@@ -8,6 +8,7 @@ import 'package:cw_trainer/exercises/exercise_base.dart';
 import 'package:cw_trainer/exercises/familiarity_exercise.dart';
 import 'package:cw_trainer/exercises/ttr_exercise.dart';
 import 'package:cw_trainer/exercises/sending_exercise.dart';
+import 'package:cw_trainer/exercises/word_exercise.dart';
 
 enum CourseType with ConfigEnum {
   bc1(1, 'BC1'),
@@ -22,12 +23,14 @@ enum CourseType with ConfigEnum {
             ExerciseType.familiarity,
             ExerciseType.copyGroups,
             ExerciseType.sending,
+            ExerciseType.words,
           ],
         CourseType.bc2 => const [
             ExerciseType.ttr,
             ExerciseType.familiarity,
             ExerciseType.copyGroups,
             ExerciseType.sending,
+            ExerciseType.words,
           ],
       };
 
@@ -41,7 +44,8 @@ enum ExerciseType with ConfigEnum {
   ttr(2, 'TTR'),
   familiarity(3, 'Familiarity'),
   copyGroups(4, 'Flow Practice'),
-  sending(5, 'Sending Exercise');
+  sending(5, 'Sending Exercise'),
+  words(6, 'Words');
 
   const ExerciseType(this.i, this.displayName);
   ExerciseType? fromInt(int i) =>
@@ -81,6 +85,7 @@ class ExerciseController {
       ExerciseType.familiarity => FamiliarityExercise(config, course),
       ExerciseType.copyGroups => CopyGroupsExercise(config, course),
       ExerciseType.sending => SendingExercise(config, course),
+      ExerciseType.words => WordExercise(config, course),
     };
   }
 
@@ -92,5 +97,18 @@ class ExerciseController {
   static ExerciseController getCurrent(AppConfig config) {
     return getByType(config, config.sharedExercise.currentCourse,
         config.sharedExercise.curExerciseType);
+  }
+
+  static List<ExerciseType> getAvailableExercises(AppConfig config) {
+    List<ExerciseType> supported =
+        config.sharedExercise.currentCourse.supportedExercises;
+
+    if (supported.contains(ExerciseType.words)) {
+      if (!WordExercise.isAvailable(config)) {
+        return supported.where((t) => t != ExerciseType.words).toList();
+      }
+    }
+
+    return supported;
   }
 }
