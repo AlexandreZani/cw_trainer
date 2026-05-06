@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:cw_trainer/config/prefixed_shared_state.dart';
 import 'package:cw_trainer/exercises/exercises.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -106,21 +105,7 @@ class SharedExerciseConfig {
     _prefs.set('exercise_num', max(n, 1));
   }
 
-  ExerciseType get curExerciseType {
-    ExerciseType e = _prefs.getEnum('cur_exercise_type', ExerciseType.values) ??
-        ExerciseType.ttr;
-
-    if (!currentCourse.supportedExercises.contains(e)) {
-      return currentCourse.supportedExercises[0];
-    }
-
-    return e;
-  }
-
-  set curExerciseType(ExerciseType type) {
-    _prefs.set('cur_exercise_type', type);
-  }
-
+  // TODO: Handle case where current exercise id is incorrect.
   int get currentExerciseId => _prefs.get('current_exercise_id') ?? 0;
 
   set currentExerciseId(int v) {

@@ -110,13 +110,11 @@ class ExercisePicker extends StatelessWidget {
 class ExerciseSelector extends StatelessWidget {
   ExerciseSelector(
       {super.key, required this.appState, required this.audioHandler})
-      : currentCourse = appState.appConfig.sharedExercise.currentCourse,
-        curExerciseType = appState.appConfig.sharedExercise.curExerciseType;
+      : currentCourse = appState.appConfig.sharedExercise.currentCourse;
 
   final MyAppState appState;
   final AudioHandler audioHandler;
   final CourseType currentCourse;
-  final ExerciseType curExerciseType;
 
   @override
   Widget build(BuildContext context) {
@@ -134,13 +132,7 @@ class ExerciseSelector extends StatelessWidget {
               appState.appConfig.sharedExercise.currentCourse = v;
             }),
         const Spacer(),
-        ConfigEnumPicker(
-            values:
-                ExerciseController.getAvailableExercises(appState.appConfig),
-            initialValue: curExerciseType,
-            onSelected: (v) {
-              appState.appConfig.sharedExercise.curExerciseType = v;
-            }),
+        ExercisePicker(appConfig: appState.appConfig),
         const Spacer(),
       ],
     );

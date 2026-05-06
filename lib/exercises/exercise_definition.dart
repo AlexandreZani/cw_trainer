@@ -3,8 +3,6 @@ import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/exercises/licw_data.dart';
 import 'package:cw_trainer/exercises/random_word_selector.dart';
 
-// Part of the new way to define exercises.
-
 enum PracticeSettings {
   cwSpeed,
   delayAfterSpeaking,
@@ -75,7 +73,7 @@ class ExerciseDefinition {
 
     switch (kind) {
       case RandomGroup(forceGroupSize: null):
-        settings.add(PracticeSettings.numberOfGroups);
+        settings.add(PracticeSettings.groupSize);
       default:
     }
 

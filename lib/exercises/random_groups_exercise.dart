@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:cw_trainer/config/config.dart';
-import 'package:cw_trainer/exercises/exercise_for_description.dart';
+import 'package:cw_trainer/exercises/exercise_for_definition.dart';
 import 'package:cw_trainer/exercises/licw_data.dart';
 
 class RandomGroupGenerator {

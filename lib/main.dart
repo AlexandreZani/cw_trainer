@@ -1,5 +1,4 @@
 import 'package:cw_trainer/audio/audio.dart';
-import 'package:cw_trainer/exercises/exercises.dart';
 import 'package:cw_trainer/pages/practice_page.dart';
 import 'package:cw_trainer/pages/settings_page.dart';
 import 'package:cw_trainer/pages/info_pages.dart';
@@ -10,13 +9,6 @@ import 'package:audio_service/audio_service.dart';
 import 'package:logging/logging.dart';
 
 late AudioHandler _audioHandler;
-
-extension CwTrainerAudioHandler on AudioHandler {
-  Future<void> setExerciseType(ExerciseType exerciseType) async {
-    _audioHandler
-        .customAction('setExerciseType', {'exerciseType': exerciseType});
-  }
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
