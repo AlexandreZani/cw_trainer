@@ -46,7 +46,6 @@ class ExerciseController {
       .firstWhere((e) => e.id == config.sharedExercise.currentExerciseId);
 
   static ExerciseController getCurrent(AppConfig config) {
-    // TODO: Handle or-else case
     ExerciseDefinition def = getCurrentDefinition(config);
     return ExerciseController(config, ExerciseForDefinition(config, def));
   }

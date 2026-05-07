@@ -93,7 +93,6 @@ class ExercisePicker extends StatelessWidget {
     List<ExerciseDefinition> available =
         ExerciseController.getAvailableExercises2(appConfig);
     return DropdownMenu(
-      // TODO: Handle case where current exercise id is not available.
       initialSelection: appConfig.sharedExercise.currentExerciseId,
       dropdownMenuEntries: available
           .map((e) => DropdownMenuEntry(value: e.id, label: e.name))

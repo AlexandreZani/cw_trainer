@@ -89,8 +89,10 @@ class TtsConfig {
 
 class SharedExerciseConfig {
   final NotifyingPrefixedSharedState _prefs;
+  final AppConfig _appConfig;
 
-  SharedExerciseConfig(NotifyingPrefixedSharedState Function(String) builder)
+  SharedExerciseConfig(
+      NotifyingPrefixedSharedState Function(String) builder, this._appConfig)
       : _prefs = builder('shared_exercise');
 
   bool get repeat => _prefs.get('repeat') ?? false;
@@ -105,8 +107,17 @@ class SharedExerciseConfig {
     _prefs.set('exercise_num', max(n, 1));
   }
 
-  // TODO: Handle case where current exercise id is incorrect.
-  int get currentExerciseId => _prefs.get('current_exercise_id') ?? 0;
+  int get currentExerciseId {
+    int id = _prefs.get('current_exercise_id') ?? 0;
+    List<int> available = ExerciseController.getAvailableExercises2(_appConfig)
+        .map((e) => e.id)
+        .toList();
+    if (available.contains(id)) {
+      return id;
+    } else {
+      return available[0];
+    }
+  }
 
   set currentExerciseId(int v) {
     _prefs.set('current_exercise_id', v);
@@ -224,7 +235,8 @@ class AppConfig extends ChangeNotifier {
 
   CwConfig get cw => CwConfig(_builder);
   TtsConfig get tts => TtsConfig(_builder);
-  SharedExerciseConfig get sharedExercise => SharedExerciseConfig(_builder);
+  SharedExerciseConfig get sharedExercise =>
+      SharedExerciseConfig(_builder, this);
   RandomGroupsConfig get randomGroups => RandomGroupsConfig(_builder);
   LicwConfig get licw => LicwConfig(_builder);
   MiscConfig get misc => MiscConfig(_builder);
