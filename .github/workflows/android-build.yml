@@ -1,0 +1,34 @@
+name: Android Build Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Android APK
+        run: flutter build apk --no-pub --debug
+
+      - name: Move android-last-known-good tag
+        if: github.event_name == 'push'
+        run: |
+          git tag -f android-last-known-good
+          git push origin -f refs/tags/android-last-known-good

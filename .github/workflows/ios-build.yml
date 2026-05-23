@@ -1,0 +1,34 @@
+name: iOS Build Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS (no codesign)
+        run: flutter build ios --no-codesign --release
+
+      - name: Move ios-last-known-good tag
+        if: github.event_name == 'push'
+        run: |
+          git tag -f ios-last-known-good
+          git push origin -f refs/tags/ios-last-known-good
