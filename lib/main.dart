@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cw_trainer/config/config.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:logging/logging.dart';
 
 late AudioHandler _audioHandler;
@@ -18,6 +19,9 @@ void main() async {
   });
 
   AppConfig config = await readAppConfigFromShared();
+
+  final session = await AudioSession.instance;
+  await session.configure(const AudioSessionConfiguration.music());
 
   _audioHandler = await AudioService.init(
     builder: () => CwAudioHandler(config),

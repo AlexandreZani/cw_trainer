@@ -11,6 +11,7 @@ import 'package:cw_trainer/audio/wav.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:logging/logging.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CwAudioHandler extends BaseAudioHandler {
   final log = Logger('CwAudioHandler');
@@ -77,7 +78,7 @@ class CwAudioHandler extends BaseAudioHandler {
       return;
     }
 
-    if (!_readyNext()) {
+    if (!await _readyNext()) {
       log.finest('exercised is complete');
       _onExerciseFinished();
       return;
@@ -124,7 +125,7 @@ class CwAudioHandler extends BaseAudioHandler {
     }
     _paused = false;
 
-    if (_currentAudioItem == null && !_readyNext()) {
+    if (_currentAudioItem == null && !await _readyNext()) {
       return;
     }
 
@@ -181,7 +182,7 @@ class CwAudioHandler extends BaseAudioHandler {
     _onExerciseFinished();
   }
 
-  bool _readyNext() {
+  Future<bool> _readyNext() async {
     log.finest('_readyNext');
     _currentAudioItem = _currentExercise.getNextAudioItem();
     if (_currentAudioItem == null) {
@@ -190,12 +191,12 @@ class CwAudioHandler extends BaseAudioHandler {
 
     switch (_currentAudioItem!.type) {
       case AudioItemType.morse:
-        _readyMorse(_currentAudioItem!.textString);
+        await _readyMorse(_currentAudioItem!.textString);
         log.finest('_readyNext morse done');
         return true;
 
       case AudioItemType.silence:
-        _readySilence(_currentAudioItem!.milliseconds);
+        await _readySilence(_currentAudioItem!.milliseconds);
         log.finest('_readyNext silence done');
         return true;
 
@@ -218,65 +219,28 @@ class CwAudioHandler extends BaseAudioHandler {
     _flutterTts.setSpeechRate(_currentExercise.appConfig.tts.rate);
   }
 
-  void _readyMorse(String s) async {
-    var generator = _getMorseGenerator();
-    var frames = generator.stringToPcm(s);
+  Future<void> _readyMorse(String s) async {
+    final generator = _getMorseGenerator();
+    final frames = generator.stringToPcm(s);
+    await _writeAndLoadClip(pcmToWav(frames, _currentExercise.appConfig.cw.sampleRate));
+  }
+
+  Future<void> _readySilence(int ms) async {
+    final sampleRate = _currentExercise.appConfig.cw.sampleRate;
+    final numFrames = (sampleRate * ms) ~/ 1000;
+    final frames = List.filled(numFrames, 128);
+    await _writeAndLoadClip(pcmToWav(frames, sampleRate));
+  }
+
+  // just_audio's iOS StreamAudioSource (via local HTTP proxy) is rejected by
+  // AVPlayer with error -11850, so write the clip to disk and load via path.
+  Future<void> _writeAndLoadClip(Uint8List wav) async {
+    final tmp = await getTemporaryDirectory();
+    final wavFile = File('${tmp.path}/cw_clip.wav');
+    await wavFile.writeAsBytes(wav, flush: true);
     await _player.stop();
-    await _player.setAudioSource(
-        WavSource(frames, _currentExercise.appConfig.cw.sampleRate));
+    await _player.setFilePath(wavFile.path);
   }
-
-  void _readySilence(int ms) async {
-    int numFrames = (_currentExercise.appConfig.cw.sampleRate * ms) ~/ 1000;
-    var frames = List.filled(numFrames, 128);
-    await _player.stop();
-    await _player.setAudioSource(WavSource(
-        Uint8List.fromList(frames), _currentExercise.appConfig.cw.sampleRate));
-  }
-}
-
-class WavSource extends StreamAudioSource {
-  final log = Logger('WavSource');
-  // Assumes pcm was sampled at 44.1kHz in 8 bits.
-  final Uint8List _wav;
-  WavSource(List<int> frames, int sampleRate)
-      : _wav = pcmToWav(frames, sampleRate);
-
-  @override
-  Future<StreamAudioResponse> request([int? start, int? end]) async {
-    log.finest('AudioStream requested');
-    var r = StreamAudioResponse(
-      sourceLength: _wav.length,
-      contentLength: _wav.length,
-      offset: 0,
-      stream: Stream.value(_wav),
-      contentType: 'audio/wav',
-      rangeRequestsSupported: false,
-    );
-    // writeToFile(_wav);
-    log.finest('Made response ${_wav.length}');
-    return r;
-  }
-}
-
-void writeToFile(List<int> frames) async {
-  final log = Logger('writeToFile');
-  // final Directory directory = await getApplicationCacheDirectory();
-  String filepath =
-      '/storage/emulated/0/Download/cw.wav'; // '${directory.path}/my_file.wav';
-  log.finest(filepath);
-  final File file = File(filepath);
-  var sink = file.openWrite();
-  file.writeAsBytes(frames);
-  await sink.flush();
-
-/*
-  for (var f in frames) {
-    sink.write('${f.toString()},\n');
-    await sink.flush();
-  }
-*/
-  await sink.close();
 }
 
 class CustomAudioState {
